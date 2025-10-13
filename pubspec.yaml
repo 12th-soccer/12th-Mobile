@@ -11,6 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  flutter_svg: ^2.1.0
   material_symbols_icons: ^4.2719.0
 
 dev_dependencies:
@@ -29,3 +30,8 @@ flutter:
           weight: 400
         - asset: assets/fonts/Pretendard.ttf
           weight: 600
+
+  assets:
+    - assets/images/logo.svg
+    - assets/images/kakao.svg
+    - assets/images/google.svg
