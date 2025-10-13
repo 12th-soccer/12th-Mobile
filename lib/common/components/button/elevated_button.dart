@@ -98,7 +98,7 @@ class _TwelfthElevatedButtonState extends State<TwelfthElevatedButton> {
               ),
 
             ElevatedButton(
-              onPressed: isEnabled ? widget.onPressed : null,
+              onPressed: null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.transparent,
                 shadowColor: Colors.transparent,
