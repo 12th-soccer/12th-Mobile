@@ -13,4 +13,15 @@ abstract final class TwelfthColor {
     Color(0xFFFFFFFF),
     Color(0xFF8C92AC)
   ];
+  static const Color black = Color(0xFF000000);
+}
+
+abstract final class TwelfthGradient {
+  static LinearGradient horizontal(List<Color> baseColors) {
+    return LinearGradient(
+      colors: baseColors,
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+  }
 }
