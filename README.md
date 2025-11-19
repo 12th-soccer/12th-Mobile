@@ -1,16 +1,16 @@
-# twelfth_mobile
+<h1 align="center"> 12th-Mobile </h1>
 
-A new Flutter project.
+<p align="center"> <b> 팬들이 더욱 직관적으로 경기에 대한 정보를 확인할 수 있는 플랫폼 </b>
+  <br> 축구 팬들이 자주 사용하는 앱의 <b>불편한 부분</b>과, <br> 기존 <b>'오늘의 K리그' 앱의 한계를 개선하기 위해</b> 제작한 앱입니다. <br></p>
 
-## Getting Started
+<hr>
 
-This project is a starting point for a Flutter application.
+<h1 align="center"> 서비스 소개 </h1>
 
-A few resources to get you started if this is your first Flutter project:
+<p align="center"> K리그만 보는 팬들이 직관을 가지 못하더라도, 경기에 대한 정보를 확인할 수 있는 플랫폼이며,
+<br> <b> 단순히 결과만 제공하는 것 </b>이 아니라 <b> 더 보기 쉬운 화면 </b>을 제공합니다. </p>
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<p align="center"> ⚽ <b> K리그 경기 일정 & 정보 제공 </b> — 팬들이 직관적으로 경기에 대한 정보를 확인</p>
+<p align="center"> 🏟️ <b> 팀/선수 맞춤 정보 </b> — 관심 구단과 선수 중심으로 필요한 데이터 우선 제공</p>
+<p align="center"> 📅 <b> 달력 기반 일정 보기 </b> — 오늘 경기, 이번 주 경기 등 날짜별 한눈에 확인</p>
+<p align="center"> 🔔 <b> 실시간 경기 알림 </b> — 경기 시작, 득점, 카드, 교체 등 주요 이벤트 알림</p>
