@@ -28,4 +28,11 @@ flutter:
         - asset: assets/fonts/Pretendard.ttf
           weight: 400
         - asset: assets/fonts/Pretendard.ttf
+<<<<<<< Updated upstream
           weight: 600
+=======
+          weight: 600
+
+  assets:
+    - assets/images/
+>>>>>>> Stashed changes
