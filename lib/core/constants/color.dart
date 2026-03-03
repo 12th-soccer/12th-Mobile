@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
 
 abstract final class CustomColor {
   static const Color main = Color(0xFFC4C7D4);
@@ -11,7 +11,8 @@ abstract final class CustomColor {
   static const Color gray900 = Color(0xFF414141);
   static const Color gray950 = Color(0xFF1C1C1C);
 
-<<<<<<< Updated upstream:lib/constants/color.dart
+  static const Color red = Color(0xFFFF5C5C);
+
   static const List<Color> silverGradient = [
     Color(0xFFFFFFFF),
     Color(0xFF8C92AC),
@@ -27,7 +28,3 @@ abstract final class TwelfthGradient {
     );
   }
 }
-=======
-  static const Color red = Color(0xFFFF5C5C);
-}
->>>>>>> Stashed changes:lib/core/constants/color.dart
