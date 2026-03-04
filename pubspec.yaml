@@ -12,6 +12,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   material_symbols_icons: ^4.2719.0
+  flutter_svg: ^2.0.10
 
 dev_dependencies:
   flutter_test:
@@ -28,11 +29,7 @@ flutter:
         - asset: assets/fonts/Pretendard.ttf
           weight: 400
         - asset: assets/fonts/Pretendard.ttf
-<<<<<<< Updated upstream
-          weight: 600
-=======
           weight: 600
 
   assets:
     - assets/images/
->>>>>>> Stashed changes
