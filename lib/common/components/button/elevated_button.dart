@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:twelfth_mobile/constants/color.dart';
-import 'package:twelfth_mobile/core/constants/text_style.dart';
+import 'package:twelfth_mobile/constants/text_style.dart';
 
 class TwelfthElevatedButton extends StatelessWidget {
   final Widget child;
   final Color? backgroundColor;
   final Gradient? gradient;
+  final Gradient? borderGradient;
   final Color? textColor;
   final String? imgPath;
   final VoidCallback? onPressed;
@@ -19,6 +20,7 @@ class TwelfthElevatedButton extends StatelessWidget {
     required this.child,
     this.backgroundColor,
     this.gradient,
+    this.borderGradient,
     this.textColor,
     this.imgPath,
     this.onPressed,
@@ -37,16 +39,16 @@ class TwelfthElevatedButton extends StatelessWidget {
     if (isOutlined) {
       effectiveBgColor = Colors.transparent;
     } else if (!isEnabled) {
-      effectiveBgColor = TwelfthColor.gray900.withValues(alpha: 0.5);
+      effectiveBgColor = CustomColor.gray900.withValues(alpha: 0.5);
       effectiveGradient = null;
     } else if (effectiveGradient != null) {
       effectiveBgColor = Colors.transparent;
     } else {
-      effectiveBgColor = backgroundColor ?? TwelfthColor.gray900;
+      effectiveBgColor = backgroundColor ?? CustomColor.gray900;
     }
 
-    final effectiveTextColor = textColor ??
-        (isOutlined ? TwelfthColor.white : TwelfthColor.white);
+    final effectiveTextColor =
+        textColor ?? (isOutlined ? CustomColor.white : CustomColor.white);
 
     Widget buttonChild = Row(
       mainAxisSize: MainAxisSize.min,
@@ -57,11 +59,36 @@ class TwelfthElevatedButton extends StatelessWidget {
           const SizedBox(width: 8),
         ],
         DefaultTextStyle(
-          style: CustomTextStyle.body1.copyWith(color: effectiveTextColor),
+          style: CustomTextStyle.heading2.copyWith(color: effectiveTextColor),
           child: child,
         ),
       ],
     );
+
+    if (isOutlined && borderGradient != null) {
+      return GestureDetector(
+        onTap: isEnabled ? onPressed : null,
+        child: Opacity(
+          opacity: isEnabled ? 1.0 : 0.5,
+          child: Container(
+            width: double.infinity,
+            height: height,
+            decoration: BoxDecoration(
+              gradient: borderGradient,
+              borderRadius: BorderRadius.circular(borderRadius),
+            ),
+            child: Container(
+              margin: const EdgeInsets.all(1),
+              decoration: BoxDecoration(
+                color: CustomColor.background,
+                borderRadius: BorderRadius.circular(borderRadius - 1),
+              ),
+              child: Center(child: buttonChild),
+            ),
+          ),
+        ),
+      );
+    }
 
     return GestureDetector(
       onTap: isEnabled ? onPressed : null,
@@ -75,7 +102,7 @@ class TwelfthElevatedButton extends StatelessWidget {
             gradient: effectiveGradient,
             borderRadius: BorderRadius.circular(borderRadius),
             border: isOutlined
-                ? Border.all(color: TwelfthColor.gray900, width: 1)
+                ? Border.all(color: CustomColor.gray900, width: 1)
                 : null,
           ),
           child: Center(child: buttonChild),

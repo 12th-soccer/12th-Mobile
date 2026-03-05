@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/constants/color.dart';
 
 class CustomTextStyle {
   /// heading

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:twelfth_mobile/core/constants/color.dart';
-import 'package:twelfth_mobile/core/constants/text_style.dart';
+import 'package:twelfth_mobile/constants/color.dart';
+import 'package:twelfth_mobile/constants/text_style.dart';
 
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController controller;

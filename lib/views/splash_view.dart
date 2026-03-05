@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
 import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/twelfth_assets.dart';
+import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/views/auth/login_view.dart';
 
 class TwelfthSplashView extends StatelessWidget {
@@ -11,7 +12,7 @@ class TwelfthSplashView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: TwelfthColor.background,
+      backgroundColor: CustomColor.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -21,14 +22,14 @@ class TwelfthSplashView extends StatelessWidget {
               SvgPicture.asset(TwelfthAssets.logo, height: 36),
               const Spacer(),
               TwelfthElevatedButton(
-                isOutlined: true,
+                backgroundColor: CustomColor.gray900,
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (_) => const LoginView()),
                   );
                 },
-                child: const Text('로그인하러 가기'),
+                child: Text('로그인하러 가기'),
               ),
               const SizedBox(height: 16),
             ],
