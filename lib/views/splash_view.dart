@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
 import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/twelfth_assets.dart';
-import 'package:twelfth_mobile/constants/text_style.dart';
-import 'package:twelfth_mobile/views/auth/login_view.dart';
+import 'package:twelfth_mobile/core/router/router_paths.dart';
 
 class TwelfthSplashView extends StatelessWidget {
   const TwelfthSplashView({super.key});
@@ -22,13 +22,8 @@ class TwelfthSplashView extends StatelessWidget {
               SvgPicture.asset(TwelfthAssets.logo),
               const Spacer(),
               TwelfthElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LoginView()),
-                  );
-                },
-                child: Text('로그인하러 가기'),
+                onPressed: () => context.go(AppRoutes.login),
+                child: const Text('로그인하러 가기'),
               ),
             ],
           ),
