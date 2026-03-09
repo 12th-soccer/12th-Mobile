@@ -15,8 +15,8 @@ abstract final class CustomColor {
   static const Color yellow = Color(0xFFFFD15C);
 
   static const List<Color> silverGradient = [
-    Color(0xFFFFFFFF),
     Color(0xFF8C92AC),
+    Color(0xFFFFFFFF),
   ];
 }
 
