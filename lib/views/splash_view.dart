@@ -15,14 +15,13 @@ class TwelfthSplashView extends StatelessWidget {
       backgroundColor: CustomColor.background,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
               const Spacer(),
-              SvgPicture.asset(TwelfthAssets.logo, height: 36),
+              SvgPicture.asset(TwelfthAssets.logo),
               const Spacer(),
               TwelfthElevatedButton(
-                backgroundColor: CustomColor.gray900,
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
@@ -31,7 +30,6 @@ class TwelfthSplashView extends StatelessWidget {
                 },
                 child: Text('로그인하러 가기'),
               ),
-              const SizedBox(height: 16),
             ],
           ),
         ),
