@@ -16,7 +16,10 @@ class TwelfthBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(color: CustomColor.background),
+      decoration: const BoxDecoration(
+        color: CustomColor.background,
+        border: Border(top: BorderSide(color: CustomColor.gray900, width: 1)),
+      ),
       child: SafeArea(
         child: SizedBox(
           height: 56,
@@ -41,6 +44,7 @@ class TwelfthBottomNavBar extends StatelessWidget {
 
     return GestureDetector(
       onTap: () => onTap(index),
+      behavior: HitTestBehavior.opaque,
       child: SizedBox(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
