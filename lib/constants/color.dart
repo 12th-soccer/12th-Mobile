@@ -8,11 +8,15 @@ abstract final class CustomColor {
 
   static const Color gray500 = Color(0xFF939393);
   static const Color gray600 = Color(0xFF787878);
+  static const Color gray800 = Color(0xFF282828);
   static const Color gray900 = Color(0xFF414141);
   static const Color gray950 = Color(0xFF1C1C1C);
 
   static const Color red = Color(0xFFFF5C5C);
   static const Color yellow = Color(0xFFFFD15C);
+  static const Color blue = Color(0xFF5C8AFF);
+  static const Color green = Color(0xFF6CFF59);
+  static const Color orange = Color(0xFFFF8644);
 
   static const List<Color> silverGradient = [
     Color(0xFF8C92AC),
