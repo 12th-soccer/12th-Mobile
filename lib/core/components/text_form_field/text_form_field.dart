@@ -139,7 +139,7 @@ class CustomTextFormField extends StatelessWidget {
       alignLabelWithHint: decoration?.alignLabelWithHint,
       constraints: decoration?.constraints,
 
-      enabledBorder: OutlineInputBorder(
+      enabledBorder: decoration?.enabledBorder ?? OutlineInputBorder(
         borderSide: BorderSide(
           color: CustomColor.gray900,
           width: 1,
@@ -147,7 +147,7 @@ class CustomTextFormField extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
 
-      focusedBorder: OutlineInputBorder(
+      focusedBorder: decoration?.focusedBorder ?? OutlineInputBorder(
         borderSide: BorderSide(
           color: CustomColor.white,
           width: 1,
