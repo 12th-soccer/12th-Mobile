@@ -34,7 +34,7 @@ class OnboardingCompleteView extends StatelessWidget {
               TwelfthElevatedButton(
                 gradient: TwelfthGradient.horizontal(CustomColor.silverGradient),
                 textColor: CustomColor.black,
-                onPressed: () => context.go(AppRoutes.home),
+                onPressed: () => context.go(AppRoutes.schedule),
                 child: const Text('시작하기'),
               ),
             ],

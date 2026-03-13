@@ -32,7 +32,7 @@ class _LoginViewState extends State<LoginView> {
 
   void _onLogin() {
     if (_formKey.currentState?.validate() ?? false) {
-      context.go(AppRoutes.home);
+      context.go(AppRoutes.schedule);
     }
   }
 

@@ -79,7 +79,7 @@ class _SignUpEmailViewState extends State<SignUpEmailView> {
                               )
                             : null,
                         textColor: isValidEmail ? CustomColor.black : null,
-                        onPressed: _onNext,
+                        onPressed: isValidEmail ? _onNext : null,
                         child: const Text('다음'),
                       );
                     },
