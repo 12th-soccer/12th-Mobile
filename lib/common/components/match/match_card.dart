@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 
-class MatchList extends StatelessWidget {
+class MatchCard extends StatelessWidget {
   final String homeTeam;
   final String awayTeam;
   final Widget center;
@@ -10,7 +10,7 @@ class MatchList extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final VoidCallback? onTap;
 
-  const MatchList({
+  const MatchCard({
     super.key,
     required this.homeTeam,
     required this.awayTeam,
@@ -72,10 +72,15 @@ class MatchList extends StatelessWidget {
   }
 }
 
+/// TODO: 연동 시 각 구단의 로고로 변경
 class _TeamLogo extends StatelessWidget {
   final double size;
+  final String? imageUrl;
 
-  const _TeamLogo({required this.size});
+  const _TeamLogo({
+    required this.size,
+    this.imageUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +91,12 @@ class _TeamLogo extends StatelessWidget {
         color: CustomColor.gray900,
         shape: BoxShape.circle,
       ),
+      child: imageUrl != null
+          ? ClipOval(
+          child: Image.network(
+              imageUrl!, fit: BoxFit.cover)
+      )
+          : null,
     );
   }
 }
