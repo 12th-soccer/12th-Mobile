@@ -9,9 +9,17 @@ abstract final class AppRoutes {
   static const onboardingPlayer = '/onboarding/player';
   static const onboardingTeam = '/onboarding/team';
   static const onboardingComplete = '/onboarding/complete';
-  static const main = '/main';
-  static const match = '/main/match';
-  static const team = '/main/team';
-  static const player = '/main/player';
-  static const notifications = '/main/notifications';
+
+  // Shell tabs (bottom nav visible)
+  static const ranking = '/ranking';
+  static const search = '/search';
+  static const schedule = '/schedule';
+  static const favorites = '/favorites';
+  static const profile = '/profile';
+
+  // Detail views (no bottom nav)
+  static const match = '/match';
+  static const team = '/team';
+  static const player = '/player';
+  static const notifications = '/notifications';
 }

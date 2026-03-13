@@ -5,6 +5,8 @@ import 'package:twelfth_mobile/views/auth/sign_up/sign_up_email_view.dart';
 import 'package:twelfth_mobile/views/auth/sign_up/sign_up_password_view.dart';
 import 'package:twelfth_mobile/views/auth/sign_up/sign_up_success_view.dart';
 import 'package:twelfth_mobile/views/auth/sign_up/sign_up_verify_view.dart';
+import 'package:twelfth_mobile/views/favorites/favorites_view.dart';
+import 'package:twelfth_mobile/views/search/search_view.dart';
 import 'package:twelfth_mobile/views/main_app.dart';
 import 'package:twelfth_mobile/views/match/match_detail_view.dart';
 import 'package:twelfth_mobile/views/onboarding/onboarding_complete_view.dart';
@@ -12,8 +14,11 @@ import 'package:twelfth_mobile/views/onboarding/onboarding_player_view.dart';
 import 'package:twelfth_mobile/views/onboarding/onboarding_team_view.dart';
 import 'package:twelfth_mobile/views/onboarding/onboarding_welcome_view.dart';
 import 'package:twelfth_mobile/views/profile/notification_settings_view.dart';
+import 'package:twelfth_mobile/views/profile/profile_view.dart';
 import 'package:twelfth_mobile/views/ranking/player_detail_view.dart';
+import 'package:twelfth_mobile/views/ranking/ranking_view.dart';
 import 'package:twelfth_mobile/views/ranking/team_detail_view.dart';
+import 'package:twelfth_mobile/views/schedule/schedule_view.dart';
 import 'package:twelfth_mobile/views/splash_view.dart';
 
 final appRouter = GoRouter(
@@ -70,28 +75,68 @@ final appRouter = GoRouter(
       builder: (context, state) => const OnboardingCompleteView(),
     ),
 
-    /// main
-    GoRoute(
-      path: AppRoutes.main,
-      builder: (context, state) => const TwelfthMainApp(),
-      routes: [
-        GoRoute(
-          path: 'match',
-          builder: (context, state) => const MatchDetailView(),
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) =>
+          TwelfthMainApp(navigationShell: navigationShell),
+      branches: [
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.ranking,
+              builder: (context, state) => const RankingView(),
+            ),
+          ],
         ),
-        GoRoute(
-          path: 'team',
-          builder: (context, state) => const TeamDetailView(),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.search,
+              builder: (context, state) => const SearchView(),
+            ),
+          ],
         ),
-        GoRoute(
-          path: 'player',
-          builder: (context, state) => const PlayerDetailView(),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.schedule,
+              builder: (context, state) => const ScheduleView(),
+            ),
+          ],
         ),
-        GoRoute(
-          path: 'notifications',
-          builder: (context, state) => const NotificationSettingsView(),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.favorites,
+              builder: (context, state) => const FavoritesView(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.profile,
+              builder: (context, state) => const ProfileView(),
+            ),
+          ],
         ),
       ],
+    ),
+
+    GoRoute(
+      path: AppRoutes.match,
+      builder: (context, state) => const MatchDetailView(),
+    ),
+    GoRoute(
+      path: AppRoutes.team,
+      builder: (context, state) => const TeamDetailView(),
+    ),
+    GoRoute(
+      path: AppRoutes.player,
+      builder: (context, state) => const PlayerDetailView(),
+    ),
+    GoRoute(
+      path: AppRoutes.notifications,
+      builder: (context, state) => const NotificationSettingsView(),
     ),
   ],
 );
