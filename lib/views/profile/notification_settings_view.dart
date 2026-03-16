@@ -15,7 +15,6 @@ class NotificationSettingsView extends ConsumerStatefulWidget {
 
 class _NotificationSettingsViewState
     extends ConsumerState<NotificationSettingsView> {
-  // 저장 전 로컬 편집 상태
   late bool _masterEnabled;
   late bool _onMatchStart;
   late bool _before1Hour;
@@ -25,7 +24,6 @@ class _NotificationSettingsViewState
   @override
   void initState() {
     super.initState();
-    // 진입 시 provider에서 현재 저장된 값을 읽어옴
     final saved = ref.read(notificationSettingsProvider);
     _masterEnabled = saved.masterEnabled;
     _onMatchStart = saved.onMatchStart;

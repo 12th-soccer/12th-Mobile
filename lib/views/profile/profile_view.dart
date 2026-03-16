@@ -14,7 +14,10 @@ class ProfileView extends StatelessWidget {
       backgroundColor: CustomColor.background,
       body: SafeArea(
         child: Column(
-          children: [_buildProfileHeader(), _buildMenuList(context)],
+          children: [
+            _buildProfileHeader(),
+            _buildMenuList(context),
+          ],
         ),
       ),
     );
