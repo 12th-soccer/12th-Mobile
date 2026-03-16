@@ -75,6 +75,7 @@ final appRouter = GoRouter(
       builder: (context, state) => const OnboardingCompleteView(),
     ),
 
+    /// main shell (bottom nav visible)
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) =>
           TwelfthMainApp(navigationShell: navigationShell),
@@ -122,17 +123,24 @@ final appRouter = GoRouter(
       ],
     ),
 
+    /// detail views (no bottom nav)
     GoRoute(
       path: AppRoutes.match,
       builder: (context, state) => const MatchDetailView(),
     ),
     GoRoute(
       path: AppRoutes.team,
-      builder: (context, state) => const TeamDetailView(),
+      builder: (context, state) {
+        final teamName = state.extra is String ? state.extra as String : '';
+        return TeamDetailView(teamName: teamName);
+      },
     ),
     GoRoute(
       path: AppRoutes.player,
-      builder: (context, state) => const PlayerDetailView(),
+      builder: (context, state) {
+        final playerName = state.extra is String ? state.extra as String : '';
+        return PlayerDetailView(playerName: playerName);
+      },
     ),
     GoRoute(
       path: AppRoutes.notifications,
