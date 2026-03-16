@@ -32,16 +32,12 @@ class _LoginViewState extends State<LoginView> {
 
   void _onLogin() {
     if (_formKey.currentState?.validate() ?? false) {
-      context.go(AppRoutes.main);
+      context.go(AppRoutes.schedule);
     }
   }
 
-  void _onGoogleLogin({bool isNewUser = true}) {
-    if (isNewUser) {
-      context.go(AppRoutes.onboardingWelcome);
-    } else {
-      context.go(AppRoutes.main);
-    }
+  void _onGoogleLogin() {
+    // TODO: 서버 연결 후 Google OAuth 구현
   }
 
   @override
@@ -140,7 +136,7 @@ class _LoginViewState extends State<LoginView> {
                     backgroundColor: CustomColor.white,
                     textColor: CustomColor.black,
                     imgPath: TwelfthAssets.google,
-                    onPressed: () => _onGoogleLogin(isNewUser: true),
+                    onPressed: _onGoogleLogin,
                     child: const Text('구글 계정으로 로그인'),
                   ),
                 ],
