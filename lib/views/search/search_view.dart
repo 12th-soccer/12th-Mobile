@@ -169,7 +169,7 @@ class _SearchViewState extends State<SearchView> {
               onSubmitted: _search,
               onChanged: (v) {
                 setState(() {});
-                if (v.trim().isEmpty) {
+                if (v.trim().isEmpty && (_showResults || _results.isNotEmpty)) {
                   setState(() {
                     _showResults = false;
                     _results = [];
