@@ -25,37 +25,37 @@ class _RankingViewState extends State<RankingView> {
   void initState() {
     super.initState();
     _k1Teams = [
-      _MockTeam(rank: 1,  name: '울산 HD FC',          points: 45, goalsFor: 45, goalsAgainst: 20),
-      _MockTeam(rank: 2,  name: '강원 FC',              points: 42, goalsFor: 42, goalsAgainst: 22),
-      _MockTeam(rank: 3,  name: 'FC 서울',              points: 40, goalsFor: 38, goalsAgainst: 23),
-      _MockTeam(rank: 4,  name: '전북 현대 모터스 FC',   points: 40, goalsFor: 35, goalsAgainst: 26),
-      _MockTeam(rank: 5,  name: '인천 유나이티드',        points: 35, goalsFor: 33, goalsAgainst: 28),
-      _MockTeam(rank: 6,  name: '포항 스틸러스',          points: 32, goalsFor: 30, goalsAgainst: 27),
-      _MockTeam(rank: 7,  name: '부천 FC',              points: 28, goalsFor: 28, goalsAgainst: 30),
-      _MockTeam(rank: 8,  name: '제주 SK',              points: 25, goalsFor: 26, goalsAgainst: 32),
-      _MockTeam(rank: 9,  name: '광주 FC',              points: 22, goalsFor: 24, goalsAgainst: 35),
-      _MockTeam(rank: 10, name: 'FC 안양',              points: 20, goalsFor: 22, goalsAgainst: 36),
-      _MockTeam(rank: 11, name: '대전 하나 시티즌',       points: 15, goalsFor: 18, goalsAgainst: 40),
-      _MockTeam(rank: 12, name: '김천 상무',             points: 12, goalsFor: 15, goalsAgainst: 45),
+      _MockTeam(rank: 1,  name: '울산 HD FC', points: 45, goalsFor: 45, goalsAgainst: 20),
+      _MockTeam(rank: 2,  name: '강원 FC', points: 42, goalsFor: 42, goalsAgainst: 22),
+      _MockTeam(rank: 3,  name: 'FC 서울', points: 40, goalsFor: 38, goalsAgainst: 23),
+      _MockTeam(rank: 4,  name: '전북 현대 모터스 FC', points: 40, goalsFor: 35, goalsAgainst: 26),
+      _MockTeam(rank: 5,  name: '인천 유나이티드', points: 35, goalsFor: 33, goalsAgainst: 28),
+      _MockTeam(rank: 6,  name: '포항 스틸러스', points: 32, goalsFor: 30, goalsAgainst: 27),
+      _MockTeam(rank: 7,  name: '부천 FC', points: 28, goalsFor: 28, goalsAgainst: 30),
+      _MockTeam(rank: 8,  name: '제주 SK', points: 25, goalsFor: 26, goalsAgainst: 32),
+      _MockTeam(rank: 9,  name: '광주 FC', points: 22, goalsFor: 24, goalsAgainst: 35),
+      _MockTeam(rank: 10, name: 'FC 안양', points: 20, goalsFor: 22, goalsAgainst: 36),
+      _MockTeam(rank: 11, name: '대전 하나 시티즌', points: 15, goalsFor: 18, goalsAgainst: 40),
+      _MockTeam(rank: 12, name: '김천 상무', points: 12, goalsFor: 15, goalsAgainst: 45),
     ];
     _k2Teams = [
-      _MockTeam(rank: 1,  name: '서울 이랜드',   points: 40, goalsFor: 38, goalsAgainst: 18),
-      _MockTeam(rank: 2,  name: '성남 FC',       points: 38, goalsFor: 35, goalsAgainst: 20),
-      _MockTeam(rank: 3,  name: '수원 삼성',     points: 37, goalsFor: 33, goalsAgainst: 22),
-      _MockTeam(rank: 4,  name: '수원 FC',       points: 36, goalsFor: 30, goalsAgainst: 22),
+      _MockTeam(rank: 1,  name: '서울 이랜드', points: 40, goalsFor: 38, goalsAgainst: 18),
+      _MockTeam(rank: 2,  name: '성남 FC', points: 38, goalsFor: 35, goalsAgainst: 20),
+      _MockTeam(rank: 3,  name: '수원 삼성', points: 37, goalsFor: 33, goalsAgainst: 22),
+      _MockTeam(rank: 4,  name: '수원 FC', points: 36, goalsFor: 30, goalsAgainst: 22),
       _MockTeam(rank: 5,  name: '전남 드래곤즈', points: 35, goalsFor: 32, goalsAgainst: 25),
-      _MockTeam(rank: 6,  name: '용인 FC',       points: 34, goalsFor: 28, goalsAgainst: 20),
+      _MockTeam(rank: 6,  name: '용인 FC', points: 34, goalsFor: 28, goalsAgainst: 20),
       _MockTeam(rank: 7,  name: '파주 프런티어', points: 32, goalsFor: 26, goalsAgainst: 22),
-      _MockTeam(rank: 8,  name: '화성 FC',       points: 31, goalsFor: 25, goalsAgainst: 22),
+      _MockTeam(rank: 8,  name: '화성 FC', points: 31, goalsFor: 25, goalsAgainst: 22),
       _MockTeam(rank: 9,  name: '부산 아이파크', points: 30, goalsFor: 24, goalsAgainst: 23),
-      _MockTeam(rank: 10, name: '경남 FC',       points: 28, goalsFor: 23, goalsAgainst: 22),
-      _MockTeam(rank: 11, name: '충남 아산',     points: 25, goalsFor: 20, goalsAgainst: 22),
-      _MockTeam(rank: 12, name: '충북 청주',     points: 20, goalsFor: 18, goalsAgainst: 26),
+      _MockTeam(rank: 10, name: '경남 FC', points: 28, goalsFor: 23, goalsAgainst: 22),
+      _MockTeam(rank: 11, name: '충남 아산', points: 25, goalsFor: 20, goalsAgainst: 22),
+      _MockTeam(rank: 12, name: '충북 청주', points: 20, goalsFor: 18, goalsAgainst: 26),
       _MockTeam(rank: 13, name: '안산 그리너스', points: 18, goalsFor: 16, goalsAgainst: 28),
-      _MockTeam(rank: 14, name: 'FC 안양',       points: 12, goalsFor: 14, goalsAgainst: 34),
-      _MockTeam(rank: 15, name: '천안 시티',     points: 8,  goalsFor: 12, goalsAgainst: 36),
-      _MockTeam(rank: 16, name: '김해 FC',       points: 4,  goalsFor: 8,  goalsAgainst: 42),
-      _MockTeam(rank: 17, name: '대구 FC',       points: 4,  goalsFor: 8,  goalsAgainst: 42),
+      _MockTeam(rank: 14, name: 'FC 안양', points: 12, goalsFor: 14, goalsAgainst: 34),
+      _MockTeam(rank: 15, name: '천안 시티', points: 8,  goalsFor: 12, goalsAgainst: 36),
+      _MockTeam(rank: 16, name: '김해 FC', points: 4,  goalsFor: 8,  goalsAgainst: 42),
+      _MockTeam(rank: 17, name: '대구 FC', points: 4,  goalsFor: 8,  goalsAgainst: 42),
     ];
   }
 
@@ -182,7 +182,6 @@ class _RankingViewState extends State<RankingView> {
                       ),
                     ),
                     spacing,
-                    // +/- (득점-실점)
                     SizedBox(
                       width: 42,
                       child: Text(
@@ -194,7 +193,6 @@ class _RankingViewState extends State<RankingView> {
                         ),
                       ),
                     ),
-                    // = (득실차)
                     SizedBox(
                       width: 32,
                       child: Text(
@@ -203,7 +201,6 @@ class _RankingViewState extends State<RankingView> {
                         style: CustomTextStyle.body3.copyWith(color: diffColor),
                       ),
                     ),
-                    // 승점
                     SizedBox(
                       width: 28,
                       child: Text(
@@ -223,7 +220,7 @@ class _RankingViewState extends State<RankingView> {
                         color: isBookmarked
                             ? CustomColor.yellow
                             : CustomColor.main,
-                        fill: isBookmarked ? 1.0 : 0.0,
+                        fill: isBookmarked ? 1 : 0,
                         size: 20,
                       ),
                     ),
