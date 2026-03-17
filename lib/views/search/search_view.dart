@@ -283,7 +283,10 @@ class _FilterDropdown extends StatelessWidget {
   final String label;
   final void Function(_FilterType) onSelected;
 
-  const _FilterDropdown({required this.label, required this.onSelected});
+  const _FilterDropdown({
+    required this.label,
+    required this.onSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -299,10 +302,10 @@ class _FilterDropdown extends StatelessWidget {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: CustomColor.gray600),
+          side: const BorderSide(color: CustomColor.main),
         ),
         offset: const Offset(0, 36),
-        constraints: const BoxConstraints(minWidth: 80),
+        constraints: const BoxConstraints(minWidth: 72, maxWidth: 72),
         itemBuilder: (_) => [
           PopupMenuItem(
             value: _FilterType.player,
@@ -315,23 +318,26 @@ class _FilterDropdown extends StatelessWidget {
             child: Center(child: Text('구단', style: CustomTextStyle.body2)),
           ),
         ],
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            border: Border.all(color: CustomColor.gray600),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(label, style: CustomTextStyle.body2),
-              const SizedBox(width: 4),
-              const Icon(
-                Symbols.keyboard_arrow_down,
-                color: CustomColor.white,
-                size: 16,
-              ),
-            ],
+        child: SizedBox(
+          width: 72,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              border: Border.all(color: CustomColor.main),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(label, style: CustomTextStyle.body2),
+                const SizedBox(width: 4),
+                const Icon(
+                  Symbols.keyboard_arrow_down,
+                  color: CustomColor.white,
+                  size: 16,
+                ),
+              ],
+            ),
           ),
         ),
       ),
