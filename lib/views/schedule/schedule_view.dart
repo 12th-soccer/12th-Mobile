@@ -24,12 +24,6 @@ class _ScheduleViewState extends State<ScheduleView> {
   Timer? _autoRefreshTimer;
   final _searchController = TextEditingController();
 
-  static const _gap2 = SizedBox(height: 2);
-  static const _gap8 = SizedBox(height: 8);
-
-  static final _liveTeamNameStyle =
-      CustomTextStyle.heading3.copyWith(color: CustomColor.gray800);
-
   static final _searchBorder = OutlineInputBorder(
     borderSide: const BorderSide(color: CustomColor.gray800),
     borderRadius: BorderRadius.circular(8),
@@ -99,14 +93,6 @@ class _ScheduleViewState extends State<ScheduleView> {
     _resetToToday();
   }
 
-  void _prevMonth() => setState(
-    () => _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month - 1),
-  );
-
-  void _nextMonth() => setState(
-    () => _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1),
-  );
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -134,8 +120,27 @@ class _ScheduleViewState extends State<ScheduleView> {
               ),
             ),
             const SizedBox(height: 20),
-            _buildCalendar(),
-            _buildLeagueTabs(),
+            _ScheduleCalendar(
+              focusedMonth: _focusedMonth,
+              selectedDate: _selectedDate,
+              onPrevMonth: () => setState(
+                () => _focusedMonth = DateTime(
+                  _focusedMonth.year,
+                  _focusedMonth.month - 1,
+                ),
+              ),
+              onNextMonth: () => setState(
+                () => _focusedMonth = DateTime(
+                  _focusedMonth.year,
+                  _focusedMonth.month + 1,
+                ),
+              ),
+              onDateSelected: (date) => setState(() => _selectedDate = date),
+            ),
+            _LeagueTabs(
+              selectedIndex: _leagueTabIndex,
+              onTap: (index) => setState(() => _leagueTabIndex = index),
+            ),
             Expanded(child: _buildMatchList()),
           ],
         ),
@@ -143,14 +148,79 @@ class _ScheduleViewState extends State<ScheduleView> {
     );
   }
 
-  Widget _buildCalendar() {
-    final year = _focusedMonth.year;
-    final month = _focusedMonth.month;
+  Widget _buildMatchList() {
+    return RefreshIndicator(
+      onRefresh: _onRefresh,
+      color: CustomColor.white,
+      backgroundColor: CustomColor.gray900,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        children: [
+          _LiveMatchCard(
+            homeTeam: _liveHome,
+            awayTeam: _liveAway,
+            time: _liveTime,
+            score: _liveScore,
+            onTap: () => context.push(
+              AppRoutes.match,
+              extra: MatchExtra(
+                homeTeam: _liveHome,
+                awayTeam: _liveAway,
+                matchState: MatchState.live,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          ..._mockMatches.map(
+            (match) => MatchCard(
+              homeTeam: match.homeTeam,
+              awayTeam: match.awayTeam,
+              center: Text(
+                match.time,
+                style: CustomTextStyle.body2.copyWith(
+                  color: CustomColor.gray500,
+                ),
+              ),
+              onTap: () => context.push(
+                AppRoutes.match,
+                extra: MatchExtra(
+                  homeTeam: match.homeTeam,
+                  awayTeam: match.awayTeam,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ScheduleCalendar extends StatelessWidget {
+  const _ScheduleCalendar({
+    required this.focusedMonth,
+    required this.selectedDate,
+    required this.onPrevMonth,
+    required this.onNextMonth,
+    required this.onDateSelected,
+  });
+
+  final DateTime focusedMonth;
+  final DateTime selectedDate;
+  final VoidCallback onPrevMonth;
+  final VoidCallback onNextMonth;
+  final ValueChanged<DateTime> onDateSelected;
+
+  static const _weekLabels = ['일', '월', '화', '수', '목', '금', '토'];
+
+  @override
+  Widget build(BuildContext context) {
+    final year = focusedMonth.year;
+    final month = focusedMonth.month;
     final firstWeekday = DateTime(year, month, 1).weekday % 7;
     final daysInMonth = DateTime(year, month + 1, 0).day;
     final prevMonthDays = DateTime(year, month, 0).day;
-
-    const weekLabels = ['일', '월', '화', '수', '목', '금', '토'];
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -162,7 +232,7 @@ class _ScheduleViewState extends State<ScheduleView> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 GestureDetector(
-                  onTap: _prevMonth,
+                  onTap: onPrevMonth,
                   behavior: HitTestBehavior.opaque,
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -175,7 +245,7 @@ class _ScheduleViewState extends State<ScheduleView> {
                 ),
                 Text('$month월', style: CustomTextStyle.heading2),
                 GestureDetector(
-                  onTap: _nextMonth,
+                  onTap: onNextMonth,
                   behavior: HitTestBehavior.opaque,
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -197,12 +267,10 @@ class _ScheduleViewState extends State<ScheduleView> {
                   ? CustomColor.blue
                   : CustomColor.gray600;
               return Expanded(
-                child: SizedBox(
-                  child: Center(
-                    child: Text(
-                      weekLabels[i],
-                      style: CustomTextStyle.body3.copyWith(color: color),
-                    ),
+                child: Center(
+                  child: Text(
+                    _weekLabels[i],
+                    style: CustomTextStyle.body3.copyWith(color: color),
                   ),
                 ),
               );
@@ -236,9 +304,9 @@ class _ScheduleViewState extends State<ScheduleView> {
                           : DateTime(year, month + 1, day));
 
                 final isSelected =
-                    _selectedDate.year == date.year &&
-                    _selectedDate.month == date.month &&
-                    _selectedDate.day == date.day;
+                    selectedDate.year == date.year &&
+                    selectedDate.month == date.month &&
+                    selectedDate.day == date.day;
 
                 Color textColor;
                 if (!isCurrentMonth) {
@@ -255,9 +323,7 @@ class _ScheduleViewState extends State<ScheduleView> {
 
                 return Expanded(
                   child: GestureDetector(
-                    onTap: isCurrentMonth
-                        ? () => setState(() => _selectedDate = date)
-                        : null,
+                    onTap: isCurrentMonth ? () => onDateSelected(date) : null,
                     child: SizedBox(
                       height: 34,
                       child: Center(
@@ -290,8 +356,16 @@ class _ScheduleViewState extends State<ScheduleView> {
       ),
     );
   }
+}
 
-  Widget _buildLeagueTabs() {
+class _LeagueTabs extends StatelessWidget {
+  const _LeagueTabs({required this.selectedIndex, required this.onTap});
+
+  final int selectedIndex;
+  final ValueChanged<int> onTap;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
         border: Border(
@@ -300,11 +374,11 @@ class _ScheduleViewState extends State<ScheduleView> {
       ),
       child: Row(
         children: List.generate(2, (index) {
-          final isSelected = _leagueTabIndex == index;
+          final isSelected = selectedIndex == index;
           final label = ['K1', 'K2'][index];
           return Expanded(
             child: GestureDetector(
-              onTap: () => setState(() => _leagueTabIndex = index),
+              onTap: () => onTap(index),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
@@ -334,107 +408,93 @@ class _ScheduleViewState extends State<ScheduleView> {
       ),
     );
   }
+}
 
-  Widget _buildMatchList() {
-    return RefreshIndicator(
-      onRefresh: _onRefresh,
-      color: CustomColor.white,
-      backgroundColor: CustomColor.gray900,
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        children: [
-          _buildLiveMatchCard(),
-          const SizedBox(height: 8),
-          ..._mockMatches.asMap().entries.expand((entry) sync* {
-            yield _buildMatchItem(entry.value);
-          }),
-        ],
-      ),
-    );
-  }
+class _LiveMatchCard extends StatelessWidget {
+  const _LiveMatchCard({
+    required this.homeTeam,
+    required this.awayTeam,
+    required this.time,
+    required this.score,
+    required this.onTap,
+  });
 
-  Widget _buildLiveMatchCard() {
+  final String homeTeam;
+  final String awayTeam;
+  final String time;
+  final String score;
+  final VoidCallback onTap;
+
+  static const _gap2 = SizedBox(height: 2);
+  static const _gap8 = SizedBox(height: 8);
+  static final _teamNameStyle = CustomTextStyle.heading3.copyWith(
+    color: CustomColor.gray800,
+  );
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push(
-        AppRoutes.match,
-        extra: MatchExtra(
-          homeTeam: _liveHome,
-          awayTeam: _liveAway,
-          matchState: MatchState.live,
-        ),
-      ),
+      onTap: onTap,
       child: Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: CustomColor.main,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            children: [
-              _buildTeamLogo(size: 70),
-              _gap8,
-              Text(_liveHome, style: _liveTeamNameStyle),
-            ],
-          ),
-          Column(
-            children: [
-              Text(
-                'Live',
-                style: CustomTextStyle.body2.copyWith(color: CustomColor.red),
-              ),
-              _gap2,
-              Text(
-                _liveTime,
-                style: CustomTextStyle.body2.copyWith(
-                  color: CustomColor.gray600,
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: CustomColor.main,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              children: [
+                const _TeamLogo(size: 70),
+                _gap8,
+                Text(homeTeam, style: _teamNameStyle),
+              ],
+            ),
+            Column(
+              children: [
+                Text(
+                  'Live',
+                  style: CustomTextStyle.body2.copyWith(color: CustomColor.red),
                 ),
-              ),
-              _gap2,
-              Text(
-                _liveScore,
-                style: CustomTextStyle.body2.copyWith(
-                  color: CustomColor.gray800,
+                _gap2,
+                Text(
+                  time,
+                  style: CustomTextStyle.body2.copyWith(
+                    color: CustomColor.gray600,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          Column(
-            children: [
-              _buildTeamLogo(size: 70),
-              _gap8,
-              Text(_liveAway, style: _liveTeamNameStyle),
-            ],
-          ),
-        ],
-      ),
-      ),
-    );
-  }
-
-  Widget _buildMatchItem(_MockMatch match) {
-    return MatchCard(
-      homeTeam: match.homeTeam,
-      awayTeam: match.awayTeam,
-      center: Text(
-        match.time,
-        style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
-      ),
-      onTap: () => context.push(
-        AppRoutes.match,
-        extra: MatchExtra(
-          homeTeam: match.homeTeam,
-          awayTeam: match.awayTeam,
+                _gap2,
+                Text(
+                  score,
+                  style: CustomTextStyle.body2.copyWith(
+                    color: CustomColor.gray800,
+                  ),
+                ),
+              ],
+            ),
+            Column(
+              children: [
+                const _TeamLogo(size: 70),
+                _gap8,
+                Text(awayTeam, style: _teamNameStyle),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildTeamLogo({required double size}) {
+class _TeamLogo extends StatelessWidget {
+  const _TeamLogo({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: size,
       height: size,
