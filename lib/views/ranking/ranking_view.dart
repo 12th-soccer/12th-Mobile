@@ -15,7 +15,7 @@ class RankingView extends StatefulWidget {
 
 class _RankingViewState extends State<RankingView> {
   int _tabIndex = 0;
-  final spacing = const SizedBox(width: 10);
+  static const spacing = SizedBox(width: 10);
   final List<String> _tabs = ['K1', 'K2'];
 
   late List<_MockTeam> _k1Teams;

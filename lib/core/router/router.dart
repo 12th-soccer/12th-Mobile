@@ -126,7 +126,14 @@ final appRouter = GoRouter(
     /// detail views (no bottom nav)
     GoRoute(
       path: AppRoutes.match,
-      builder: (context, state) => const MatchDetailView(),
+      builder: (context, state) {
+        final extra = state.extra is MatchExtra ? state.extra as MatchExtra : null;
+        return MatchDetailView(
+          homeTeam: extra?.homeTeam ?? '',
+          awayTeam: extra?.awayTeam ?? '',
+          matchState: extra?.matchState ?? MatchState.upcoming,
+        );
+      },
     ),
     GoRoute(
       path: AppRoutes.team,

@@ -15,7 +15,7 @@ class FavoritesView extends StatefulWidget {
 
 class _FavoritesViewState extends State<FavoritesView> {
   int _tabIndex = 0;
-  final spacing = const SizedBox(width: 10);
+  static const spacing = SizedBox(width: 10);
   final List<String> _tabs = ['구단', '선수'];
 
   @override
