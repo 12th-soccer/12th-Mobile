@@ -8,6 +8,7 @@ import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
+import 'package:twelfth_mobile/common/components/bookmark/bookmarking.dart';
 import 'package:twelfth_mobile/views/match/match_detail_view.dart';
 
 class ScheduleView extends StatefulWidget {
@@ -147,12 +148,24 @@ class _ScheduleViewState extends State<ScheduleView> {
     final today = DateTime(now.year, now.month, now.day);
     final isToday = _selectedDate == today;
     final isPast = _selectedDate.isBefore(today);
+    final bookmarkedTeams = Bookmarking.instance.teams;
+
+    bool _isFavoriteMatch(_MockMatch m) =>
+        bookmarkedTeams.contains(m.homeTeam) ||
+        bookmarkedTeams.contains(m.awayTeam);
+
     final filteredMatches = _mockMatches.where((match) {
       return match.league == _leagueTabIndex &&
           _selectedDate.year == _focusedMonth.year &&
           _selectedDate.month == _focusedMonth.month &&
           _selectedDate.day == match.day;
-    }).toList();
+    }).toList()
+      ..sort((a, b) {
+        final aFav = _isFavoriteMatch(a) ? 0 : 1;
+        final bFav = _isFavoriteMatch(b) ? 0 : 1;
+        if (aFav != bFav) return aFav.compareTo(bFav);
+        return a.homeTeam.compareTo(b.homeTeam);
+      });
 
     return RefreshIndicator(
       onRefresh: _onRefresh,
