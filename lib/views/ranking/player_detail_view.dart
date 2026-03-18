@@ -75,7 +75,7 @@ class PlayerDetailView extends StatelessWidget {
       date: '2024. 04. 06',
       home: '광주 FC',
       away: 'FC 안양',
-      result: "어시스트 10''",
+      result: "어시스트 10'",
       isTeamHome: false,
     ),
   ];

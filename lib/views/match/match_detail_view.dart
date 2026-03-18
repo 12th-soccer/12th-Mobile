@@ -53,6 +53,14 @@ class _MatchDetailViewState extends State<MatchDetailView> {
     _currentState = widget.matchState;
   }
 
+  @override
+  void didUpdateWidget(covariant MatchDetailView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.matchState != widget.matchState) {
+      _currentState = widget.matchState;
+    }
+  }
+
   static const _events = [
     _MatchEvent(
       playerName: '서진수',
