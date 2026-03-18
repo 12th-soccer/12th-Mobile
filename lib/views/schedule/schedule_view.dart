@@ -35,24 +35,18 @@ class _ScheduleViewState extends State<ScheduleView> {
   static const String _liveScore = '2:1';
 
   static const List<_MockMatch> _mockMatches = [
-    _MockMatch(homeTeam: '강원 FC', awayTeam: '광주 FC', time: '19:00', day: 5),
-    _MockMatch(homeTeam: '김천 상무', awayTeam: '대전 하나 시티즌', time: '19:00', day: 5),
-    _MockMatch(homeTeam: 'FC 서울', awayTeam: '인천 유나이티드', time: '14:00', day: 8),
-    _MockMatch(homeTeam: '전북 현대', awayTeam: '포항 스틸러스', time: '16:30', day: 8),
-    _MockMatch(
-      homeTeam: '울산 HD FC',
-      awayTeam: '제주 유나이티드',
-      time: '19:00',
-      day: 21,
-    ),
-    _MockMatch(homeTeam: '수원 삼성', awayTeam: '대구 FC', time: '14:00', day: 12),
-    _MockMatch(homeTeam: '광주 FC', awayTeam: '김천 상무', time: '16:30', day: 12),
-    _MockMatch(
-      homeTeam: '대전 하나 시티즌',
-      awayTeam: '강원 FC',
-      time: '19:00',
-      day: 29,
-    ),
+    // K1
+    _MockMatch(homeTeam: '강원 FC', awayTeam: '광주 FC', time: '19:00', day: 5, league: 0, score: '2 : 1'),
+    _MockMatch(homeTeam: 'FC 서울', awayTeam: '인천 유나이티드', time: '14:00', day: 8, league: 0, score: '3 : 2'),
+    _MockMatch(homeTeam: '전북 현대', awayTeam: '포항 스틸러스', time: '16:30', day: 8, league: 0, score: '1 : 1'),
+    _MockMatch(homeTeam: '울산 HD FC', awayTeam: '제주 유나이티드', time: '19:00', day: 21, league: 0),
+    _MockMatch(homeTeam: '대전 하나 시티즌', awayTeam: '강원 FC', time: '19:00', day: 29, league: 0),
+    // K2
+    _MockMatch(homeTeam: '김천 상무', awayTeam: '대전 하나 시티즌', time: '19:00', day: 5, league: 1, score: '0 : 0'),
+    _MockMatch(homeTeam: '수원 삼성', awayTeam: '대구 FC', time: '14:00', day: 12, league: 1, score: '2 : 3'),
+    _MockMatch(homeTeam: '광주 FC', awayTeam: '김천 상무', time: '16:30', day: 12, league: 1, score: '1 : 0'),
+    _MockMatch(homeTeam: '부산 아이파크', awayTeam: '충남 아산', time: '14:00', day: 21, league: 1),
+    _MockMatch(homeTeam: '서울 E-랜드', awayTeam: '경남 FC', time: '16:00', day: 29, league: 1),
   ];
 
   @override
@@ -149,6 +143,20 @@ class _ScheduleViewState extends State<ScheduleView> {
   }
 
   Widget _buildMatchList() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final isToday = _selectedDate == today;
+    final isPast = _selectedDate.isBefore(today);
+
+    final filteredMatches = _mockMatches.where((match) {
+      return match.league == _leagueTabIndex &&
+          _selectedDate.year == _focusedMonth.year &&
+          _selectedDate.month == _focusedMonth.month &&
+          _selectedDate.day == match.day;
+    }).toList();
+
+    final matchState = isPast ? MatchState.finished : MatchState.upcoming;
+
     return RefreshIndicator(
       onRefresh: _onRefresh,
       color: CustomColor.white,
@@ -157,40 +165,58 @@ class _ScheduleViewState extends State<ScheduleView> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 16),
         children: [
-          _LiveMatchCard(
-            homeTeam: _liveHome,
-            awayTeam: _liveAway,
-            time: _liveTime,
-            score: _liveScore,
-            onTap: () => context.push(
-              AppRoutes.match,
-              extra: MatchExtra(
-                homeTeam: _liveHome,
-                awayTeam: _liveAway,
-                matchState: MatchState.live,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          ..._mockMatches.map(
-            (match) => MatchCard(
-              homeTeam: match.homeTeam,
-              awayTeam: match.awayTeam,
-              center: Text(
-                match.time,
-                style: CustomTextStyle.body2.copyWith(
-                  color: CustomColor.gray500,
-                ),
-              ),
+          if (isToday) ...[
+            _LiveMatchCard(
+              homeTeam: _liveHome,
+              awayTeam: _liveAway,
+              time: _liveTime,
+              score: _liveScore,
               onTap: () => context.push(
                 AppRoutes.match,
                 extra: MatchExtra(
-                  homeTeam: match.homeTeam,
-                  awayTeam: match.awayTeam,
+                  homeTeam: _liveHome,
+                  awayTeam: _liveAway,
+                  matchState: MatchState.live,
                 ),
               ),
             ),
-          ),
+            const SizedBox(height: 8),
+          ],
+          if (filteredMatches.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 48),
+              child: Center(
+                child: Text(
+                  '경기 없음',
+                  style: CustomTextStyle.body2.copyWith(
+                    color: CustomColor.gray600,
+                  ),
+                ),
+              ),
+            )
+          else
+            ...filteredMatches.map(
+              (match) => MatchCard(
+                homeTeam: match.homeTeam,
+                awayTeam: match.awayTeam,
+                center: Text(
+                  isPast ? (match.score ?? '-') : match.time,
+                  style: CustomTextStyle.body2.copyWith(
+                    color: CustomColor.gray500,
+                  ),
+                ),
+                onTap: () => context.push(
+                  AppRoutes.match,
+                  extra: MatchExtra(
+                    homeTeam: match.homeTeam,
+                    awayTeam: match.awayTeam,
+                    matchState: matchState,
+                    matchDate: '${_focusedMonth.month}/${match.day}',
+                    matchTime: match.time,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -511,11 +537,15 @@ class _MockMatch {
   final String awayTeam;
   final String time;
   final int day;
+  final String? score;
+  final int league;
 
   const _MockMatch({
     required this.homeTeam,
     required this.awayTeam,
     required this.time,
     required this.day,
+    required this.league,
+    this.score,
   });
 }

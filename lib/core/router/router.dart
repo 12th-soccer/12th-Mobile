@@ -132,6 +132,8 @@ final appRouter = GoRouter(
           homeTeam: extra?.homeTeam ?? '',
           awayTeam: extra?.awayTeam ?? '',
           matchState: extra?.matchState ?? MatchState.upcoming,
+          matchDate: extra?.matchDate,
+          matchTime: extra?.matchTime,
         );
       },
     ),
