@@ -42,9 +42,13 @@ class TwelfthAppBar extends StatelessWidget implements PreferredSizeWidget {
           ? Text(title!, style: CustomTextStyle.heading2)
           : null,
       actions: actions,
+      bottom: const PreferredSize(
+        preferredSize: Size.fromHeight(1),
+        child: Divider(height: 1, thickness: 1, color: CustomColor.gray900),
+      ),
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 1);
 }
