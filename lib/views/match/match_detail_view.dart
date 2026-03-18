@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
 import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
+import 'package:twelfth_mobile/core/router/router_paths.dart';
 
 enum MatchState { upcoming, live, finished }
 
@@ -165,19 +167,22 @@ class _MatchDetailViewState extends State<MatchDetailView> {
   }
 
   Widget _buildTeamColumn(String name) {
-    return Column(
-      children: [
-        Container(
-          width: 70,
-          height: 70,
-          decoration: const BoxDecoration(
-            color: CustomColor.gray900,
-            shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: () => context.push(AppRoutes.team, extra: name),
+      child: Column(
+        children: [
+          Container(
+            width: 70,
+            height: 70,
+            decoration: const BoxDecoration(
+              color: CustomColor.gray900,
+              shape: BoxShape.circle,
+            ),
           ),
-        ),
-        const SizedBox(height: 10),
-        Text(name, style: CustomTextStyle.body2),
-      ],
+          const SizedBox(height: 10),
+          Text(name, style: CustomTextStyle.body2),
+        ],
+      ),
     );
   }
 
@@ -241,22 +246,28 @@ class _MatchDetailViewState extends State<MatchDetailView> {
   }
 
   Widget _buildEventItem(_MatchEvent event) {
-    final avatar = Container(
-      width: 32,
-      height: 32,
-      decoration: const BoxDecoration(
-        color: CustomColor.gray900,
-        shape: BoxShape.circle,
+    final avatar = GestureDetector(
+      onTap: () => context.push(AppRoutes.player, extra: event.playerName),
+      child: Container(
+        width: 32,
+        height: 32,
+        decoration: const BoxDecoration(
+          color: CustomColor.gray900,
+          shape: BoxShape.circle,
+        ),
       ),
     );
     final timeText = Text(
       "${event.minute}'",
       style: CustomTextStyle.body2.copyWith(color: CustomColor.gray600),
     );
-    final nameText = Text(
-      event.playerName,
-      style: CustomTextStyle.body2,
-      overflow: TextOverflow.ellipsis,
+    final nameText = GestureDetector(
+      onTap: () => context.push(AppRoutes.player, extra: event.playerName),
+      child: Text(
+        event.playerName,
+        style: CustomTextStyle.body2,
+        overflow: TextOverflow.ellipsis,
+      ),
     );
     final icon = _buildEventIcon(event.type);
 
@@ -397,25 +408,28 @@ class _MatchDetailViewState extends State<MatchDetailView> {
   }
 
   Widget _buildBenchPlayer(String name) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: const BoxDecoration(
-            color: CustomColor.gray900,
-            shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: () => context.push(AppRoutes.player, extra: name),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: const BoxDecoration(
+              color: CustomColor.gray900,
+              shape: BoxShape.circle,
+            ),
           ),
-        ),
-        _vGap4,
-        Text(
-          name,
-          style: CustomTextStyle.body4,
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ],
+          _vGap4,
+          Text(
+            name,
+            style: CustomTextStyle.body4,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 
@@ -430,19 +444,22 @@ class _MatchDetailViewState extends State<MatchDetailView> {
   }
 
   Widget _buildPlayerBadge(String name) {
-    return Column(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: const BoxDecoration(
-            color: CustomColor.gray900,
-            shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: () => context.push(AppRoutes.player, extra: name),
+      child: Column(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: const BoxDecoration(
+              color: CustomColor.gray900,
+              shape: BoxShape.circle,
+            ),
           ),
-        ),
-        _vGap4,
-        Text(name, style: CustomTextStyle.body4, textAlign: TextAlign.center),
-      ],
+          _vGap4,
+          Text(name, style: CustomTextStyle.body4, textAlign: TextAlign.center),
+        ],
+      ),
     );
   }
 }
