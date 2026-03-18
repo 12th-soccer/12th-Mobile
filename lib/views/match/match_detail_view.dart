@@ -269,12 +269,15 @@ class _MatchDetailViewState extends State<MatchDetailView> {
       "${event.minute}'",
       style: CustomTextStyle.body2.copyWith(color: CustomColor.gray600),
     );
-    final nameText = GestureDetector(
-      onTap: () => context.push(AppRoutes.player, extra: event.playerName),
-      child: Text(
-        event.playerName,
-        style: CustomTextStyle.body2,
-        overflow: TextOverflow.ellipsis,
+    final nameText = Flexible(
+      child: GestureDetector(
+        onTap: () => context.push(AppRoutes.player, extra: event.playerName),
+        child: Text(
+          event.playerName,
+          style: CustomTextStyle.body2,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
     );
     final icon = _buildEventIcon(event.type);
