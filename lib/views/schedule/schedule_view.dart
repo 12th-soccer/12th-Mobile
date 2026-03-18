@@ -35,13 +35,13 @@ class _ScheduleViewState extends State<ScheduleView> {
   static const String _liveScore = '2:1';
 
   static const List<_MockMatch> _mockMatches = [
-    // K1
+    // K1 경기
     _MockMatch(homeTeam: '강원 FC', awayTeam: '광주 FC', time: '19:00', day: 5, league: 0, score: '2 : 1'),
     _MockMatch(homeTeam: 'FC 서울', awayTeam: '인천 유나이티드', time: '14:00', day: 8, league: 0, score: '3 : 2'),
     _MockMatch(homeTeam: '전북 현대', awayTeam: '포항 스틸러스', time: '16:30', day: 8, league: 0, score: '1 : 1'),
     _MockMatch(homeTeam: '울산 HD FC', awayTeam: '제주 유나이티드', time: '19:00', day: 21, league: 0),
     _MockMatch(homeTeam: '대전 하나 시티즌', awayTeam: '강원 FC', time: '19:00', day: 29, league: 0),
-    // K2
+    // K2 경기
     _MockMatch(homeTeam: '김천 상무', awayTeam: '대전 하나 시티즌', time: '19:00', day: 5, league: 1, score: '0 : 0'),
     _MockMatch(homeTeam: '수원 삼성', awayTeam: '대구 FC', time: '14:00', day: 12, league: 1, score: '2 : 3'),
     _MockMatch(homeTeam: '광주 FC', awayTeam: '김천 상무', time: '16:30', day: 12, league: 1, score: '1 : 0'),
@@ -147,15 +147,12 @@ class _ScheduleViewState extends State<ScheduleView> {
     final today = DateTime(now.year, now.month, now.day);
     final isToday = _selectedDate == today;
     final isPast = _selectedDate.isBefore(today);
-
     final filteredMatches = _mockMatches.where((match) {
       return match.league == _leagueTabIndex &&
           _selectedDate.year == _focusedMonth.year &&
           _selectedDate.month == _focusedMonth.month &&
           _selectedDate.day == match.day;
     }).toList();
-
-    final matchState = isPast ? MatchState.finished : MatchState.upcoming;
 
     return RefreshIndicator(
       onRefresh: _onRefresh,
@@ -184,39 +181,40 @@ class _ScheduleViewState extends State<ScheduleView> {
           ],
           if (filteredMatches.isEmpty)
             Padding(
-              padding: const EdgeInsets.only(top: 48),
+              padding: const EdgeInsets.symmetric(vertical: 40),
               child: Center(
                 child: Text(
-                  '경기 없음',
-                  style: CustomTextStyle.body2.copyWith(
-                    color: CustomColor.gray600,
-                  ),
+                  '해당 날짜에 경기가 없습니다',
+                  style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
                 ),
               ),
             )
           else
-            ...filteredMatches.map(
-              (match) => MatchCard(
+            ...filteredMatches.map((match) {
+              final matchState = isPast ? MatchState.finished : MatchState.upcoming;
+              final centerWidget = isPast && match.score != null
+                  ? Text(match.score!, style: CustomTextStyle.body2)
+                  : Text(
+                      match.time,
+                      style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
+                    );
+
+              return MatchCard(
                 homeTeam: match.homeTeam,
                 awayTeam: match.awayTeam,
-                center: Text(
-                  isPast ? (match.score ?? '-') : match.time,
-                  style: CustomTextStyle.body2.copyWith(
-                    color: CustomColor.gray500,
-                  ),
-                ),
+                center: centerWidget,
                 onTap: () => context.push(
                   AppRoutes.match,
                   extra: MatchExtra(
                     homeTeam: match.homeTeam,
                     awayTeam: match.awayTeam,
                     matchState: matchState,
-                    matchDate: '${_focusedMonth.month}/${match.day}',
+                    matchDate: '${_selectedDate.month}/${_selectedDate.day}',
                     matchTime: match.time,
                   ),
                 ),
-              ),
-            ),
+              );
+            }),
         ],
       ),
     );
@@ -537,8 +535,8 @@ class _MockMatch {
   final String awayTeam;
   final String time;
   final int day;
-  final String? score;
   final int league;
+  final String? score;
 
   const _MockMatch({
     required this.homeTeam,
