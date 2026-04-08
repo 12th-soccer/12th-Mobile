@@ -32,7 +32,7 @@ class _AuthInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     final token = await TokenStorage.instance.getAccessToken();
-    developer.log('[Dio] ${options.method} ${options.path} | token: ${token == null ? 'null' : token.isEmpty ? 'empty' : '${token.substring(0, token.length.clamp(0, 20))}...'}');
+    developer.log('[Dio] ${options.method} ${options.path} | authHeader: ${token != null && token.isNotEmpty ? 'set' : 'unset'}');
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     }

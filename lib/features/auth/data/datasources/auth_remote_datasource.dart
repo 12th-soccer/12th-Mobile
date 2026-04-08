@@ -36,10 +36,13 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
       data: {'email': email, 'password': password},
     );
     final rawData = response.data;
-    developer.log('[Auth] 로그인 응답 data type: ${rawData.runtimeType}');
-    developer.log('[Auth] 로그인 응답 data: $rawData');
-    final Map<String, dynamic> jsonMap =
-        rawData is String ? jsonDecode(rawData) as Map<String, dynamic> : rawData as Map<String, dynamic>;
+    assert(() {
+      developer.log('[Auth] 로그인 응답 data type: ${rawData.runtimeType}');
+      return true;
+    }());
+    final Map<String, dynamic> jsonMap = rawData is String
+        ? jsonDecode(rawData) as Map<String, dynamic>
+        : rawData as Map<String, dynamic>;
     return LoginResponseModel.fromJson(jsonMap);
   }
 

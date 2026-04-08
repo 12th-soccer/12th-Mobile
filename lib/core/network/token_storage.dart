@@ -17,6 +17,8 @@ class TokenStorage {
     await _storage.write(key: _accessKey, value: accessToken);
     if (refreshToken != null) {
       await _storage.write(key: _refreshKey, value: refreshToken);
+    } else {
+      await _storage.delete(key: _refreshKey);
     }
   }
 
@@ -31,6 +33,6 @@ class TokenStorage {
 
   Future<bool> hasToken() async {
     final token = await getAccessToken();
-    return token != null;
+    return token != null && token.isNotEmpty;
   }
 }
