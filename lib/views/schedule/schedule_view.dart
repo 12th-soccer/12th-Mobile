@@ -2,14 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:twelfth_mobile/common/components/match/match_card.dart';
 import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.dart';
-import 'package:go_router/go_router.dart';
-import 'package:twelfth_mobile/core/router/router_paths.dart';
-import 'package:twelfth_mobile/common/components/bookmark/bookmarking.dart';
-import 'package:twelfth_mobile/views/match/match_detail_view.dart';
 
 class ScheduleView extends StatefulWidget {
   const ScheduleView({super.key});
@@ -29,26 +24,6 @@ class _ScheduleViewState extends State<ScheduleView> {
     borderSide: const BorderSide(color: CustomColor.gray800),
     borderRadius: BorderRadius.circular(8),
   );
-
-  static const String _liveHome = '강원FC';
-  static const String _liveAway = '광주FC';
-  static const String _liveTime = '65:31';
-  static const String _liveScore = '2:1';
-
-  static const List<_MockMatch> _mockMatches = [
-    // K1 경기
-    _MockMatch(homeTeam: '강원 FC', awayTeam: '광주 FC', time: '19:00', day: 5, league: 0, score: '2 : 1'),
-    _MockMatch(homeTeam: 'FC 서울', awayTeam: '인천 유나이티드', time: '14:00', day: 8, league: 0, score: '3 : 2'),
-    _MockMatch(homeTeam: '전북 현대', awayTeam: '포항 스틸러스', time: '16:30', day: 8, league: 0, score: '1 : 1'),
-    _MockMatch(homeTeam: '울산 HD FC', awayTeam: '제주 유나이티드', time: '19:00', day: 21, league: 0),
-    _MockMatch(homeTeam: '대전 하나 시티즌', awayTeam: '강원 FC', time: '19:00', day: 29, league: 0),
-    // K2 경기
-    _MockMatch(homeTeam: '김천 상무', awayTeam: '대전 하나 시티즌', time: '19:00', day: 5, league: 1, score: '0 : 0'),
-    _MockMatch(homeTeam: '수원 삼성', awayTeam: '대구 FC', time: '14:00', day: 12, league: 1, score: '2 : 3'),
-    _MockMatch(homeTeam: '광주 FC', awayTeam: '김천 상무', time: '16:30', day: 12, league: 1, score: '1 : 0'),
-    _MockMatch(homeTeam: '부산 아이파크', awayTeam: '충남 아산', time: '14:00', day: 21, league: 1),
-    _MockMatch(homeTeam: '서울 E-랜드', awayTeam: '경남 FC', time: '16:00', day: 29, league: 1),
-  ];
 
   @override
   void initState() {
@@ -144,29 +119,6 @@ class _ScheduleViewState extends State<ScheduleView> {
   }
 
   Widget _buildMatchList() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final isToday = _selectedDate == today;
-    final isPast = _selectedDate.isBefore(today);
-    final bookmarkedTeams = Bookmarking.instance.teams;
-
-    bool _isFavoriteMatch(_MockMatch m) =>
-        bookmarkedTeams.contains(m.homeTeam) ||
-        bookmarkedTeams.contains(m.awayTeam);
-
-    final filteredMatches = _mockMatches.where((match) {
-      return match.league == _leagueTabIndex &&
-          _selectedDate.year == _focusedMonth.year &&
-          _selectedDate.month == _focusedMonth.month &&
-          _selectedDate.day == match.day;
-    }).toList()
-      ..sort((a, b) {
-        final aFav = _isFavoriteMatch(a) ? 0 : 1;
-        final bFav = _isFavoriteMatch(b) ? 0 : 1;
-        if (aFav != bFav) return aFav.compareTo(bFav);
-        return a.homeTeam.compareTo(b.homeTeam);
-      });
-
     return RefreshIndicator(
       onRefresh: _onRefresh,
       color: CustomColor.white,
@@ -175,59 +127,15 @@ class _ScheduleViewState extends State<ScheduleView> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 16),
         children: [
-          if (isToday) ...[
-            _LiveMatchCard(
-              homeTeam: _liveHome,
-              awayTeam: _liveAway,
-              time: _liveTime,
-              score: _liveScore,
-              onTap: () => context.push(
-                AppRoutes.match,
-                extra: MatchExtra(
-                  homeTeam: _liveHome,
-                  awayTeam: _liveAway,
-                  matchState: MatchState.live,
-                ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 40),
+            child: Center(
+              child: Text(
+                '해당 날짜에 경기가 없습니다',
+                style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
               ),
             ),
-            const SizedBox(height: 8),
-          ],
-          if (filteredMatches.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 40),
-              child: Center(
-                child: Text(
-                  '해당 날짜에 경기가 없습니다',
-                  style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
-                ),
-              ),
-            )
-          else
-            ...filteredMatches.map((match) {
-              final matchState = isPast ? MatchState.finished : MatchState.upcoming;
-              final centerWidget = isPast && match.score != null
-                  ? Text(match.score!, style: CustomTextStyle.body2)
-                  : Text(
-                      match.time,
-                      style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
-                    );
-
-              return MatchCard(
-                homeTeam: match.homeTeam,
-                awayTeam: match.awayTeam,
-                center: centerWidget,
-                onTap: () => context.push(
-                  AppRoutes.match,
-                  extra: MatchExtra(
-                    homeTeam: match.homeTeam,
-                    awayTeam: match.awayTeam,
-                    matchState: matchState,
-                    matchDate: '${_selectedDate.month}/${_selectedDate.day}',
-                    matchTime: match.time,
-                  ),
-                ),
-              );
-            }),
+          ),
         ],
       ),
     );
@@ -421,9 +329,7 @@ class _LeagueTabs extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: isSelected
-                          ? CustomColor.white
-                          : Colors.transparent,
+                      color: isSelected ? CustomColor.white : Colors.transparent,
                       width: 2,
                     ),
                   ),
@@ -432,9 +338,7 @@ class _LeagueTabs extends StatelessWidget {
                   child: Text(
                     label,
                     style: CustomTextStyle.heading3.copyWith(
-                      color: isSelected
-                          ? CustomColor.white
-                          : CustomColor.gray600,
+                      color: isSelected ? CustomColor.white : CustomColor.gray600,
                     ),
                   ),
                 ),
@@ -445,118 +349,4 @@ class _LeagueTabs extends StatelessWidget {
       ),
     );
   }
-}
-
-class _LiveMatchCard extends StatelessWidget {
-  const _LiveMatchCard({
-    required this.homeTeam,
-    required this.awayTeam,
-    required this.time,
-    required this.score,
-    required this.onTap,
-  });
-
-  final String homeTeam;
-  final String awayTeam;
-  final String time;
-  final String score;
-  final VoidCallback onTap;
-
-  static const _gap2 = SizedBox(height: 2);
-  static const _gap8 = SizedBox(height: 8);
-  static final _teamNameStyle = CustomTextStyle.heading3.copyWith(
-    color: CustomColor.gray800,
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: CustomColor.main,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              children: [
-                const _TeamLogo(size: 70),
-                _gap8,
-                Text(homeTeam, style: _teamNameStyle),
-              ],
-            ),
-            Column(
-              children: [
-                Text(
-                  'Live',
-                  style: CustomTextStyle.body2.copyWith(color: CustomColor.red),
-                ),
-                _gap2,
-                Text(
-                  time,
-                  style: CustomTextStyle.body2.copyWith(
-                    color: CustomColor.gray600,
-                  ),
-                ),
-                _gap2,
-                Text(
-                  score,
-                  style: CustomTextStyle.body2.copyWith(
-                    color: CustomColor.gray800,
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                const _TeamLogo(size: 70),
-                _gap8,
-                Text(awayTeam, style: _teamNameStyle),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TeamLogo extends StatelessWidget {
-  const _TeamLogo({required this.size});
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: const BoxDecoration(
-        color: CustomColor.gray900,
-        shape: BoxShape.circle,
-      ),
-    );
-  }
-}
-
-class _MockMatch {
-  final String homeTeam;
-  final String awayTeam;
-  final String time;
-  final int day;
-  final int league;
-  final String? score;
-
-  const _MockMatch({
-    required this.homeTeam,
-    required this.awayTeam,
-    required this.time,
-    required this.day,
-    required this.league,
-    this.score,
-  });
 }
