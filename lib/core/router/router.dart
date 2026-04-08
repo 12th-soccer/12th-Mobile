@@ -17,6 +17,7 @@ import 'package:twelfth_mobile/views/profile/notification_settings_view.dart';
 import 'package:twelfth_mobile/views/profile/profile_view.dart';
 import 'package:twelfth_mobile/views/ranking/player_detail_view.dart';
 import 'package:twelfth_mobile/views/ranking/ranking_view.dart';
+import 'package:twelfth_mobile/features/ranking/domain/entities/club_ranking.dart';
 import 'package:twelfth_mobile/views/ranking/team_detail_view.dart';
 import 'package:twelfth_mobile/views/schedule/schedule_view.dart';
 import 'package:twelfth_mobile/views/splash_view.dart';
@@ -140,8 +141,8 @@ final appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.team,
       builder: (context, state) {
-        final teamName = state.extra is String ? state.extra as String : '';
-        return TeamDetailView(teamName: teamName);
+        final team = state.extra as ClubRanking;
+        return TeamDetailView(clubId: team.clubId, teamName: team.clubName);
       },
     ),
     GoRoute(

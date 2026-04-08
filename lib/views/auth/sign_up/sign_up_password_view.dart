@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
 import 'package:twelfth_mobile/common/components/title/twelfth_accent_title.dart';
 import 'package:twelfth_mobile/constants/color.dart';
+import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.dart';
-import 'package:go_router/go_router.dart';
-import 'package:twelfth_mobile/core/router/router.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
+import 'package:twelfth_mobile/features/auth/presentation/providers/auth_provider.dart';
 
-class SignUpPasswordView extends StatefulWidget {
+class SignUpPasswordView extends ConsumerStatefulWidget {
   const SignUpPasswordView({super.key});
 
   @override
-  State<SignUpPasswordView> createState() => _SignUpPasswordViewState();
+  ConsumerState<SignUpPasswordView> createState() => _SignUpPasswordViewState();
 }
 
-class _SignUpPasswordViewState extends State<SignUpPasswordView> {
+class _SignUpPasswordViewState extends ConsumerState<SignUpPasswordView> {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
@@ -30,14 +32,32 @@ class _SignUpPasswordViewState extends State<SignUpPasswordView> {
     super.dispose();
   }
 
-  void _onCreate() {
-    if (_formKey.currentState?.validate() ?? false) {
+  Future<void> _onCreate() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    final success = await ref
+        .read(authNotifierProvider.notifier)
+        .signUp(password: _passwordController.text);
+    if (!mounted) return;
+    if (success) {
       context.go(AppRoutes.signUpSuccess);
+    } else {
+      final error = ref.read(authNotifierProvider).errorMessage;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error ?? '오류가 발생했습니다', style: CustomTextStyle.body2.copyWith(color: CustomColor.black)),
+          backgroundColor: CustomColor.main,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+      ref.read(authNotifierProvider.notifier).clearError();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(authNotifierProvider).isLoading;
+
     return Scaffold(
       backgroundColor: CustomColor.background,
       appBar: const TwelfthAppBar(),
@@ -75,8 +95,11 @@ class _SignUpPasswordViewState extends State<SignUpPasswordView> {
                       if (value == null || value.isEmpty) {
                         return '비밀번호를 입력해 주세요';
                       }
-                      if (value.length < 8) {
-                        return '비밀번호는 8자 이상이어야 합니다';
+                      final passwordRegex = RegExp(
+                        r'^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[_!#$*])[a-zA-Z0-9_!#$*]{8,}$',
+                      );
+                      if (!passwordRegex.hasMatch(value)) {
+                        return '최소 비밀번호는 8글자이며 숫자, 영어 대소문자, _!#\$*만 가능합니다';
                       }
                       return null;
                     },
@@ -96,8 +119,9 @@ class _SignUpPasswordViewState extends State<SignUpPasswordView> {
                           color: CustomColor.gray600,
                           size: 20,
                         ),
-                        onPressed: () =>
-                            setState(() => _obscureConfirm = !_obscureConfirm),
+                        onPressed: () => setState(
+                          () => _obscureConfirm = !_obscureConfirm,
+                        ),
                       ),
                     ),
                     onFieldSubmitted: (_) => _onCreate(),
@@ -108,28 +132,40 @@ class _SignUpPasswordViewState extends State<SignUpPasswordView> {
                       if (value != _passwordController.text) {
                         return '비밀번호가 일치하지 않습니다';
                       }
+                      final passwordRegex = RegExp(
+                        r'^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[_!#$*])[a-zA-Z0-9_!#$*]{8,}$',
+                      );
+                      if (!passwordRegex.hasMatch(value)) {
+                        return '최소 비밀번호는 8글자이며 숫자, 영어 대소문자, _!#\$*만 가능합니다';
+                      }
                       return null;
                     },
                   ),
                   const Spacer(),
                   ListenableBuilder(
-                    listenable: Listenable.merge([
-                      _passwordController,
-                      _confirmController,
-                    ]),
+                    listenable: Listenable.merge(
+                        [_passwordController, _confirmController]),
                     builder: (context, _) {
-                      final isFilled =
-                          _passwordController.text.isNotEmpty &&
+                      final isFilled = _passwordController.text.isNotEmpty &&
                           _confirmController.text.isNotEmpty;
+                      final enabled = isFilled && !isLoading;
                       return TwelfthElevatedButton(
-                        gradient: isFilled
+                        gradient: enabled
                             ? TwelfthGradient.horizontal(
-                                CustomColor.silverGradient,
-                              )
+                                CustomColor.silverGradient)
                             : null,
-                        textColor: isFilled ? CustomColor.black : null,
-                        onPressed: _onCreate,
-                        child: const Text('생성'),
+                        textColor: enabled ? CustomColor.black : null,
+                        onPressed: enabled ? _onCreate : null,
+                        child: isLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: CustomColor.black,
+                                ),
+                              )
+                            : const Text('생성'),
                       );
                     },
                   ),

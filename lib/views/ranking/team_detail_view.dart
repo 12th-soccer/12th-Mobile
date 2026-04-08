@@ -1,174 +1,140 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
 import 'package:twelfth_mobile/common/components/bookmark/bookmarking.dart';
 import 'package:twelfth_mobile/constants/color.dart';
+import 'package:twelfth_mobile/constants/team_social_links.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/constants/twelfth_assets.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
+import 'package:twelfth_mobile/features/ranking/domain/entities/club_detail.dart';
+import 'package:twelfth_mobile/features/ranking/presentation/providers/ranking_provider.dart';
 import 'package:twelfth_mobile/views/match/match_detail_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const _vGap2 = SizedBox(height: 2);
 const _vGap8 = SizedBox(height: 8);
 const _hGap4 = SizedBox(width: 4);
 
-class TeamDetailView extends StatefulWidget {
+class TeamDetailView extends ConsumerWidget {
+  final int clubId;
   final String teamName;
 
-  const TeamDetailView({super.key, required this.teamName});
+  const TeamDetailView({
+    super.key,
+    required this.clubId,
+    required this.teamName,
+  });
 
   @override
-  State<TeamDetailView> createState() => _TeamDetailViewState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final detailAsync = ref.watch(clubDetailProvider(clubId));
 
-class _TeamDetailViewState extends State<TeamDetailView> {
-  static const _upcomingMatches = [
-    _MockMatchResult(
-      home: '강원 FC',
-      away: '울산 HD FC',
-      date: '3/21',
-      time: '19:00',
-      isTeamHome: true,
-    ),
-    _MockMatchResult(
-      home: '대전 하나 시티즌',
-      away: '강원 FC',
-      date: '3/29',
-      time: '19:00',
-      isTeamHome: false,
-    ),
-    _MockMatchResult(
-      home: '강원 FC',
-      away: '포항 스틸러스',
-      date: '4/5',
-      time: '14:00',
-      isTeamHome: true,
-    ),
-    _MockMatchResult(
-      home: '수원 삼성',
-      away: '강원 FC',
-      date: '4/12',
-      time: '16:30',
-      isTeamHome: false,
-    ),
-    _MockMatchResult(
-      home: '강원 FC',
-      away: 'FC 서울',
-      date: '4/19',
-      time: '19:00',
-      isTeamHome: true,
-    ),
-  ];
-
-  static const _pastMatches = [
-    _MockMatchResult(
-      home: '강원 FC',
-      away: '광주 FC',
-      homeScore: 3,
-      awayScore: 1,
-      date: '12/11',
-      isTeamHome: true,
-    ),
-    _MockMatchResult(
-      home: '강원 FC',
-      away: '광주 FC',
-      homeScore: 2,
-      awayScore: 3,
-      date: '12/1',
-      isTeamHome: true,
-    ),
-    _MockMatchResult(
-      home: '강원 FC',
-      away: '광주 FC',
-      homeScore: 3,
-      awayScore: 1,
-      date: '11/30',
-      isTeamHome: true,
-    ),
-    _MockMatchResult(
-      home: '인천 유나이티드',
-      away: '강원 FC',
-      homeScore: 0,
-      awayScore: 2,
-      date: '11/20',
-      isTeamHome: false,
-    ),
-    _MockMatchResult(
-      home: '강원 FC',
-      away: '전북 현대',
-      homeScore: 1,
-      awayScore: 1,
-      date: '11/10',
-      isTeamHome: true,
-    ),
-    _MockMatchResult(
-      home: '포항 스틸러스',
-      away: '강원 FC',
-      homeScore: 2,
-      awayScore: 0,
-      date: '11/3',
-      isTeamHome: false,
-    ),
-    _MockMatchResult(
-      home: '강원 FC',
-      away: '대구 FC',
-      homeScore: 4,
-      awayScore: 1,
-      date: '10/27',
-      isTeamHome: true,
-    ),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: Bookmarking.instance,
-      builder: (context, _) => _buildScaffold(context),
+      builder: (context, _) {
+        final isBookmarked = Bookmarking.instance.isTeamBookmarked(teamName);
+        return Scaffold(
+          backgroundColor: CustomColor.background,
+          appBar: TwelfthAppBar(
+            title: teamName,
+            actions: [
+              IconButton(
+                icon: Icon(
+                  Symbols.star,
+                  color: isBookmarked ? CustomColor.yellow : CustomColor.main,
+                  fill: isBookmarked ? 1 : 0,
+                ),
+                onPressed: () => Bookmarking.instance.toggleTeam(teamName),
+              ),
+            ],
+          ),
+          body: detailAsync.when(
+            loading: () => const Center(
+              child: CircularProgressIndicator(color: CustomColor.white),
+            ),
+            error: (e, _) => Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '정보를 불러오지 못했습니다',
+                    style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
+                  ),
+                  const SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () => ref.invalidate(clubDetailProvider(clubId)),
+                    child: Text(
+                      '다시 시도',
+                      style: CustomTextStyle.body2.copyWith(color: CustomColor.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            data: (detail) => _buildBody(context, detail),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildScaffold(BuildContext context) {
-    final isBookmarked = Bookmarking.instance.isTeamBookmarked(widget.teamName);
-    return Scaffold(
-      backgroundColor: CustomColor.background,
-      appBar: TwelfthAppBar(
-        title: widget.teamName,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Symbols.star,
-              color: isBookmarked ? CustomColor.yellow : CustomColor.main,
-              fill: isBookmarked ? 1 : 0,
-            ),
-            onPressed: () => Bookmarking.instance.toggleTeam(widget.teamName),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _buildTeamHeader(),
+  Widget _buildBody(BuildContext context, ClubDetail detail) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _buildTeamHeader(detail.stadiumName),
+          if (detail.upcomingMatches.isNotEmpty)
             _MatchSection(
               title: '일정',
-              matches: _upcomingMatches,
+              matches: detail.upcomingMatches,
+              teamName: teamName,
               isUpcoming: true,
             ),
+          if (detail.pastMatches.isNotEmpty)
             _MatchSection(
               title: '경기 내역',
-              matches: _pastMatches,
+              matches: detail.pastMatches,
+              teamName: teamName,
               isUpcoming: false,
             ),
-            const SizedBox(height: 24),
-          ],
-        ),
+          const SizedBox(height: 24),
+        ],
       ),
     );
   }
 
-  Widget _buildTeamHeader() {
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Widget _buildSocialLinks() {
+    final links = TeamSocials.of(teamName);
+    if (links == null) return const SizedBox.shrink();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        GestureDetector(
+          onTap: () => _launchUrl(links.youtube),
+          child: SvgPicture.asset(TwelfthAssets.youtube, width: 30, height: 30),
+        ),
+        const SizedBox(width: 50),
+        GestureDetector(
+          onTap: () => _launchUrl(links.instagram),
+          child: SvgPicture.asset(TwelfthAssets.instagram, width: 30, height: 30),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTeamHeader(String stadiumName) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
       child: Column(
@@ -183,7 +149,7 @@ class _TeamDetailViewState extends State<TeamDetailView> {
             ),
           ),
           const SizedBox(height: 16),
-          Text(widget.teamName, style: CustomTextStyle.heading1),
+          Text(teamName, style: CustomTextStyle.heading1),
           _vGap8,
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -196,22 +162,13 @@ class _TeamDetailViewState extends State<TeamDetailView> {
               ),
               _hGap4,
               Text(
-                '대전월드컵경기장',
-                style: CustomTextStyle.body3.copyWith(
-                  color: CustomColor.gray500,
-                ),
+                stadiumName,
+                style: CustomTextStyle.body3.copyWith(color: CustomColor.gray500),
               ),
             ],
           ),
           const SizedBox(height: 28),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SvgPicture.asset(TwelfthAssets.youtube, width: 30, height: 30),
-              const SizedBox(width: 50),
-              SvgPicture.asset(TwelfthAssets.instagram, width: 30, height: 30),
-            ],
-          ),
+          _buildSocialLinks(),
         ],
       ),
     );
@@ -220,12 +177,14 @@ class _TeamDetailViewState extends State<TeamDetailView> {
 
 class _MatchSection extends StatefulWidget {
   final String title;
-  final List<_MockMatchResult> matches;
+  final List<ClubMatch> matches;
+  final String teamName;
   final bool isUpcoming;
 
   const _MatchSection({
     required this.title,
     required this.matches,
+    required this.teamName,
     required this.isUpcoming,
   });
 
@@ -292,12 +251,10 @@ class _MatchSectionState extends State<_MatchSection> {
                 final pageMatches = widget.matches.sublist(start, end);
                 return Column(
                   children: pageMatches
-                      .map(
-                        (m) => SizedBox(
-                          height: rowHeight,
-                          child: _buildMatchRow(m, context),
-                        ),
-                      )
+                      .map((m) => SizedBox(
+                            height: rowHeight,
+                            child: _buildMatchRow(m, context),
+                          ))
                       .toList(),
                 );
               },
@@ -328,23 +285,29 @@ class _MatchSectionState extends State<_MatchSection> {
     );
   }
 
-  Widget _buildMatchRow(_MockMatchResult match, BuildContext context) {
+  Widget _buildMatchRow(ClubMatch match, BuildContext context) {
+    final dateStr =
+        '${match.matchDate.month}/${match.matchDate.day}';
+    final timeStr =
+        '${match.matchDate.hour.toString().padLeft(2, '0')}:${match.matchDate.minute.toString().padLeft(2, '0')}';
+    final isTeamHome = match.homeTeamName == widget.teamName;
+
     final extra = MatchExtra(
-      homeTeam: match.home,
-      awayTeam: match.away,
+      homeTeam: match.homeTeamName,
+      awayTeam: match.awayTeamName,
       matchState: widget.isUpcoming ? MatchState.upcoming : MatchState.finished,
-      matchDate: match.date,
-      matchTime: match.time,
+      matchDate: dateStr,
+      matchTime: timeStr,
     );
 
     String? scoreText;
     Color scoreColor = CustomColor.gray500;
     if (!widget.isUpcoming &&
-        match.homeScore != null &&
-        match.awayScore != null) {
-      scoreText = '${match.homeScore} : ${match.awayScore}';
-      final ourScore = match.isTeamHome ? match.homeScore! : match.awayScore!;
-      final theirScore = match.isTeamHome ? match.awayScore! : match.homeScore!;
+        match.homeTeamScore != null &&
+        match.awayTeamScore != null) {
+      scoreText = '${match.homeTeamScore} : ${match.awayTeamScore}';
+      final ourScore = isTeamHome ? match.homeTeamScore! : match.awayTeamScore!;
+      final theirScore = isTeamHome ? match.awayTeamScore! : match.homeTeamScore!;
       if (ourScore > theirScore) {
         scoreColor = CustomColor.green;
       } else if (ourScore < theirScore) {
@@ -358,18 +321,18 @@ class _MatchSectionState extends State<_MatchSection> {
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           children: [
-            Expanded(child: _buildTeamTag(match.away, MainAxisAlignment.start)),
+            Expanded(
+              child: _buildTeamTag(match.awayTeamName, MainAxisAlignment.start),
+            ),
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  match.date,
-                  style: CustomTextStyle.body2.copyWith(
-                    color: CustomColor.gray500,
-                  ),
+                  dateStr,
+                  style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
                 ),
                 _vGap2,
-                _buildHABadge(match.isTeamHome),
+                _buildHABadge(isTeamHome),
                 if (scoreText != null) ...[
                   _vGap2,
                   Text(
@@ -379,7 +342,9 @@ class _MatchSectionState extends State<_MatchSection> {
                 ],
               ],
             ),
-            Expanded(child: _buildTeamTag(match.home, MainAxisAlignment.end)),
+            Expanded(
+              child: _buildTeamTag(match.homeTeamName, MainAxisAlignment.end),
+            ),
           ],
         ),
       ),
@@ -437,24 +402,4 @@ class _MatchSectionState extends State<_MatchSection> {
       color: CustomColor.gray500,
     );
   }
-}
-
-class _MockMatchResult {
-  final String home;
-  final String away;
-  final String date;
-  final String? time;
-  final int? homeScore;
-  final int? awayScore;
-  final bool isTeamHome;
-
-  const _MockMatchResult({
-    required this.home,
-    required this.away,
-    required this.date,
-    required this.isTeamHome,
-    this.time,
-    this.homeScore,
-    this.awayScore,
-  });
 }

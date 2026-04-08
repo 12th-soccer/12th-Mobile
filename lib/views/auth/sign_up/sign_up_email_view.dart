@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
 import 'package:twelfth_mobile/common/components/title/twelfth_accent_title.dart';
 import 'package:twelfth_mobile/constants/color.dart';
+import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.dart';
-import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
+import 'package:twelfth_mobile/features/auth/presentation/providers/auth_provider.dart';
 
-class SignUpEmailView extends StatefulWidget {
+class SignUpEmailView extends ConsumerStatefulWidget {
   const SignUpEmailView({super.key});
 
   @override
-  State<SignUpEmailView> createState() => _SignUpEmailViewState();
+  ConsumerState<SignUpEmailView> createState() => _SignUpEmailViewState();
 }
 
-class _SignUpEmailViewState extends State<SignUpEmailView> {
+class _SignUpEmailViewState extends ConsumerState<SignUpEmailView> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
 
@@ -24,14 +27,32 @@ class _SignUpEmailViewState extends State<SignUpEmailView> {
     super.dispose();
   }
 
-  void _onNext() {
-    if (_formKey.currentState?.validate() ?? false) {
+  Future<void> _onNext() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    final success = await ref
+        .read(authNotifierProvider.notifier)
+        .sendVerificationEmail(_emailController.text);
+    if (!mounted) return;
+    if (success) {
       context.push(AppRoutes.signUpVerify, extra: _emailController.text);
+    } else {
+      final error = ref.read(authNotifierProvider).errorMessage;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error ?? '오류가 발생했습니다', style: CustomTextStyle.body2.copyWith(color: CustomColor.black)),
+          backgroundColor: CustomColor.main,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+      ref.read(authNotifierProvider.notifier).clearError();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(authNotifierProvider).isLoading;
+
     return Scaffold(
       backgroundColor: CustomColor.background,
       appBar: const TwelfthAppBar(),
@@ -56,10 +77,8 @@ class _SignUpEmailViewState extends State<SignUpEmailView> {
                       if (value == null || value.isEmpty) {
                         return '이메일을 입력해 주세요';
                       }
-                      final emailRegex = RegExp(
-                        r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$',
-                      );
-                      if (!emailRegex.hasMatch(value)) {
+                      if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
+                          .hasMatch(value)) {
                         return '올바른 이메일 형식을 입력해 주세요';
                       }
                       return null;
@@ -72,15 +91,24 @@ class _SignUpEmailViewState extends State<SignUpEmailView> {
                       final isValidEmail = RegExp(
                         r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$',
                       ).hasMatch(value.text);
+                      final enabled = isValidEmail && !isLoading;
                       return TwelfthElevatedButton(
-                        gradient: isValidEmail
+                        gradient: enabled
                             ? TwelfthGradient.horizontal(
-                                CustomColor.silverGradient,
-                              )
+                                CustomColor.silverGradient)
                             : null,
-                        textColor: isValidEmail ? CustomColor.black : null,
-                        onPressed: isValidEmail ? _onNext : null,
-                        child: const Text('다음'),
+                        textColor: enabled ? CustomColor.black : null,
+                        onPressed: enabled ? _onNext : null,
+                        child: isLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: CustomColor.black,
+                                ),
+                              )
+                            : const Text('다음'),
                       );
                     },
                   ),

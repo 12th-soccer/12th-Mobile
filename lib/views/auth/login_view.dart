@@ -1,27 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
 import 'package:twelfth_mobile/constants/color.dart';
+import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/constants/twelfth_assets.dart';
 import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.dart';
-import 'package:go_router/go_router.dart';
-import 'package:twelfth_mobile/constants/text_style.dart';
-import 'package:twelfth_mobile/core/router/router.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
+import 'package:twelfth_mobile/features/auth/presentation/providers/auth_provider.dart';
+import 'package:twelfth_mobile/features/auth/presentation/providers/auth_state.dart';
 
-class LoginView extends StatefulWidget {
+class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  ConsumerState<LoginView> createState() => _LoginViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
+class _LoginViewState extends ConsumerState<LoginView> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+
+  static const _smallSpacing = SizedBox(height: 5);
+  static const _middleSpacing = SizedBox(height: 10);
+  static const _bigSpacing = SizedBox(height: 20);
 
   @override
   void dispose() {
@@ -30,9 +36,19 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
-  void _onLogin() {
-    if (_formKey.currentState?.validate() ?? false) {
-      context.go(AppRoutes.schedule);
+  Future<void> _onLogin() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    final success = await ref.read(authNotifierProvider.notifier).login(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+    if (!mounted) return;
+    if (success) {
+      context.go(AppRoutes.ranking);
+    } else {
+      final error = ref.read(authNotifierProvider).errorMessage;
+      _showError(error ?? '오류가 발생했습니다');
+      ref.read(authNotifierProvider.notifier).clearError();
     }
   }
 
@@ -40,11 +56,20 @@ class _LoginViewState extends State<LoginView> {
     // TODO: 서버 연결 후 Google OAuth 구현
   }
 
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: CustomTextStyle.body2.copyWith(color: CustomColor.black)),
+        backgroundColor: CustomColor.main,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    const smallSpacing = SizedBox(height: 5);
-    const middleSpacing = SizedBox(height: 10);
-    const bigSpacing = SizedBox(height: 20);
+    final isLoading = ref.watch(authNotifierProvider).isLoading;
 
     return Scaffold(
       backgroundColor: CustomColor.background,
@@ -62,22 +87,20 @@ class _LoginViewState extends State<LoginView> {
                   Center(child: SvgPicture.asset(TwelfthAssets.logo)),
                   const SizedBox(height: 48),
                   _buildLabel('이메일'),
-                  smallSpacing,
+                  _smallSpacing,
                   CustomTextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(hintText: '이메일 입력'),
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return '이메일을 입력해 주세요';
-                      }
+                      if (value == null || value.isEmpty) return '이메일을 입력해 주세요';
                       return null;
                     },
                   ),
-                  bigSpacing,
+                  _bigSpacing,
                   _buildLabel('비밀번호'),
-                  smallSpacing,
+                  _smallSpacing,
                   CustomTextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -91,9 +114,8 @@ class _LoginViewState extends State<LoginView> {
                               : Symbols.visibility,
                           color: CustomColor.gray600,
                         ),
-                        onPressed: () {
-                          setState(() => _obscurePassword = !_obscurePassword);
-                        },
+                        onPressed: () =>
+                            setState(() => _obscurePassword = !_obscurePassword),
                       ),
                     ),
                     onFieldSubmitted: (_) => _onLogin(),
@@ -106,14 +128,23 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const Spacer(flex: 1),
                   TwelfthElevatedButton(
-                    gradient: TwelfthGradient.horizontal(
-                      CustomColor.silverGradient,
-                    ),
-                    textColor: CustomColor.black,
-                    onPressed: _onLogin,
-                    child: const Text('로그인'),
+                    gradient: !isLoading
+                        ? TwelfthGradient.horizontal(CustomColor.silverGradient)
+                        : null,
+                    textColor: !isLoading ? CustomColor.black : null,
+                    onPressed: !isLoading ? _onLogin : null,
+                    child: isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: CustomColor.black,
+                            ),
+                          )
+                        : const Text('로그인'),
                   ),
-                  middleSpacing,
+                  _middleSpacing,
                   TwelfthElevatedButton(
                     isOutlined: true,
                     borderGradient: TwelfthGradient.horizontal(
@@ -122,7 +153,7 @@ class _LoginViewState extends State<LoginView> {
                     onPressed: () => context.push(AppRoutes.signUpEmail),
                     child: const Text('회원가입'),
                   ),
-                  bigSpacing,
+                  _bigSpacing,
                   Center(
                     child: Text(
                       '소셜 로그인',
@@ -131,7 +162,7 @@ class _LoginViewState extends State<LoginView> {
                       ),
                     ),
                   ),
-                  middleSpacing,
+                  _middleSpacing,
                   TwelfthElevatedButton(
                     backgroundColor: CustomColor.white,
                     textColor: CustomColor.black,
@@ -148,7 +179,5 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Widget _buildLabel(String text) {
-    return Text(text, style: CustomTextStyle.body2);
-  }
+  Widget _buildLabel(String text) => Text(text, style: CustomTextStyle.body2);
 }
