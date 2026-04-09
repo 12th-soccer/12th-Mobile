@@ -4,26 +4,20 @@ class ApiEndpoints {
   /// baseURL
   static const baseUrl = AppEnv.baseUrl;
 
-  /// auth
+  /// USEr
   static const google = "/auth/google";
-
-  /// user
   static const signUp = "/user/verify/signup";
   static const logIn = "/user/login";
   static const email = "/user/email";
   static const logOut = "/user/logout";
 
   /// ranking
-  static const ranking = "/ranking";
-
-  /// search
-  static const clubSearch = "/search/club";
-  static const playerSearch = "/search/player";
+  static String ranking(String leagueType) => "/ranking?leagueType=$leagueType";
 
   /// club
   static String club(String clubId) => "/club/$clubId";
+  static const clubSearch = "/club/search";
   static const clubFavorite = "/club/favorite";
-  static String schedule(String clubId) => "/club/schedule/$clubId";
 
   /// match
   static String match(String matchId) => "/match/$matchId";
@@ -31,14 +25,18 @@ class ApiEndpoints {
 
   /// player
   static String player(String playerId) => "/player/$playerId";
-  static const playerFavorite = "/player/interest";
+  static const playerInterest = "/player/interest";
+  static const playerSearch = "/player/search";
 
   /// favorite
   static String favoriteClub(String clubId) => "/favorite/club/$clubId";
   static String favoritePlayer(String playerId) => "/favorite/player/$playerId";
-  static String clubDelete(String clubId) => "/favorite/club/$clubId";
-  static String playerDelete(String playerId) => "/favorite/player/$playerId";
+  static String favoriteSchedule(String clubId) => "/favorite/schedule/$clubId";
 
   /// alarm
   static const alarmSetting = "/alram/setting";
+
+  /// goal & event
+  static String goal(String playerId) => "/goal/$playerId";
+  static String event(String matchId) => "/event/$matchId";
 }
