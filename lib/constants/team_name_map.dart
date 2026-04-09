@@ -3,7 +3,7 @@ abstract final class TeamNameMap {
     // K1
     'FC Seoul': 'FC 서울',
     'Ulsan HD FC': '울산 HD FC',
-    'Jeonbuk Hyundai Motors': '전북 현대 모터스',
+    'Jeonbuk Hyundai Motors FC': '전북 현대 모터스',
     'Daejeon Hana Citizen': '대전 하나 시티즌',
     'Bucheon FC 1995': '부천FC1995',
     'Gwangju FC': '광주FC',

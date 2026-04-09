@@ -40,5 +40,5 @@ class ApiEndpoints {
   static String playerDelete(String playerId) => "/favorite/player/$playerId";
 
   /// alarm
-  static const alarmSetting = "/alarm/setting";
+  static const alarmSetting = "/alram/setting";
 }
