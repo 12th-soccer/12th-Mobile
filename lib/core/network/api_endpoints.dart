@@ -10,6 +10,7 @@ class ApiEndpoints {
   static const logIn = "/user/login";
   static const email = "/user/email";
   static const logOut = "/user/logout";
+  static const userInfo = "/user/info";
 
   /// ranking
   static String ranking(String leagueType) => "/ranking?leagueType=$leagueType";
@@ -21,7 +22,7 @@ class ApiEndpoints {
 
   /// match
   static String match(String matchId) => "/match/$matchId";
-  static const matchByDate = "/match/matches";
+  static const matchByDate = "/match";
 
   /// player
   static String player(String playerId) => "/player/$playerId";
