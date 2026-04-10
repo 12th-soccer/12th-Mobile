@@ -20,17 +20,22 @@ class SearchRemoteDataSourceImpl implements ISearchRemoteDataSource {
     return rawData as Map<String, dynamic>;
   }
 
+  void _logDebug(String message) {
+    assert(() {
+      developer.log(message, name: 'SearchRemoteDataSource');
+      return true;
+    }());
+  }
+
   @override
   Future<List<ClubSearchResultModel>> searchClubs(String keyword) async {
     try {
-      developer.log('[Search] 구단 검색: keyword=$keyword');
+      _logDebug('[Search] 구단 검색 요청');
       final response = await _dio.get(
         ApiEndpoints.clubSearch,
         queryParameters: {'keyword': keyword},
       );
-      developer.log(
-        '[Search] 구단 검색 응답 status: ${response.statusCode} | data: ${response.data}',
-      );
+      _logDebug('[Search] 구단 검색 응답 status: ${response.statusCode}');
       final data = _parseMap(response.data);
       final list =
           (data['clubs'] as List<dynamic>?) ??
@@ -40,8 +45,8 @@ class SearchRemoteDataSourceImpl implements ISearchRemoteDataSource {
           .map((e) => ClubSearchResultModel.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      developer.log(
-        '[Search] 구단 검색 실패 (DioException)\n  type: ${e.type}\n  status: ${e.response?.statusCode}\n  message: ${e.message}\n  error: ${e.error}\n  URL: ${e.requestOptions.uri}\n  response: ${e.response?.data}',
+      _logDebug(
+        '[Search] 구단 검색 실패 type=${e.type} status=${e.response?.statusCode} path=${e.requestOptions.path}',
       );
       rethrow;
     } catch (e, stack) {

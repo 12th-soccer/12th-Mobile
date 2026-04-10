@@ -6,6 +6,7 @@ enum SearchStatus { initial, loading, success, empty, error }
 enum SearchFilter { player, club }
 
 class SearchState {
+  static const Object _noChange = Object();
   final SearchStatus status;
   final SearchFilter filter;
   final List<ClubSearchResult> clubs;
@@ -31,12 +32,14 @@ class SearchState {
     SearchFilter? filter,
     List<ClubSearchResult>? clubs,
     List<PlayerSearchResult>? players,
-    String? errorMessage,
+    Object? errorMessage = _noChange,
   }) => SearchState(
     status: status ?? this.status,
     filter: filter ?? this.filter,
     clubs: clubs ?? this.clubs,
     players: players ?? this.players,
-    errorMessage: errorMessage,
+    errorMessage: identical(errorMessage, _noChange)
+        ? this.errorMessage
+        : errorMessage as String?,
   );
 }

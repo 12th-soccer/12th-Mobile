@@ -26,6 +26,8 @@ final _searchPlayersUseCaseProvider = Provider<SearchPlayersUseCase>(
 );
 
 class SearchNotifier extends Notifier<SearchState> {
+  int _requestId = 0;
+
   @override
   SearchState build() => const SearchState();
 
@@ -33,16 +35,19 @@ class SearchNotifier extends Notifier<SearchState> {
     state = state.copyWith(
       filter: filter,
       status: SearchStatus.initial,
+      errorMessage: null,
       clubs: [],
       players: [],
     );
   }
 
   Future<void> search(String keyword) async {
+    final requestId = ++_requestId;
     final q = keyword.trim();
     if (q.isEmpty) {
       state = state.copyWith(
         status: SearchStatus.initial,
+        errorMessage: null,
         clubs: [],
         players: [],
       );
@@ -54,11 +59,13 @@ class SearchNotifier extends Notifier<SearchState> {
     try {
       if (state.filter == SearchFilter.club) {
         final clubs = await ref.read(_searchClubsUseCaseProvider).call(q);
+        if (requestId != _requestId) return;
         state = clubs.isEmpty
             ? state.copyWith(status: SearchStatus.empty, clubs: [])
             : state.copyWith(status: SearchStatus.success, clubs: clubs);
       } else {
         final players = await ref.read(_searchPlayersUseCaseProvider).call(q);
+        if (requestId != _requestId) return;
         state = players.isEmpty
             ? state.copyWith(status: SearchStatus.empty, players: [])
             : state.copyWith(status: SearchStatus.success, players: players);
@@ -72,7 +79,7 @@ class SearchNotifier extends Notifier<SearchState> {
   }
 
   void reset() {
-    state = SearchState(filter: state.filter);
+    state = SearchState(filter: state.filter, errorMessage: null);
   }
 
   String _parseError(DioException e) {
