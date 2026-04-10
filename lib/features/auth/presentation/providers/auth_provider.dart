@@ -61,7 +61,7 @@ class AuthNotifier extends Notifier<AuthState> {
       );
       state = state.copyWith(
         status: AuthStatus.error,
-        errorMessage: _parseError(e),
+        errorMessage: _parseEmailError(e),
       );
       return false;
     } catch (e, stack) {
@@ -177,18 +177,37 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 
   Future<void> logout() async {
+    developer.log('[Auth] 로그아웃 시작');
     state = state.copyWith(status: AuthStatus.loading);
     try {
       await ref.read(_logoutUseCaseProvider).call();
+      developer.log('[Auth] 로그아웃 성공 → 상태 초기화');
     } on DioException catch (e) {
-      developer.log('[Auth] 로그아웃 실패: ${e.message}');
+      developer.log(
+        '[Auth] 로그아웃 실패 (DioException)\n'
+        '  type: ${e.type}\n'
+        '  status: ${e.response?.statusCode}\n'
+        '  message: ${e.message}\n'
+        '  response: ${e.response?.data}',
+      );
+    } catch (e, stack) {
+      developer.log('[Auth] 로그아웃 실패 (Exception)\n  $e\n$stack');
     } finally {
+      developer.log('[Auth] 로그아웃 finally → 토큰 초기화');
       state = const AuthState();
     }
   }
 
   void clearError() {
     state = state.copyWith(status: AuthStatus.initial, errorMessage: null);
+  }
+
+  String _parseEmailError(DioException e) {
+    final status = e.response?.statusCode;
+    if (status == 409 || status == 400) {
+      return '이미 가입된 이메일 입니다.';
+    }
+    return _parseError(e);
   }
 
   String _parseError(DioException e) {
@@ -202,7 +221,7 @@ class AuthNotifier extends Notifier<AuthState> {
       case 404:
         return '해당 이메일을 가진 유저를 찾을 수 없습니다';
       case 409:
-        return '이미 가입된 이메일입니다';
+        return '이미 등록된 이메일입니다.';
       case 500:
         return '서버 오류가 발생했습니다';
       default:

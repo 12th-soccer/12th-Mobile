@@ -48,7 +48,9 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
 
   @override
   Future<void> sendVerificationEmail(String email) async {
-    await _dio.post(ApiEndpoints.email, data: {'email': email});
+    developer.log('[Auth] 인증 이메일 발송 요청: $email');
+    final response = await _dio.post(ApiEndpoints.email, data: {'email': email});
+    developer.log('[Auth] 인증 이메일 발송 응답: status=${response.statusCode}, data=${response.data}');
   }
 
   @override
@@ -65,6 +67,8 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
 
   @override
   Future<void> logout() async {
-    await _dio.delete(ApiEndpoints.logOut);
+    developer.log('[Auth] 로그아웃 요청: DELETE ${ApiEndpoints.logOut}');
+    final response = await _dio.delete(ApiEndpoints.logOut);
+    developer.log('[Auth] 로그아웃 응답: status=${response.statusCode}');
   }
 }
