@@ -54,7 +54,7 @@ class ClubDetailModel {
         clubId: json['clubId'] as int,
         clubName: TeamNameMap.translate(json['clubName'] as String),
         stadiumName: json['stadiumName'] as String,
-        matches: (json['matches'] as List<dynamic>)
+        matches: ((json['matches'] as List<dynamic>?) ?? [])
             .map((e) => ClubMatchModel.fromJson(e as Map<String, dynamic>))
             .toList(),
       );

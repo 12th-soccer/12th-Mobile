@@ -9,11 +9,13 @@ import 'package:twelfth_mobile/common/components/title/twelfth_accent_title.dart
 import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.dart';
+import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/features/auth/presentation/providers/auth_provider.dart';
 
 class SignUpVerifyView extends ConsumerStatefulWidget {
   final String email;
+
   const SignUpVerifyView({super.key, required this.email});
 
   @override
@@ -38,7 +40,6 @@ class _SignUpVerifyViewState extends ConsumerState<SignUpVerifyView> {
     super.dispose();
   }
 
-  /// 재전송 — API 재호출 + 타이머 초기화
   Future<void> _resendCode() async {
     await ref
         .read(authNotifierProvider.notifier)
@@ -73,15 +74,10 @@ class _SignUpVerifyViewState extends ConsumerState<SignUpVerifyView> {
     if (success) {
       context.push(AppRoutes.signUpPassword);
     } else {
-      final error = ref.read(authNotifierProvider).errorMessage;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error ?? '오류가 발생했습니다', style: CustomTextStyle.body2.copyWith(color: CustomColor.black)),
-          backgroundColor: CustomColor.main,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
-      );
+      final errorMessage =
+          ref.read(authNotifierProvider).errorMessage ?? '오류가 발생했습니다';
+
+      context.showErrorSnackBar(errorMessage);
       ref.read(authNotifierProvider.notifier).clearError();
     }
   }
@@ -158,7 +154,9 @@ class _SignUpVerifyViewState extends ConsumerState<SignUpVerifyView> {
                   gradient: isComplete && !isLoading
                       ? TwelfthGradient.horizontal(CustomColor.silverGradient)
                       : null,
-                  textColor: isComplete && !isLoading ? CustomColor.black : null,
+                  textColor: isComplete && !isLoading
+                      ? CustomColor.black
+                      : null,
                   onPressed: isComplete && !isLoading ? _onNext : null,
                   child: isLoading
                       ? const SizedBox(

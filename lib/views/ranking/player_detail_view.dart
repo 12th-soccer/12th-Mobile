@@ -1,64 +1,151 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
-import 'package:twelfth_mobile/common/components/bookmark/bookmarking.dart';
 import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
+import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
+import 'package:twelfth_mobile/features/favorites/presentation/providers/favorites_provider.dart';
+import 'package:twelfth_mobile/features/ranking/domain/entities/player_detail.dart';
+import 'package:twelfth_mobile/features/ranking/presentation/providers/ranking_provider.dart';
 
-class PlayerDetailView extends StatelessWidget {
+class PlayerDetailView extends ConsumerWidget {
+  final int playerId;
   final String playerName;
-  static const spacing = SizedBox(height: 20);
 
-  const PlayerDetailView({super.key, required this.playerName});
+  const PlayerDetailView({
+    super.key,
+    required this.playerId,
+    required this.playerName,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: Bookmarking.instance,
-      builder: (context, _) {
-        final isBookmarked = Bookmarking.instance.isPlayerBookmarked(playerName);
-        return Scaffold(
-          backgroundColor: CustomColor.background,
-          appBar: TwelfthAppBar(
-            title: '선수 상세',
-            actions: [
-              IconButton(
-                icon: Icon(
-                  Symbols.star,
-                  color: isBookmarked ? CustomColor.yellow : CustomColor.main,
-                  fill: isBookmarked ? 1 : 0,
-                ),
-                onPressed: () => Bookmarking.instance.togglePlayer(playerName),
-              ),
-            ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final detailAsync = ref.watch(playerDetailProvider(playerId));
+    final favoritesAsync = ref.watch(favoritePlayersNotifierProvider);
+    final isFavorite =
+        favoritesAsync.valueOrNull?.any((p) => p.playerId == playerId) ?? false;
+
+    return Scaffold(
+      backgroundColor: CustomColor.background,
+      appBar: TwelfthAppBar(
+        title: '선수 상세',
+        actions: [
+          IconButton(
+            icon: Icon(
+              Symbols.star,
+              color: isFavorite ? CustomColor.yellow : CustomColor.main,
+              fill: isFavorite ? 1 : 0,
+            ),
+            onPressed: () async {
+              try {
+                await ref
+                    .read(favoritePlayersNotifierProvider.notifier)
+                    .toggleFavorite(playerId, playerName);
+              } catch (_) {
+                if (context.mounted) {
+                  context.showErrorSnackBar(
+                    '관심 선수 설정에 실패했습니다.',
+                  );
+                }
+              }
+            },
           ),
-          body: SingleChildScrollView(
-            child: _buildPlayerHeader(),
-          ),
-        );
-      },
+        ],
+      ),
+      body: detailAsync.when(
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: CustomColor.white),
+        ),
+        error: (e, _) =>
+            _buildBody(PlayerDetail(playerId: playerId, name: playerName)),
+        data: _buildBody,
+      ),
     );
   }
 
-  Widget _buildPlayerHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-      child: Column(
-        children: [
-          Center(
-            child: Container(
-              width: 100,
-              height: 100,
-              decoration: const BoxDecoration(
-                color: CustomColor.gray900,
-                shape: BoxShape.circle,
+  Widget _buildBody(PlayerDetail detail) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        child: Column(
+          children: [
+            Center(
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: const BoxDecoration(
+                  color: CustomColor.gray900,
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Center(child: Text(playerName, style: CustomTextStyle.heading1)),
-        ],
+            const SizedBox(height: 16),
+            Center(child: Text(detail.name, style: CustomTextStyle.heading1)),
+            const SizedBox(height: 24),
+            _InfoGrid(detail: detail),
+          ],
+        ),
       ),
+    );
+  }
+}
+
+class _InfoGrid extends StatelessWidget {
+  final PlayerDetail detail;
+
+  static const _vGap20 = SizedBox(height: 20);
+
+  const _InfoGrid({required this.detail});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            children: [
+              _InfoCell(label: '소속', value: detail.clubName),
+              _vGap20,
+              _InfoCell(label: '포지션', value: detail.position),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Column(
+            children: [
+              _InfoCell(
+                label: '나이',
+                value: detail.age != null ? '${detail.age}세' : null,
+              ),
+              _vGap20,
+              _InfoCell(label: '번호', value: detail.number?.toString()),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _InfoCell extends StatelessWidget {
+  final String label;
+  final String? value;
+
+  const _InfoCell({required this.label, this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    if (value == null) return const SizedBox.shrink();
+    return Column(
+      children: [
+        Text(
+          label,
+          style: CustomTextStyle.body3.copyWith(color: CustomColor.gray500),
+        ),
+        const SizedBox(height: 4),
+        Text(value!, style: CustomTextStyle.body1),
+      ],
     );
   }
 }

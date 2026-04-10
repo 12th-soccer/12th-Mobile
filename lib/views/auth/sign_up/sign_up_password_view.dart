@@ -8,6 +8,7 @@ import 'package:twelfth_mobile/common/components/title/twelfth_accent_title.dart
 import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.dart';
+import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/features/auth/presentation/providers/auth_provider.dart';
 
@@ -41,15 +42,10 @@ class _SignUpPasswordViewState extends ConsumerState<SignUpPasswordView> {
     if (success) {
       context.go(AppRoutes.signUpSuccess);
     } else {
-      final error = ref.read(authNotifierProvider).errorMessage;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error ?? '오류가 발생했습니다', style: CustomTextStyle.body2.copyWith(color: CustomColor.black)),
-          backgroundColor: CustomColor.main,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
-      );
+      final errorMessage =
+          ref.read(authNotifierProvider).errorMessage ?? '오류가 발생했습니다.';
+
+      context.showErrorSnackBar(errorMessage);
       ref.read(authNotifierProvider.notifier).clearError();
     }
   }
@@ -119,9 +115,8 @@ class _SignUpPasswordViewState extends ConsumerState<SignUpPasswordView> {
                           color: CustomColor.gray600,
                           size: 20,
                         ),
-                        onPressed: () => setState(
-                          () => _obscureConfirm = !_obscureConfirm,
-                        ),
+                        onPressed: () =>
+                            setState(() => _obscureConfirm = !_obscureConfirm),
                       ),
                     ),
                     onFieldSubmitted: (_) => _onCreate(),
@@ -143,16 +138,20 @@ class _SignUpPasswordViewState extends ConsumerState<SignUpPasswordView> {
                   ),
                   const Spacer(),
                   ListenableBuilder(
-                    listenable: Listenable.merge(
-                        [_passwordController, _confirmController]),
+                    listenable: Listenable.merge([
+                      _passwordController,
+                      _confirmController,
+                    ]),
                     builder: (context, _) {
-                      final isFilled = _passwordController.text.isNotEmpty &&
+                      final isFilled =
+                          _passwordController.text.isNotEmpty &&
                           _confirmController.text.isNotEmpty;
                       final enabled = isFilled && !isLoading;
                       return TwelfthElevatedButton(
                         gradient: enabled
                             ? TwelfthGradient.horizontal(
-                                CustomColor.silverGradient)
+                                CustomColor.silverGradient,
+                              )
                             : null,
                         textColor: enabled ? CustomColor.black : null,
                         onPressed: enabled ? _onCreate : null,

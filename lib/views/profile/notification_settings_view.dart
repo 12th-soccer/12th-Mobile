@@ -4,6 +4,8 @@ import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
 import 'package:twelfth_mobile/common/providers/notification_settings_provider.dart';
 import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
+import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
+import 'package:twelfth_mobile/features/alarm/presentation/providers/alarm_provider.dart';
 
 class NotificationSettingsView extends ConsumerStatefulWidget {
   const NotificationSettingsView({super.key});
@@ -32,13 +34,26 @@ class _NotificationSettingsViewState
     _before15Min = saved.before15Min;
   }
 
-  void _save() {
+  Future<void> _save() async {
     final notifier = ref.read(notificationSettingsProvider.notifier);
     notifier.setMaster(_masterEnabled);
     notifier.setOnMatchStart(_onMatchStart);
     notifier.setBefore1Hour(_before1Hour);
     notifier.setBefore30Min(_before30Min);
     notifier.setBefore15Min(_before15Min);
+
+    if (_masterEnabled) {
+      final success = await ref.read(alarmNotifierProvider.notifier).setAlarm();
+      if (!mounted) return;
+      if (!success) {
+        context.showErrorSnackBar(
+          '알람 설정에 실패했습니다. 다시 시도해 주세요.',
+        );
+        return;
+      }
+    }
+
+    if (!mounted) return;
     Navigator.of(context).pop();
   }
 
@@ -122,8 +137,9 @@ class _NotificationSettingsViewState
               if (sublabel != null)
                 Text(
                   sublabel,
-                  style: CustomTextStyle.body3
-                      .copyWith(color: CustomColor.gray500),
+                  style: CustomTextStyle.body3.copyWith(
+                    color: CustomColor.gray500,
+                  ),
                 ),
             ],
           ),

@@ -8,6 +8,7 @@ import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/constants/twelfth_assets.dart';
 import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.dart';
+import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/features/auth/presentation/providers/auth_provider.dart';
 import 'package:twelfth_mobile/features/auth/presentation/providers/auth_state.dart';
@@ -38,7 +39,9 @@ class _LoginViewState extends ConsumerState<LoginView> {
 
   Future<void> _onLogin() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    final success = await ref.read(authNotifierProvider.notifier).login(
+    final success = await ref
+        .read(authNotifierProvider.notifier)
+        .login(
           email: _emailController.text,
           password: _passwordController.text,
         );
@@ -57,14 +60,10 @@ class _LoginViewState extends ConsumerState<LoginView> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message, style: CustomTextStyle.body2.copyWith(color: CustomColor.black)),
-        backgroundColor: CustomColor.main,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
+    final errorMessage =
+        ref.read(authNotifierProvider).errorMessage ?? '오류가 발생했습니다';
+
+    context.showErrorSnackBar(errorMessage);
   }
 
   @override
@@ -114,8 +113,9 @@ class _LoginViewState extends ConsumerState<LoginView> {
                               : Symbols.visibility,
                           color: CustomColor.gray600,
                         ),
-                        onPressed: () =>
-                            setState(() => _obscurePassword = !_obscurePassword),
+                        onPressed: () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
                       ),
                     ),
                     onFieldSubmitted: (_) => _onLogin(),

@@ -1,29 +1,35 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
-import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.dart';
+import 'package:twelfth_mobile/core/router/router_paths.dart';
+import 'package:twelfth_mobile/features/match/domain/entities/match.dart';
+import 'package:twelfth_mobile/features/match/presentation/providers/match_provider.dart';
+import 'package:twelfth_mobile/views/match/match_detail_view.dart';
 
-class ScheduleView extends StatefulWidget {
+class ScheduleView extends ConsumerStatefulWidget {
   const ScheduleView({super.key});
 
   @override
-  State<ScheduleView> createState() => _ScheduleViewState();
+  ConsumerState<ScheduleView> createState() => _ScheduleViewState();
 }
 
-class _ScheduleViewState extends State<ScheduleView> {
+class _ScheduleViewState extends ConsumerState<ScheduleView> {
   late DateTime _focusedMonth;
   late DateTime _selectedDate;
   int _leagueTabIndex = 0;
   Timer? _autoRefreshTimer;
-  final _searchController = TextEditingController();
 
-  static final _searchBorder = OutlineInputBorder(
-    borderSide: const BorderSide(color: CustomColor.gray800),
-    borderRadius: BorderRadius.circular(8),
-  );
+  String get _dateKey {
+    final d = _selectedDate;
+    final mm = d.month.toString().padLeft(2, '0');
+    final dd = d.day.toString().padLeft(2, '0');
+    return '${d.year}-$mm-$dd';
+  }
 
   @override
   void initState() {
@@ -37,7 +43,6 @@ class _ScheduleViewState extends State<ScheduleView> {
   @override
   void dispose() {
     _autoRefreshTimer?.cancel();
-    _searchController.dispose();
     super.dispose();
   }
 
@@ -59,7 +64,7 @@ class _ScheduleViewState extends State<ScheduleView> {
   }
 
   Future<void> _onRefresh() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    ref.invalidate(matchesByDateProvider(_dateKey));
     _resetToToday();
   }
 
@@ -72,21 +77,33 @@ class _ScheduleViewState extends State<ScheduleView> {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: CustomTextFormField(
-                controller: _searchController,
-                keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.search,
-                decoration: InputDecoration(
-                  hintText: '선수이름, 구단이름으로 검색',
-                  fillColor: CustomColor.gray800,
-                  enabledBorder: _searchBorder,
-                  focusedBorder: _searchBorder,
-                  prefixIcon: const Icon(
-                    Symbols.search,
-                    color: CustomColor.gray600,
+              child: GestureDetector(
+                onTap: () => context.push(AppRoutes.search),
+                child: Container(
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: CustomColor.gray800,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: CustomColor.gray800),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Symbols.search,
+                        color: CustomColor.gray600,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '선수이름, 구단이름으로 검색',
+                        style: CustomTextStyle.body2.copyWith(
+                          color: CustomColor.gray600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                onChanged: (_) => setState(() {}),
               ),
             ),
             const SizedBox(height: 20),
@@ -119,26 +136,230 @@ class _ScheduleViewState extends State<ScheduleView> {
   }
 
   Widget _buildMatchList() {
-    return RefreshIndicator(
-      onRefresh: _onRefresh,
-      color: CustomColor.white,
-      backgroundColor: CustomColor.gray900,
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 40),
-            child: Center(
+    final matchesAsync = ref.watch(matchesByDateProvider(_dateKey));
+    final leagueFilter = _leagueTabIndex == 0 ? 'K1' : 'K2';
+
+    return matchesAsync.when(
+      loading: () => const Center(
+        child: CircularProgressIndicator(color: CustomColor.white),
+      ),
+      error: (e, _) => RefreshIndicator(
+        onRefresh: _onRefresh,
+        color: CustomColor.white,
+        backgroundColor: CustomColor.gray900,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(vertical: 40),
+          children: [
+            Center(
               child: Text(
-                '해당 날짜에 경기가 없습니다',
-                style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
+                '경기 정보를 불러오지 못했습니다',
+                style: CustomTextStyle.body2.copyWith(
+                  color: CustomColor.gray500,
+                ),
               ),
             ),
+          ],
+        ),
+      ),
+      data: (matches) {
+        final filtered = matches
+            .where((m) => m.leagueType == null || m.leagueType == leagueFilter)
+            .toList();
+
+        if (filtered.isEmpty) {
+          return RefreshIndicator(
+            onRefresh: _onRefresh,
+            color: CustomColor.white,
+            backgroundColor: CustomColor.gray900,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(vertical: 40),
+              children: [
+                Center(
+                  child: Text(
+                    '해당 날짜에 경기가 없습니다',
+                    style: CustomTextStyle.body2.copyWith(
+                      color: CustomColor.gray500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: _onRefresh,
+          color: CustomColor.white,
+          backgroundColor: CustomColor.gray900,
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            itemCount: filtered.length,
+            itemBuilder: (context, index) => _MatchCard(match: filtered[index]),
           ),
-        ],
+        );
+      },
+    );
+  }
+}
+
+class _MatchCard extends StatelessWidget {
+  final Match match;
+
+  const _MatchCard({required this.match});
+
+  @override
+  Widget build(BuildContext context) {
+    final dateStr = '${match.matchDate.month}/${match.matchDate.day}';
+    final timeStr =
+        '${match.matchDate.hour.toString().padLeft(2, '0')}:${match.matchDate.minute.toString().padLeft(2, '0')}';
+
+    MatchState state;
+    if (match.isFinished) {
+      state = MatchState.finished;
+    } else if (match.matchDate.isBefore(DateTime.now())) {
+      state = MatchState.live;
+    } else {
+      state = MatchState.upcoming;
+    }
+
+    final extra = MatchExtra(
+      matchId: match.matchId,
+      homeTeam: match.homeTeamName,
+      awayTeam: match.awayTeamName,
+      matchState: state,
+      matchDate: dateStr,
+      matchTime: timeStr,
+    );
+
+    return GestureDetector(
+      onTap: () => context.push(AppRoutes.match, extra: extra),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: CustomColor.gray900,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _TeamTag(name: match.awayTeamName, align: MainAxisAlignment.start),
+            _CenterInfo(
+              matchState: state,
+              homeScore: match.homeTeamScore,
+              awayScore: match.awayTeamScore,
+              dateStr: dateStr,
+              timeStr: timeStr,
+            ),
+            _TeamTag(name: match.homeTeamName, align: MainAxisAlignment.end),
+          ],
+        ),
       ),
     );
+  }
+}
+
+class _TeamTag extends StatelessWidget {
+  final String name;
+  final MainAxisAlignment align;
+
+  const _TeamTag({required this.name, required this.align});
+
+  @override
+  Widget build(BuildContext context) {
+    final logo = Container(
+      width: 36,
+      height: 36,
+      decoration: const BoxDecoration(
+        color: CustomColor.gray800,
+        shape: BoxShape.circle,
+      ),
+    );
+    final label = Flexible(
+      child: Text(
+        name,
+        style: CustomTextStyle.body2,
+        overflow: TextOverflow.ellipsis,
+        textAlign: align == MainAxisAlignment.start
+            ? TextAlign.left
+            : TextAlign.right,
+      ),
+    );
+
+    return Expanded(
+      child: Row(
+        mainAxisAlignment: align,
+        children: align == MainAxisAlignment.start
+            ? [logo, const SizedBox(width: 6), label]
+            : [label, const SizedBox(width: 6), logo],
+      ),
+    );
+  }
+}
+
+class _CenterInfo extends StatelessWidget {
+  final MatchState matchState;
+  final int? homeScore;
+  final int? awayScore;
+  final String? dateStr;
+  final String? timeStr;
+
+  const _CenterInfo({
+    required this.matchState,
+    this.homeScore,
+    this.awayScore,
+    this.dateStr,
+    this.timeStr,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    switch (matchState) {
+      case MatchState.live:
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Live',
+              style: CustomTextStyle.body3.copyWith(color: CustomColor.green),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              homeScore != null && awayScore != null
+                  ? '$awayScore : $homeScore'
+                  : '- : -',
+              style: CustomTextStyle.heading2,
+            ),
+          ],
+        );
+      case MatchState.finished:
+        return Text(
+          homeScore != null && awayScore != null
+              ? '$awayScore : $homeScore'
+              : '- : -',
+          style: CustomTextStyle.heading2,
+        );
+      case MatchState.upcoming:
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (dateStr != null)
+              Text(
+                dateStr!,
+                style: CustomTextStyle.body3.copyWith(
+                  color: CustomColor.gray500,
+                ),
+              ),
+            if (timeStr != null) ...[
+              const SizedBox(height: 2),
+              Text(timeStr!, style: CustomTextStyle.heading2),
+            ],
+          ],
+        );
+    }
   }
 }
 
@@ -329,7 +550,9 @@ class _LeagueTabs extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: isSelected ? CustomColor.white : Colors.transparent,
+                      color: isSelected
+                          ? CustomColor.white
+                          : Colors.transparent,
                       width: 2,
                     ),
                   ),
@@ -338,7 +561,9 @@ class _LeagueTabs extends StatelessWidget {
                   child: Text(
                     label,
                     style: CustomTextStyle.heading3.copyWith(
-                      color: isSelected ? CustomColor.white : CustomColor.gray600,
+                      color: isSelected
+                          ? CustomColor.white
+                          : CustomColor.gray600,
                     ),
                   ),
                 ),

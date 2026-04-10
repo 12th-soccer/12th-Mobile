@@ -1,13 +1,16 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
+import 'package:twelfth_mobile/constants/team_name_map.dart';
 import 'package:twelfth_mobile/core/network/api_endpoints.dart';
 import 'package:twelfth_mobile/features/ranking/data/models/club_detail_model.dart';
 import 'package:twelfth_mobile/features/ranking/data/models/club_ranking_model.dart';
+import 'package:twelfth_mobile/features/ranking/domain/entities/player_detail.dart';
 
 abstract interface class IRankingRemoteDataSource {
-  Future<List<ClubRankingModel>> getRanking();
+  Future<List<ClubRankingModel>> getRanking(String leagueType);
   Future<ClubDetailModel> getClubDetail(int clubId);
+  Future<PlayerDetail> getPlayerDetail(int playerId);
 }
 
 class RankingRemoteDataSourceImpl implements IRankingRemoteDataSource {
@@ -15,15 +18,17 @@ class RankingRemoteDataSourceImpl implements IRankingRemoteDataSource {
   const RankingRemoteDataSourceImpl(this._dio);
 
   @override
-  Future<List<ClubRankingModel>> getRanking() async {
+  Future<List<ClubRankingModel>> getRanking(String leagueType) async {
     try {
-      developer.log('[Ranking] 랭킹 요청: ${ApiEndpoints.ranking}');
-      final response = await _dio.get(ApiEndpoints.ranking);
+      final url = ApiEndpoints.ranking(leagueType);
+      developer.log('[Ranking] 랭킹 요청: $url');
+      final response = await _dio.get(url);
       developer.log('[Ranking] 응답 status: ${response.statusCode}');
       developer.log('[Ranking] 응답 data type: ${response.data.runtimeType}');
       final rawData = response.data;
-      final List<dynamic> list =
-          rawData is String ? jsonDecode(rawData) as List<dynamic> : rawData as List<dynamic>;
+      final List<dynamic> list = rawData is String
+          ? jsonDecode(rawData) as List<dynamic>
+          : rawData as List<dynamic>;
       return list
           .map((e) => ClubRankingModel.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -49,8 +54,9 @@ class RankingRemoteDataSourceImpl implements IRankingRemoteDataSource {
       final response = await _dio.get(ApiEndpoints.club(clubId.toString()));
       developer.log('[Ranking] 클럽 상세 응답 status: ${response.statusCode}');
       final rawData = response.data;
-      final Map<String, dynamic> jsonMap =
-          rawData is String ? jsonDecode(rawData) as Map<String, dynamic> : rawData as Map<String, dynamic>;
+      final Map<String, dynamic> jsonMap = rawData is String
+          ? jsonDecode(rawData) as Map<String, dynamic>
+          : rawData as Map<String, dynamic>;
       return ClubDetailModel.fromJson(jsonMap);
     } on DioException catch (e) {
       developer.log(
@@ -62,6 +68,38 @@ class RankingRemoteDataSourceImpl implements IRankingRemoteDataSource {
       rethrow;
     } catch (e, stack) {
       developer.log('[Ranking] 클럽 상세 실패 (Exception)\n  $e\n$stack');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<PlayerDetail> getPlayerDetail(int playerId) async {
+    try {
+      developer.log('[Player] 선수 상세 요청: playerId=$playerId');
+      final response = await _dio.get(ApiEndpoints.player(playerId.toString()));
+      developer.log('[Player] 선수 상세 응답 status: ${response.statusCode} | data: ${response.data}');
+      final rawData = response.data;
+      final Map<String, dynamic> json = rawData is String
+          ? jsonDecode(rawData) as Map<String, dynamic>
+          : rawData as Map<String, dynamic>;
+      final rawClubName = json['clubName'] as String?;
+      return PlayerDetail(
+        playerId: json['playerId'] as int,
+        name: json['name'] as String,
+        age: json['age'] as int?,
+        position: json['position'] as String?,
+        number: json['number'] as int?,
+        clubName: rawClubName != null ? TeamNameMap.translate(rawClubName) : null,
+      );
+    } on DioException catch (e) {
+      developer.log(
+        '[Player] 선수 상세 실패 (DioException)\n'
+        '  status: ${e.response?.statusCode}\n'
+        '  URL: ${e.requestOptions.uri}',
+      );
+      rethrow;
+    } catch (e, stack) {
+      developer.log('[Player] 선수 상세 실패 (Exception)\n  $e\n$stack');
       rethrow;
     }
   }

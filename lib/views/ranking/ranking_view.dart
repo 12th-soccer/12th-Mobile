@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:twelfth_mobile/common/components/bookmark/bookmarking.dart';
 import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
+import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
+import 'package:twelfth_mobile/core/router/team_route_args.dart';
+import 'package:twelfth_mobile/features/favorites/presentation/providers/favorites_provider.dart';
 import 'package:twelfth_mobile/features/ranking/domain/entities/club_ranking.dart';
 import 'package:twelfth_mobile/features/ranking/presentation/providers/ranking_provider.dart';
 
@@ -34,9 +36,11 @@ class _RankingViewState extends ConsumerState<RankingView> {
     return null;
   }
 
+  String get _currentLeague => _tabs[_tabIndex];
+
   @override
   Widget build(BuildContext context) {
-    final rankingAsync = ref.watch(rankingNotifierProvider);
+    final rankingAsync = ref.watch(rankingProvider(_currentLeague));
 
     return Scaffold(
       backgroundColor: CustomColor.background,
@@ -55,18 +59,20 @@ class _RankingViewState extends ConsumerState<RankingView> {
                     children: [
                       Text(
                         _parseError(e),
-                        style: CustomTextStyle.body2
-                            .copyWith(color: CustomColor.gray500),
+                        style: CustomTextStyle.body2.copyWith(
+                          color: CustomColor.gray500,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
                       GestureDetector(
                         onTap: () =>
-                            ref.read(rankingNotifierProvider.notifier).refresh(),
+                            ref.invalidate(rankingProvider(_currentLeague)),
                         child: Text(
                           '다시 시도',
-                          style: CustomTextStyle.body2
-                              .copyWith(color: CustomColor.white),
+                          style: CustomTextStyle.body2.copyWith(
+                            color: CustomColor.white,
+                          ),
                         ),
                       ),
                     ],
@@ -114,28 +120,29 @@ class _RankingViewState extends ConsumerState<RankingView> {
   }
 
   Widget _buildRankingList(List<ClubRanking> teams) {
-    return ListenableBuilder(
-      listenable: Bookmarking.instance,
-      builder: (context, _) => RefreshIndicator(
-        onRefresh: () =>
-            ref.read(rankingNotifierProvider.notifier).refresh(),
-        color: CustomColor.white,
-        backgroundColor: CustomColor.gray900,
-        child: ListView.builder(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          itemCount: teams.length,
-          itemBuilder: (context, index) => _buildTeamItem(teams[index]),
-        ),
+    return RefreshIndicator(
+      onRefresh: () async => ref.invalidate(rankingProvider(_currentLeague)),
+      color: CustomColor.white,
+      backgroundColor: CustomColor.gray900,
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        itemCount: teams.length,
+        itemBuilder: (context, index) => _buildTeamItem(teams[index]),
       ),
     );
   }
 
   Widget _buildTeamItem(ClubRanking team) {
     final barColor = _rankBarColor(team.rank);
-    final isBookmarked = Bookmarking.instance.isTeamBookmarked(team.clubName);
+    final favorites = ref.watch(favoritesNotifierProvider);
+    final isFavorite =
+        favorites.valueOrNull?.any((c) => c.clubId == team.clubId) ?? false;
 
     return GestureDetector(
-      onTap: () => context.push(AppRoutes.team, extra: team),
+      onTap: () => context.push(
+        AppRoutes.team,
+        extra: TeamRouteArgs(clubId: team.clubId, teamName: team.clubName),
+      ),
       child: IntrinsicHeight(
         child: Row(
           children: [
@@ -150,8 +157,9 @@ class _RankingViewState extends ConsumerState<RankingView> {
                       child: Text(
                         '${team.rank}',
                         textAlign: TextAlign.center,
-                        style: CustomTextStyle.body2
-                            .copyWith(color: CustomColor.gray500),
+                        style: CustomTextStyle.body2.copyWith(
+                          color: CustomColor.gray500,
+                        ),
                       ),
                     ),
                     _spacing,
@@ -172,7 +180,6 @@ class _RankingViewState extends ConsumerState<RankingView> {
                       ),
                     ),
                     _spacing,
-                    // 승-무-패
                     SizedBox(
                       width: 48,
                       child: Text(
@@ -184,7 +191,6 @@ class _RankingViewState extends ConsumerState<RankingView> {
                         ),
                       ),
                     ),
-                    // 승점
                     SizedBox(
                       width: 28,
                       child: Text(
@@ -198,14 +204,25 @@ class _RankingViewState extends ConsumerState<RankingView> {
                     ),
                     const SizedBox(width: 4),
                     GestureDetector(
-                      onTap: () =>
-                          Bookmarking.instance.toggleTeam(team.clubName),
+                      onTap: () async {
+                        try {
+                          await ref
+                              .read(favoritesNotifierProvider.notifier)
+                              .toggleFavorite(team.clubId, team.clubName);
+                        } catch (_) {
+                          if (context.mounted) {
+                            context.showErrorSnackBar(
+                              '관심 구단 설정에 실패했습니다.',
+                            );
+                          }
+                        }
+                      },
                       child: Icon(
                         Symbols.star,
-                        color: isBookmarked
+                        color: isFavorite
                             ? CustomColor.yellow
                             : CustomColor.main,
-                        fill: isBookmarked ? 1 : 0,
+                        fill: isFavorite ? 1 : 0,
                         size: 20,
                       ),
                     ),

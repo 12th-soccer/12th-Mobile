@@ -3,7 +3,9 @@ import 'package:twelfth_mobile/features/ranking/domain/repositories/i_ranking_re
 
 class GetRankingUseCase {
   final IRankingRepository _repository;
+
   const GetRankingUseCase(this._repository);
 
-  Future<List<ClubRanking>> call() => _repository.getRanking();
+  Future<List<ClubRanking>> call(String leagueType) =>
+      _repository.getRanking(leagueType);
 }
