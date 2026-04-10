@@ -21,7 +21,7 @@ class ApiEndpoints {
 
   /// match
   static String match(String matchId) => "/match/$matchId";
-  static String matchDate(String date) => "/match/matches?date=$date";
+  static const matchByDate = "/match/matches";
 
   /// player
   static String player(String playerId) => "/player/$playerId";

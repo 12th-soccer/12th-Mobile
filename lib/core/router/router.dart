@@ -17,7 +17,8 @@ import 'package:twelfth_mobile/views/profile/notification_settings_view.dart';
 import 'package:twelfth_mobile/views/profile/profile_view.dart';
 import 'package:twelfth_mobile/views/ranking/player_detail_view.dart';
 import 'package:twelfth_mobile/views/ranking/ranking_view.dart';
-import 'package:twelfth_mobile/features/ranking/domain/entities/club_ranking.dart';
+import 'package:twelfth_mobile/core/router/player_route_args.dart';
+import 'package:twelfth_mobile/core/router/team_route_args.dart';
 import 'package:twelfth_mobile/views/ranking/team_detail_view.dart';
 import 'package:twelfth_mobile/views/schedule/schedule_view.dart';
 import 'package:twelfth_mobile/views/splash_view.dart';
@@ -128,28 +129,22 @@ final appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.match,
       builder: (context, state) {
-        final extra = state.extra is MatchExtra ? state.extra as MatchExtra : null;
-        return MatchDetailView(
-          homeTeam: extra?.homeTeam ?? '',
-          awayTeam: extra?.awayTeam ?? '',
-          matchState: extra?.matchState ?? MatchState.upcoming,
-          matchDate: extra?.matchDate,
-          matchTime: extra?.matchTime,
-        );
+        final extra = state.extra as MatchExtra;
+        return MatchDetailView(extra: extra);
       },
     ),
     GoRoute(
       path: AppRoutes.team,
       builder: (context, state) {
-        final team = state.extra as ClubRanking;
-        return TeamDetailView(clubId: team.clubId, teamName: team.clubName);
+        final args = state.extra as TeamRouteArgs;
+        return TeamDetailView(clubId: args.clubId, teamName: args.teamName);
       },
     ),
     GoRoute(
       path: AppRoutes.player,
       builder: (context, state) {
-        final playerName = state.extra is String ? state.extra as String : '';
-        return PlayerDetailView(playerName: playerName);
+        final args = state.extra as PlayerRouteArgs;
+        return PlayerDetailView(playerId: args.playerId, playerName: args.playerName);
       },
     ),
     GoRoute(
