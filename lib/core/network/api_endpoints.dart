@@ -26,7 +26,7 @@ class ApiEndpoints {
 
   /// player
   static String player(String playerId) => "/player/$playerId";
-  static const playerInterest = "/player/interest";
+  static const playerInterest = "/player/favorite";
   static const playerSearch = "/player/search";
 
   /// favorite
