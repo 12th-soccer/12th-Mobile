@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:twelfth_mobile/constants/color.dart';
+import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 
 class MatchCard extends StatelessWidget {
   final String homeTeam;
   final String awayTeam;
+  final String? homeLogoUrl;
+  final String? awayLogoUrl;
   final Widget center;
   final double logoSize;
   final EdgeInsetsGeometry padding;
@@ -14,6 +16,8 @@ class MatchCard extends StatelessWidget {
     super.key,
     required this.homeTeam,
     required this.awayTeam,
+    this.homeLogoUrl,
+    this.awayLogoUrl,
     required this.center,
     this.logoSize = 40,
     this.padding = const EdgeInsets.all(20),
@@ -32,7 +36,7 @@ class MatchCard extends StatelessWidget {
             Expanded(
               child: Row(
                 children: [
-                  _TeamLogo(size: logoSize),
+                  NetworkAvatar(imageUrl: homeLogoUrl, size: logoSize),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -61,7 +65,7 @@ class MatchCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  _TeamLogo(size: logoSize),
+                  NetworkAvatar(imageUrl: awayLogoUrl, size: logoSize),
                 ],
               ),
             ),
@@ -72,31 +76,3 @@ class MatchCard extends StatelessWidget {
   }
 }
 
-/// TODO: 연동 시 각 구단의 로고로 변경
-class _TeamLogo extends StatelessWidget {
-  final double size;
-  final String? imageUrl;
-
-  const _TeamLogo({
-    required this.size,
-    this.imageUrl,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: const BoxDecoration(
-        color: CustomColor.gray900,
-        shape: BoxShape.circle,
-      ),
-      child: imageUrl != null
-          ? ClipOval(
-          child: Image.network(
-              imageUrl!, fit: BoxFit.cover)
-      )
-          : null,
-    );
-  }
-}
