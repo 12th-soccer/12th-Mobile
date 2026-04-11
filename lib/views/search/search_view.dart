@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/router/player_route_args.dart';
@@ -187,15 +188,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
             padding: _itemPadding,
             child: Row(
               children: [
-                Container(
-                  width: _avatarSize,
-                  height: _avatarSize,
-                  decoration: const BoxDecoration(
-                    color: CustomColor.gray900,
-                    shape: BoxShape.circle,
-                  ),
-                  // TODO: club.logoUrl 이미지 로드
-                ),
+                NetworkAvatar(imageUrl: club.logoUrl, size: _avatarSize),
                 const SizedBox(width: _itemSpacing),
                 Expanded(child: Text(club.name, style: CustomTextStyle.body1)),
                 Text('더보기', style: _subTextStyle),
@@ -225,14 +218,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
             padding: _itemPadding,
             child: Row(
               children: [
-                Container(
-                  width: _avatarSize,
-                  height: _avatarSize,
-                  decoration: const BoxDecoration(
-                    color: CustomColor.gray900,
-                    shape: BoxShape.circle,
-                  ),
-                ),
+                NetworkAvatar(imageUrl: player.imageUrl, size: _avatarSize),
                 const SizedBox(width: _itemSpacing),
                 Expanded(
                   child: Column(

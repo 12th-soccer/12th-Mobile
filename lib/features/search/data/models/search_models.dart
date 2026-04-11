@@ -1,4 +1,3 @@
-import 'package:twelfth_mobile/constants/team_name_map.dart';
 import 'package:twelfth_mobile/features/search/domain/entities/club_search_result.dart';
 import 'package:twelfth_mobile/features/search/domain/entities/player_search_result.dart';
 
@@ -16,10 +15,8 @@ class ClubSearchResultModel {
   factory ClubSearchResultModel.fromJson(Map<String, dynamic> json) =>
       ClubSearchResultModel(
         clubId: json['clubId'] as int,
-        name: TeamNameMap.translate(
-          (json['clubName'] ?? json['name']) as String,
-        ),
-        logoUrl: json['logoUrl'] as String?,
+        name: (json['clubName'] ?? json['name']) as String,
+        logoUrl: (json['clubImageUrl'] ?? json['logoUrl']) as String?,
       );
 
   ClubSearchResult toEntity() =>
@@ -29,6 +26,7 @@ class ClubSearchResultModel {
 class PlayerSearchResultModel {
   final int playerId;
   final String name;
+  final String? imageUrl;
   final int? age;
   final String? position;
   final int? number;
@@ -37,6 +35,7 @@ class PlayerSearchResultModel {
   const PlayerSearchResultModel({
     required this.playerId,
     required this.name,
+    this.imageUrl,
     this.age,
     this.position,
     this.number,
@@ -47,6 +46,7 @@ class PlayerSearchResultModel {
       PlayerSearchResultModel(
         playerId: json['playerId'] as int,
         name: json['name'] as String,
+        imageUrl: json['playerImageUrl'] as String?,
         age: json['age'] as int?,
         position: json['position'] as String?,
         number: json['number'] as int?,
@@ -54,11 +54,12 @@ class PlayerSearchResultModel {
       );
 
   PlayerSearchResult toEntity() => PlayerSearchResult(
-    playerId: playerId,
-    name: name,
-    age: age,
-    position: position,
-    number: number,
-    clubName: clubName,
-  );
+        playerId: playerId,
+        name: name,
+        imageUrl: imageUrl,
+        age: age,
+        position: position,
+        number: number,
+        clubName: clubName,
+      );
 }
