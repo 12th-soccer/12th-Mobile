@@ -16,10 +16,7 @@ class TwelfthMainApp extends StatelessWidget {
       bottomNavigationBar: TwelfthBottomNavBar(
         currentIndex: navigationShell.currentIndex,
         onTap: (index) {
-          navigationShell.goBranch(
-            index,
-            initialLocation: index == navigationShell.currentIndex,
-          );
+          navigationShell.goBranch(index, initialLocation: true);
         },
       ),
     );
