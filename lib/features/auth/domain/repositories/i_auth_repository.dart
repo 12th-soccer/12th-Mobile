@@ -1,3 +1,5 @@
+import 'package:twelfth_mobile/features/auth/domain/entities/user_info.dart';
+
 abstract interface class IAuthRepository {
   Future<void> sendVerificationEmail(String email);
 
@@ -12,4 +14,6 @@ abstract interface class IAuthRepository {
   Future<void> logout();
 
   Future<bool> isLoggedIn();
+
+  Future<UserInfo> getUserInfo();
 }

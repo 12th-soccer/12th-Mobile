@@ -5,6 +5,7 @@ import 'package:twelfth_mobile/core/network/dio.dart';
 import 'package:twelfth_mobile/core/network/token_storage.dart';
 import 'package:twelfth_mobile/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:twelfth_mobile/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:twelfth_mobile/features/auth/domain/entities/user_info.dart';
 import 'package:twelfth_mobile/features/auth/domain/repositories/i_auth_repository.dart';
 import 'package:twelfth_mobile/features/auth/domain/usecases/auth_usecases.dart';
 import 'package:twelfth_mobile/features/auth/presentation/providers/auth_state.dart';
@@ -115,7 +116,12 @@ class AuthNotifier extends Notifier<AuthState> {
             code: state.verificationCode,
             password: password,
           );
-      developer.log('[Auth] 회원가입 성공');
+      developer.log('[Auth] 회원가입 성공 → 자동 로그인 시도');
+      // 회원가입 후 바로 토큰을 받아야 온보딩에서 API 호출 가능
+      await ref
+          .read(_loginUseCaseProvider)
+          .call(email: state.signUpEmail, password: password);
+      developer.log('[Auth] 자동 로그인 성공 → 토큰 저장 완료');
       state = const AuthState(status: AuthStatus.success);
       return true;
     } on DioException catch (e) {
@@ -237,4 +243,8 @@ class AuthNotifier extends Notifier<AuthState> {
 
 final authNotifierProvider = NotifierProvider<AuthNotifier, AuthState>(
   AuthNotifier.new,
+);
+
+final userInfoProvider = FutureProvider<UserInfo>(
+  (ref) => ref.read(authRepositoryProvider).getUserInfo(),
 );

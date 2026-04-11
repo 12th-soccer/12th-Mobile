@@ -1,29 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
+import 'package:twelfth_mobile/features/auth/presentation/providers/auth_provider.dart';
 
-class ProfileView extends StatelessWidget {
+class ProfileView extends ConsumerWidget {
   const ProfileView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: CustomColor.background,
       body: SafeArea(
         child: Column(
           children: [
-            _buildProfileHeader(),
-            _buildMenuList(context),
+            _buildProfileHeader(ref),
+            _buildMenuList(context, ref),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildProfileHeader() {
+  Widget _buildProfileHeader(WidgetRef ref) {
+    final userInfoAsync = ref.watch(userInfoProvider);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 32),
       child: Column(
@@ -37,13 +41,27 @@ class ProfileView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Text('USER', style: CustomTextStyle.heading2),
+          userInfoAsync.when(
+            loading: () => const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                color: CustomColor.white,
+                strokeWidth: 2,
+              ),
+            ),
+            error: (_, __) => Text(
+              '정보를 불러올 수 없습니다',
+              style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
+            ),
+            data: (data) => Text(data.email, style: CustomTextStyle.heading2),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildMenuList(BuildContext context) {
+  Widget _buildMenuList(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
         _buildMenuItem(
@@ -54,7 +72,10 @@ class ProfileView extends StatelessWidget {
         _buildMenuItem(
           icon: Symbols.exit_to_app,
           label: '로그아웃',
-          onTap: () => context.go(AppRoutes.login),
+          onTap: () async {
+            await ref.read(authNotifierProvider.notifier).logout();
+            if (context.mounted) context.go(AppRoutes.login);
+          },
         ),
       ],
     );

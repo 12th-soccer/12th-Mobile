@@ -1,5 +1,6 @@
 import 'package:twelfth_mobile/core/network/token_storage.dart';
 import 'package:twelfth_mobile/features/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:twelfth_mobile/features/auth/domain/entities/user_info.dart';
 import 'package:twelfth_mobile/features/auth/domain/repositories/i_auth_repository.dart';
 
 class AuthRepositoryImpl implements IAuthRepository {
@@ -40,4 +41,7 @@ class AuthRepositoryImpl implements IAuthRepository {
 
   @override
   Future<bool> isLoggedIn() => _tokenStorage.hasToken();
+
+  @override
+  Future<UserInfo> getUserInfo() => _dataSource.getUserInfo();
 }

@@ -11,7 +11,6 @@ import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.d
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/features/auth/presentation/providers/auth_provider.dart';
-import 'package:twelfth_mobile/features/auth/presentation/providers/auth_state.dart';
 
 class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
@@ -47,7 +46,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
         );
     if (!mounted) return;
     if (success) {
-      context.go(AppRoutes.ranking);
+      context.go(AppRoutes.schedule);
     } else {
       final error = ref.read(authNotifierProvider).errorMessage;
       _showError(error ?? '오류가 발생했습니다');
