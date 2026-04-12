@@ -41,6 +41,10 @@ class SearchRemoteDataSourceImpl implements ISearchRemoteDataSource {
           (data['clubs'] as List<dynamic>?) ??
           (data['content'] as List<dynamic>?) ??
           [];
+      if (list.isNotEmpty) {
+        _logDebug('[Search] 구단 검색 첫 번째 item 필드: ${(list.first as Map).keys.toList()}');
+        _logDebug('[Search] 구단 검색 첫 번째 item: ${list.first}');
+      }
       return list
           .map((e) => ClubSearchResultModel.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -64,10 +68,14 @@ class SearchRemoteDataSourceImpl implements ISearchRemoteDataSource {
         queryParameters: {'keyword': keyword},
       );
       developer.log(
-        '[Search] 선수 검색 응답 status: ${response.statusCode} | data: ${response.data}',
+        '[Search] 선수 검색 응답 status: ${response.statusCode}',
       );
       final data = _parseMap(response.data);
       final list = (data['content'] as List<dynamic>?) ?? [];
+      if (list.isNotEmpty) {
+        developer.log('[Search] 선수 검색 첫 번째 item 필드: ${(list.first as Map).keys.toList()}');
+        developer.log('[Search] 선수 검색 첫 번째 item: ${list.first}');
+      }
       return list
           .map(
             (e) => PlayerSearchResultModel.fromJson(e as Map<String, dynamic>),
