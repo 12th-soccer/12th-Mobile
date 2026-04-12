@@ -1,0 +1,128 @@
+import 'package:flutter/material.dart';
+import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
+import 'package:twelfth_mobile/constants/color.dart';
+import 'package:twelfth_mobile/constants/text_style.dart';
+import 'package:twelfth_mobile/features/match/domain/entities/match_event.dart';
+
+class EventRow extends StatelessWidget {
+  final MatchEvent event;
+
+  // true = 홈팀(왼쪽): 프로필 | 이름 | 시간 | 아이콘
+  // false = 어웨이팀(오른쪽): 아이콘 | 시간 | 이름 | 프로필
+  final bool isHome;
+  final VoidCallback? onTap;
+
+  const EventRow({
+    super.key,
+    required this.event,
+    required this.isHome,
+    this.onTap,
+  });
+
+  String get _minuteStr => "${event.eventMinute}'";
+
+  @override
+  Widget build(BuildContext context) {
+    final photo = GestureDetector(
+      onTap: onTap,
+      child: NetworkAvatar(imageUrl: event.playerImageUrl, size: 36),
+    );
+    final name = GestureDetector(
+      onTap: onTap,
+      child: Text(
+        event.playerName,
+        style: CustomTextStyle.body2.copyWith(
+          decoration: onTap != null ? TextDecoration.underline : null,
+          decorationColor: CustomColor.gray500,
+        ),
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+    final time = Text(
+      _minuteStr,
+      style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
+    );
+    final icon = _EventIcon(eventType: event.eventType);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: isHome
+          // 홈팀 (왼쪽): 프로필 | 이름 → | 시간 | 아이콘
+          ? Row(
+              children: [
+                photo,
+                const SizedBox(width: 10),
+                Expanded(child: name),
+                const SizedBox(width: 12),
+                time,
+                const SizedBox(width: 10),
+                icon,
+              ],
+            )
+          // 어웨이팀 (오른쪽): 아이콘 | 시간 | ← 이름 | 프로필
+          : Row(
+              children: [
+                icon,
+                const SizedBox(width: 10),
+                time,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Align(alignment: Alignment.centerRight, child: name),
+                ),
+                const SizedBox(width: 10),
+                photo,
+              ],
+            ),
+    );
+  }
+}
+
+class _EventIcon extends StatelessWidget {
+  final MatchEventType eventType;
+
+  const _EventIcon({required this.eventType});
+
+  @override
+  Widget build(BuildContext context) {
+    switch (eventType) {
+      case MatchEventType.goal:
+        return const Text('⚽', style: TextStyle(fontSize: 18));
+      case MatchEventType.yellowCard:
+        return Container(
+          width: 14,
+          height: 18,
+          decoration: BoxDecoration(
+            color: CustomColor.yellow,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        );
+      case MatchEventType.redCard:
+        return Container(
+          width: 14,
+          height: 18,
+          decoration: BoxDecoration(
+            color: CustomColor.red,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        );
+      case MatchEventType.subOut:
+        return Text(
+          'OUT',
+          style: CustomTextStyle.body3.copyWith(
+            color: CustomColor.red,
+            fontWeight: FontWeight.w700,
+          ),
+        );
+      case MatchEventType.subIn:
+        return Text(
+          'IN',
+          style: CustomTextStyle.body3.copyWith(
+            color: CustomColor.green,
+            fontWeight: FontWeight.w700,
+          ),
+        );
+      case MatchEventType.unknown:
+        return const SizedBox(width: 20);
+    }
+  }
+}
