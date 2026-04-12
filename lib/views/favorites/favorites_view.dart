@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/router/player_route_args.dart';
@@ -130,14 +131,7 @@ class _FavoritesViewState extends ConsumerState<FavoritesView> {
               padding: _itemPadding,
               child: Row(
                 children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: const BoxDecoration(
-                      color: CustomColor.gray900,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
+                  NetworkAvatar(imageUrl: club.imageUrl, size: 36),
                   _horizontalSpacing,
                   Expanded(child: Text(club.clubName, style: _emptyTextStyle)),
                   GestureDetector(
@@ -203,14 +197,7 @@ class _FavoritesViewState extends ConsumerState<FavoritesView> {
               padding: _itemPadding,
               child: Row(
                 children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: const BoxDecoration(
-                      color: CustomColor.gray900,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
+                  NetworkAvatar(imageUrl: player.imageUrl, size: 36),
                   _horizontalSpacing,
                   Expanded(
                     child: Text(player.playerName, style: _emptyTextStyle),
