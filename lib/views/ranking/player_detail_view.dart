@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
+import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/features/favorites/presentation/providers/favorites_provider.dart';
 import 'package:twelfth_mobile/features/ranking/domain/entities/player_detail.dart';
+import 'package:twelfth_mobile/features/ranking/domain/entities/player_goal.dart';
 import 'package:twelfth_mobile/features/ranking/presentation/providers/ranking_provider.dart';
 
 class PlayerDetailView extends ConsumerWidget {
@@ -22,6 +24,7 @@ class PlayerDetailView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(playerDetailProvider(playerId));
+    final goalsAsync = ref.watch(playerGoalsProvider(playerId));
     final favoritesAsync = ref.watch(favoritePlayersNotifierProvider);
     final isFavorite =
         favoritesAsync.valueOrNull?.any((p) => p.playerId == playerId) ?? false;
@@ -44,9 +47,7 @@ class PlayerDetailView extends ConsumerWidget {
                     .toggleFavorite(playerId, playerName);
               } catch (_) {
                 if (context.mounted) {
-                  context.showErrorSnackBar(
-                    '관심 선수 설정에 실패했습니다.',
-                  );
+                  context.showErrorSnackBar('관심 선수 설정에 실패했습니다.');
                 }
               }
             },
@@ -57,33 +58,32 @@ class PlayerDetailView extends ConsumerWidget {
         loading: () => const Center(
           child: CircularProgressIndicator(color: CustomColor.white),
         ),
-        error: (e, _) =>
-            _buildBody(PlayerDetail(playerId: playerId, name: playerName)),
-        data: _buildBody,
+        error: (e, _) => _buildBody(
+          PlayerDetail(playerId: playerId, name: playerName),
+          goalsAsync,
+        ),
+        data: (detail) => _buildBody(detail, goalsAsync),
       ),
     );
   }
 
-  Widget _buildBody(PlayerDetail detail) {
+  Widget _buildBody(
+    PlayerDetail detail,
+    AsyncValue<List<PlayerGoal>> goalsAsync,
+  ) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Container(
-                width: 100,
-                height: 100,
-                decoration: const BoxDecoration(
-                  color: CustomColor.gray900,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
+            Center(child: NetworkAvatar(imageUrl: detail.imageUrl, size: 100)),
             const SizedBox(height: 16),
             Center(child: Text(detail.name, style: CustomTextStyle.heading1)),
             const SizedBox(height: 24),
             _InfoGrid(detail: detail),
+            const SizedBox(height: 32),
+            _GoalsSection(goalsAsync: goalsAsync),
           ],
         ),
       ),
@@ -145,6 +145,63 @@ class _InfoCell extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(value!, style: CustomTextStyle.body1),
+      ],
+    );
+  }
+}
+
+class _GoalsSection extends StatelessWidget {
+  final AsyncValue<List<PlayerGoal>> goalsAsync;
+
+  const _GoalsSection({required this.goalsAsync});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('골 기록', style: CustomTextStyle.heading2),
+        const SizedBox(height: 16),
+        goalsAsync.when(
+          loading: () => const Center(
+            child: CircularProgressIndicator(color: CustomColor.white),
+          ),
+          error: (_, __) => Text(
+            '골 기록이 없습니다',
+            style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
+          ),
+          data: (goals) {
+            if (goals.isEmpty) {
+              return Text(
+                '골 기록이 없습니다',
+                style: CustomTextStyle.body2.copyWith(
+                  color: CustomColor.gray500,
+                ),
+              );
+            }
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: goals.length,
+              itemBuilder: (context, index) {
+                final goal = goals[index];
+                final dateStr =
+                    '${goal.matchDate.year}. ${goal.matchDate.month.toString().padLeft(2, '0')}. ${goal.matchDate.day.toString().padLeft(2, '0')}';
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(dateStr, style: CustomTextStyle.body2),
+                      ),
+                      Text("골 ${goal.goalTime}'", style: CustomTextStyle.body2),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ],
     );
   }

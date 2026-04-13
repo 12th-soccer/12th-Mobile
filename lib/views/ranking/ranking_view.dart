@@ -8,6 +8,7 @@ import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/core/router/team_route_args.dart';
 import 'package:twelfth_mobile/features/favorites/presentation/providers/favorites_provider.dart';
+import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/features/ranking/domain/entities/club_ranking.dart';
 import 'package:twelfth_mobile/features/ranking/presentation/providers/ranking_provider.dart';
 
@@ -163,14 +164,7 @@ class _RankingViewState extends ConsumerState<RankingView> {
                       ),
                     ),
                     _spacing,
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: const BoxDecoration(
-                        color: CustomColor.gray900,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
+                    NetworkAvatar(imageUrl: team.imageUrl, size: 32),
                     _spacing,
                     Expanded(
                       child: Text(
@@ -211,9 +205,7 @@ class _RankingViewState extends ConsumerState<RankingView> {
                               .toggleFavorite(team.clubId, team.clubName);
                         } catch (_) {
                           if (context.mounted) {
-                            context.showErrorSnackBar(
-                              '관심 구단 설정에 실패했습니다.',
-                            );
+                            context.showErrorSnackBar('관심 구단 설정에 실패했습니다.');
                           }
                         }
                       },
