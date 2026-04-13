@@ -34,8 +34,9 @@ class ApiEndpoints {
   static String favoritePlayer(String playerId) => "/favorite/player/$playerId";
   static String favoriteSchedule(String clubId) => "/favorite/schedule/$clubId";
 
-  /// alarm
-  static const alarmSetting = "/alram/setting";
+  /// notifications
+  static const notificationSettings = "/notifications/settings";
+  static const fcmTokens = "/fcm/tokens";
 
   /// goal & event
   static String goal(String playerId) => "/goal/$playerId";
