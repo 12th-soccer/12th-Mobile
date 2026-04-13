@@ -46,7 +46,6 @@ class _AuthInterceptor extends Interceptor {
   ) async {
     if (err.response?.statusCode == 401) {
       await TokenStorage.instance.clearTokens();
-      // TODO: 로그인 페이지로 이동 (NavigationService 또는 GoRouter ref 주입 필요)
     }
     handler.next(err);
   }
