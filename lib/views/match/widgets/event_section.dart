@@ -55,7 +55,10 @@ class EventsSection extends StatelessWidget {
             widgets.add(const _HalfTimeDivider());
             halfTimeInserted = true;
           }
-          final isHome = homeTeamId == null || event.clubId == homeTeamId;
+          // clubId==0 means the API didn't return it — can't determine side
+          final isHome = (homeTeamId != null && event.clubId != 0)
+              ? event.clubId == homeTeamId
+              : true; // default left if undetermined
           widgets.add(
             EventRow(
               event: event,

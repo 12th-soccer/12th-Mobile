@@ -6,6 +6,10 @@ class Match {
   final String awayTeamName;
   final int? homeTeamScore;
   final int? awayTeamScore;
+  final int? homeTeamId;
+  final int? awayTeamId;
+  final String? homeTeamImageUrl;
+  final String? awayTeamImageUrl;
 
   const Match({
     required this.matchId,
@@ -15,6 +19,10 @@ class Match {
     required this.awayTeamName,
     this.homeTeamScore,
     this.awayTeamScore,
+    this.homeTeamId,
+    this.awayTeamId,
+    this.homeTeamImageUrl,
+    this.awayTeamImageUrl,
   });
 
   bool get isFinished => homeTeamScore != null && awayTeamScore != null;

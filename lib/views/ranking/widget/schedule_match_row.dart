@@ -23,6 +23,11 @@ class ScheduleMatchRow extends StatelessWidget {
     return '${d.month}/${d.day}';
   }
 
+  String get _timeStr {
+    final d = match.matchDate;
+    return '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final myImageUrl = _isHome
@@ -49,9 +54,22 @@ class ScheduleMatchRow extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Text(
-              _dateStr,
-              style: CustomTextStyle.body3.copyWith(color: CustomColor.gray500),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  _dateStr,
+                  style: CustomTextStyle.body3.copyWith(
+                    color: CustomColor.gray500,
+                  ),
+                ),
+                Text(
+                  _timeStr,
+                  style: CustomTextStyle.body3.copyWith(
+                    color: CustomColor.gray500,
+                  ),
+                ),
+              ],
             ),
             Expanded(
               child: Text(

@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/constants/club_id_map.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match.dart';
 
 class MatchModel {
@@ -8,6 +9,10 @@ class MatchModel {
   final String awayTeamName;
   final int? homeTeamScore;
   final int? awayTeamScore;
+  final int? homeTeamId;
+  final int? awayTeamId;
+  final String? homeTeamImageUrl;
+  final String? awayTeamImageUrl;
 
   const MatchModel({
     required this.matchId,
@@ -17,17 +22,27 @@ class MatchModel {
     required this.awayTeamName,
     this.homeTeamScore,
     this.awayTeamScore,
+    this.homeTeamId,
+    this.awayTeamId,
+    this.homeTeamImageUrl,
+    this.awayTeamImageUrl,
   });
 
   factory MatchModel.fromJson(Map<String, dynamic> json) {
+    final homeRaw = json['homeTeamName'] as String;
+    final awayRaw = json['awayTeamName'] as String;
     return MatchModel(
       matchId: json['matchId'] as int,
       leagueType: json['leagueType'] as String?,
       matchDate: json['matchDate'] as String,
-      homeTeamName: json['homeTeamName'] as String,
-      awayTeamName: json['awayTeamName'] as String,
+      homeTeamName: homeRaw,
+      awayTeamName: awayRaw,
       homeTeamScore: json['homeTeamScore'] as int?,
       awayTeamScore: json['awayTeamScore'] as int?,
+      homeTeamId: json['homeTeamId'] as int? ?? ClubIdMap.lookup(homeRaw),
+      awayTeamId: json['awayTeamId'] as int? ?? ClubIdMap.lookup(awayRaw),
+      homeTeamImageUrl: json['homeTeamImageUrl'] as String?,
+      awayTeamImageUrl: json['awayTeamImageUrl'] as String?,
     );
   }
 
@@ -40,6 +55,10 @@ class MatchModel {
       awayTeamName: awayTeamName,
       homeTeamScore: homeTeamScore,
       awayTeamScore: awayTeamScore,
+      homeTeamId: homeTeamId,
+      awayTeamId: awayTeamId,
+      homeTeamImageUrl: homeTeamImageUrl,
+      awayTeamImageUrl: awayTeamImageUrl,
     );
   }
 }

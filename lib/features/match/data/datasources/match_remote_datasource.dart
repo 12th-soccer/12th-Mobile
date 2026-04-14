@@ -2,12 +2,15 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
 import 'package:twelfth_mobile/core/network/api_endpoints.dart';
+import 'package:twelfth_mobile/features/match/data/models/match_event_model.dart';
 import 'package:twelfth_mobile/features/match/data/models/match_model.dart';
 
 abstract interface class IMatchRemoteDataSource {
   Future<List<MatchModel>> getMatchesByDate(String date);
 
   Future<MatchModel> getMatchDetail(int matchId);
+
+  Future<List<MatchEventModel>> getMatchEvents(int matchId);
 }
 
 class MatchRemoteDataSourceImpl implements IMatchRemoteDataSource {
@@ -76,6 +79,35 @@ class MatchRemoteDataSourceImpl implements IMatchRemoteDataSource {
       rethrow;
     } catch (e, stack) {
       developer.log('[Match] 경기 상세 실패 (Exception)\n  $e\n$stack');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<MatchEventModel>> getMatchEvents(int matchId) async {
+    try {
+      developer.log('[Match] 경기 이벤트 조회: matchId=$matchId');
+      final response = await _dio.get(ApiEndpoints.event(matchId.toString()));
+      developer.log(
+        '[Match] 경기 이벤트 응답 status: ${response.statusCode} | data: ${response.data}',
+      );
+      final raw = response.data;
+      if (raw == null) return [];
+      final List<dynamic> list = raw is String
+          ? jsonDecode(raw) as List<dynamic>
+          : raw as List<dynamic>;
+      return list
+          .map((e) => MatchEventModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      final status = e.response?.statusCode;
+      developer.log(
+        '[Match] 경기 이벤트 실패 (DioException)\n  status: $status\n  URL: ${e.requestOptions.uri}\n  response: ${e.response?.data}',
+      );
+      if (status == 400 || status == 404) return [];
+      rethrow;
+    } catch (e, stack) {
+      developer.log('[Match] 경기 이벤트 실패 (Exception)\n  $e\n$stack');
       rethrow;
     }
   }

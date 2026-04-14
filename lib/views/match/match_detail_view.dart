@@ -3,18 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
 import 'package:twelfth_mobile/constants/color.dart';
+import 'package:twelfth_mobile/constants/stadium_map.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/core/router/player_route_args.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/core/router/team_route_args.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match.dart';
-import 'package:twelfth_mobile/features/match/domain/entities/match_event.dart';
 import 'package:twelfth_mobile/features/match/presentation/providers/match_provider.dart';
 import 'package:twelfth_mobile/views/match/widgets/center_section.dart';
-import 'package:twelfth_mobile/views/match/widgets/event_row.dart';
 import 'package:twelfth_mobile/views/match/widgets/event_section.dart';
 import 'package:twelfth_mobile/views/match/widgets/lineup_section.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 enum MatchState { upcoming, live, finished }
 
@@ -25,6 +25,8 @@ class MatchExtra {
   final MatchState matchState;
   final String? matchDate;
   final String? matchTime;
+  final int? homeTeamId;
+  final int? awayTeamId;
 
   const MatchExtra({
     required this.matchId,
@@ -33,6 +35,8 @@ class MatchExtra {
     this.matchState = MatchState.upcoming,
     this.matchDate,
     this.matchTime,
+    this.homeTeamId,
+    this.awayTeamId,
   });
 }
 
@@ -42,9 +46,9 @@ class MatchDetailView extends ConsumerWidget {
   const MatchDetailView({super.key, required this.extra});
 
   MatchState _resolveState(Match match) {
+    if (match.matchDate.isAfter(DateTime.now())) return MatchState.upcoming;
     if (match.isFinished) return MatchState.finished;
-    if (match.matchDate.isBefore(DateTime.now())) return MatchState.live;
-    return MatchState.upcoming;
+    return MatchState.live;
   }
 
   @override
@@ -111,22 +115,31 @@ class MatchDetailView extends ConsumerWidget {
               },
             ),
 
-            const Divider(color: CustomColor.gray900, thickness: 1, height: 1),
-
-            EventsSection(
-              eventsAsync: eventsAsync,
-              homeTeamId: detailAsync.valueOrNull?.homeTeamId,
-              onPlayerTap: (playerId, playerName) => context.push(
-                AppRoutes.player,
-                extra: PlayerRouteArgs(
-                  playerId: playerId,
-                  playerName: playerName,
+            if ((detailAsync.valueOrNull != null
+                    ? _resolveState(detailAsync.valueOrNull!)
+                    : extra.matchState) !=
+                MatchState.upcoming) ...[
+              const Divider(
+                color: CustomColor.gray900,
+                thickness: 1,
+                height: 1,
+              ),
+              EventsSection(
+                eventsAsync: eventsAsync,
+                homeTeamId:
+                    detailAsync.valueOrNull?.homeTeamId ?? extra.homeTeamId,
+                onPlayerTap: (playerId, playerName) => context.push(
+                  AppRoutes.player,
+                  extra: PlayerRouteArgs(
+                    playerId: playerId,
+                    playerName: playerName,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            const LineupSection(),
-            const SizedBox(height: 32),
+              const SizedBox(height: 20),
+              const LineupSection(),
+              const SizedBox(height: 32),
+            ],
           ],
         ),
       ),
@@ -161,8 +174,22 @@ class _MatchHeader extends StatelessWidget {
     this.awayImageUrl,
   });
 
+  Future<void> _openStadium(String stadiumName) async {
+    // 네이버 지도 앱 딥링크 우선 시도
+    final appUri = StadiumMap.naverMapUri(stadiumName);
+    if (await canLaunchUrl(appUri)) {
+      await launchUrl(appUri);
+      return;
+    }
+    // 미설치 시 웹으로 폴백
+    final webUri = StadiumMap.naverMapWebUri(stadiumName);
+    await launchUrl(webUri, mode: LaunchMode.externalApplication);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final stadiumName = StadiumMap.lookup(homeTeam);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       child: Row(
@@ -182,6 +209,10 @@ class _MatchHeader extends StatelessWidget {
               awayScore: awayScore,
               dateStr: dateStr,
               timeStr: timeStr,
+              stadiumName: stadiumName,
+              onStadiumTap: stadiumName != null
+                  ? () => _openStadium(stadiumName)
+                  : null,
             ),
           ),
           Expanded(
