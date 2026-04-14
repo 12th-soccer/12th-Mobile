@@ -1,58 +1,51 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 class NotificationSettings {
-  final bool masterEnabled;
-  final bool onMatchStart;
-  final bool before1Hour;
-  final bool before30Min;
-  final bool before15Min;
+  final bool notificationEnabled;
+  final bool oneHourBeforeEnabled;
+  final bool thirtyMinutesBeforeEnabled;
+  final bool fifteenMinutesBeforeEnabled;
+  final bool matchStartEnabled;
 
   const NotificationSettings({
-    this.masterEnabled = true,
-    this.onMatchStart = true,
-    this.before1Hour = false,
-    this.before30Min = false,
-    this.before15Min = false,
+    this.notificationEnabled = true,
+    this.oneHourBeforeEnabled = true,
+    this.thirtyMinutesBeforeEnabled = true,
+    this.fifteenMinutesBeforeEnabled = true,
+    this.matchStartEnabled = true,
   });
 
+  factory NotificationSettings.fromJson(Map<String, dynamic> json) =>
+      NotificationSettings(
+        notificationEnabled: json['notificationEnabled'] as bool? ?? true,
+        oneHourBeforeEnabled: json['oneHourBeforeEnabled'] as bool? ?? true,
+        thirtyMinutesBeforeEnabled:
+            json['thirtyMinutesBeforeEnabled'] as bool? ?? true,
+        fifteenMinutesBeforeEnabled:
+            json['fifteenMinutesBeforeEnabled'] as bool? ?? true,
+        matchStartEnabled: json['matchStartEnabled'] as bool? ?? true,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'notificationEnabled': notificationEnabled,
+        'oneHourBeforeEnabled': oneHourBeforeEnabled,
+        'thirtyMinutesBeforeEnabled': thirtyMinutesBeforeEnabled,
+        'fifteenMinutesBeforeEnabled': fifteenMinutesBeforeEnabled,
+        'matchStartEnabled': matchStartEnabled,
+      };
+
   NotificationSettings copyWith({
-    bool? masterEnabled,
-    bool? onMatchStart,
-    bool? before1Hour,
-    bool? before30Min,
-    bool? before15Min,
-  }) {
-    return NotificationSettings(
-      masterEnabled: masterEnabled ?? this.masterEnabled,
-      onMatchStart: onMatchStart ?? this.onMatchStart,
-      before1Hour: before1Hour ?? this.before1Hour,
-      before30Min: before30Min ?? this.before30Min,
-      before15Min: before15Min ?? this.before15Min,
-    );
-  }
+    bool? notificationEnabled,
+    bool? oneHourBeforeEnabled,
+    bool? thirtyMinutesBeforeEnabled,
+    bool? fifteenMinutesBeforeEnabled,
+    bool? matchStartEnabled,
+  }) =>
+      NotificationSettings(
+        notificationEnabled: notificationEnabled ?? this.notificationEnabled,
+        oneHourBeforeEnabled: oneHourBeforeEnabled ?? this.oneHourBeforeEnabled,
+        thirtyMinutesBeforeEnabled:
+            thirtyMinutesBeforeEnabled ?? this.thirtyMinutesBeforeEnabled,
+        fifteenMinutesBeforeEnabled:
+            fifteenMinutesBeforeEnabled ?? this.fifteenMinutesBeforeEnabled,
+        matchStartEnabled: matchStartEnabled ?? this.matchStartEnabled,
+      );
 }
-
-class NotificationSettingsNotifier extends Notifier<NotificationSettings> {
-  @override
-  NotificationSettings build() => const NotificationSettings();
-
-  void setMaster(bool value) =>
-      state = state.copyWith(masterEnabled: value);
-
-  void setOnMatchStart(bool value) =>
-      state = state.copyWith(onMatchStart: value);
-
-  void setBefore1Hour(bool value) =>
-      state = state.copyWith(before1Hour: value);
-
-  void setBefore30Min(bool value) =>
-      state = state.copyWith(before30Min: value);
-
-  void setBefore15Min(bool value) =>
-      state = state.copyWith(before15Min: value);
-}
-
-final notificationSettingsProvider =
-    NotifierProvider<NotificationSettingsNotifier, NotificationSettings>(
-  NotificationSettingsNotifier.new,
-);

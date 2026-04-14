@@ -7,114 +7,169 @@ import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/features/alarm/presentation/providers/alarm_provider.dart';
 
-class NotificationSettingsView extends ConsumerStatefulWidget {
+class NotificationSettingsView extends ConsumerWidget {
   const NotificationSettingsView({super.key});
 
   @override
-  ConsumerState<NotificationSettingsView> createState() =>
-      _NotificationSettingsViewState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settingsAsync = ref.watch(notificationSettingsNotifierProvider);
+
+    return Scaffold(
+      backgroundColor: CustomColor.background,
+      appBar: const TwelfthAppBar(title: '알림 설정'),
+      body: settingsAsync.when(
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: CustomColor.white),
+        ),
+        error: (e, _) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '설정을 불러오지 못했습니다',
+                style: CustomTextStyle.body2.copyWith(
+                  color: CustomColor.gray500,
+                ),
+              ),
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: () =>
+                    ref.invalidate(notificationSettingsNotifierProvider),
+                child: Text(
+                  '다시 시도',
+                  style: CustomTextStyle.body2.copyWith(
+                    color: CustomColor.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        data: (settings) => _SettingsForm(settings: settings),
+      ),
+    );
+  }
 }
 
-class _NotificationSettingsViewState
-    extends ConsumerState<NotificationSettingsView> {
-  late bool _masterEnabled;
-  late bool _onMatchStart;
-  late bool _before1Hour;
-  late bool _before30Min;
-  late bool _before15Min;
+class _SettingsForm extends ConsumerStatefulWidget {
+  final NotificationSettings settings;
+
+  const _SettingsForm({required this.settings});
+
+  @override
+  ConsumerState<_SettingsForm> createState() => _SettingsFormState();
+}
+
+class _SettingsFormState extends ConsumerState<_SettingsForm> {
+  late bool _notificationEnabled;
+  late bool _matchStartEnabled;
+  late bool _oneHourBefore;
+  late bool _thirtyMinsBefore;
+  late bool _fifteenMinsBefore;
 
   @override
   void initState() {
     super.initState();
-    final saved = ref.read(notificationSettingsProvider);
-    _masterEnabled = saved.masterEnabled;
-    _onMatchStart = saved.onMatchStart;
-    _before1Hour = saved.before1Hour;
-    _before30Min = saved.before30Min;
-    _before15Min = saved.before15Min;
+    _notificationEnabled = widget.settings.notificationEnabled;
+    _matchStartEnabled = widget.settings.matchStartEnabled;
+    _oneHourBefore = widget.settings.oneHourBeforeEnabled;
+    _thirtyMinsBefore = widget.settings.thirtyMinutesBeforeEnabled;
+    _fifteenMinsBefore = widget.settings.fifteenMinutesBeforeEnabled;
   }
 
   Future<void> _save() async {
-    final notifier = ref.read(notificationSettingsProvider.notifier);
-    notifier.setMaster(_masterEnabled);
-    notifier.setOnMatchStart(_onMatchStart);
-    notifier.setBefore1Hour(_before1Hour);
-    notifier.setBefore30Min(_before30Min);
-    notifier.setBefore15Min(_before15Min);
+    final updated = NotificationSettings(
+      notificationEnabled: _notificationEnabled,
+      matchStartEnabled: _matchStartEnabled,
+      oneHourBeforeEnabled: _oneHourBefore,
+      thirtyMinutesBeforeEnabled: _thirtyMinsBefore,
+      fifteenMinutesBeforeEnabled: _fifteenMinsBefore,
+    );
 
-    if (_masterEnabled) {
-      final success = await ref.read(alarmNotifierProvider.notifier).setAlarm();
-      if (!mounted) return;
-      if (!success) {
-        context.showErrorSnackBar(
-          '알람 설정에 실패했습니다. 다시 시도해 주세요.',
-        );
-        return;
-      }
-    }
+    final success = await ref
+        .read(notificationSettingsNotifierProvider.notifier)
+        .save(updated);
 
     if (!mounted) return;
+    if (!success) {
+      context.showErrorSnackBar('알림 설정 저장에 실패했습니다. 다시 시도해 주세요.');
+      return;
+    }
     Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: CustomColor.background,
-      appBar: TwelfthAppBar(
-        title: '알림 설정',
-        actions: [
-          TextButton(
-            onPressed: _save,
-            child: Text(
-              '저장',
-              style: CustomTextStyle.body1.copyWith(color: CustomColor.blue),
+    return SafeArea(
+      child: Column(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  _buildRow(
+                    label: '알림',
+                    value: _notificationEnabled,
+                    onChanged: (v) => setState(() => _notificationEnabled = v),
+                  ),
+                  if (_notificationEnabled) ...[
+                    const SizedBox(height: 8),
+                    const Divider(color: CustomColor.gray900, height: 1),
+                    const SizedBox(height: 8),
+                    _buildRow(
+                      label: '경기 시작',
+                      value: _matchStartEnabled,
+                      onChanged: (v) => setState(() => _matchStartEnabled = v),
+                      sublabel: '기본 알림으로 끄기 가능합니다.',
+                    ),
+                    const SizedBox(height: 4),
+                    _buildRow(
+                      label: '1시간 전',
+                      value: _oneHourBefore,
+                      onChanged: (v) => setState(() => _oneHourBefore = v),
+                    ),
+                    _buildRow(
+                      label: '30분 전',
+                      value: _thirtyMinsBefore,
+                      onChanged: (v) => setState(() => _thirtyMinsBefore = v),
+                    ),
+                    _buildRow(
+                      label: '15분 전',
+                      value: _fifteenMinsBefore,
+                      onChanged: (v) => setState(() => _fifteenMinsBefore = v),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _save,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CustomColor.main,
+                  foregroundColor: CustomColor.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  '저장',
+                  style: CustomTextStyle.body1.copyWith(
+                    color: CustomColor.black,
+                  ),
+                ),
+              ),
             ),
           ),
         ],
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 8),
-              _buildRow(
-                label: '알림',
-                value: _masterEnabled,
-                onChanged: (v) => setState(() => _masterEnabled = v),
-              ),
-              if (_masterEnabled) ...[
-                const SizedBox(height: 8),
-                const Divider(color: CustomColor.gray900, height: 1),
-                const SizedBox(height: 8),
-                _buildRow(
-                  label: '경기 시작',
-                  value: _onMatchStart,
-                  onChanged: (v) => setState(() => _onMatchStart = v),
-                  sublabel: '기본 알림으로 끄기 가능합니다.',
-                ),
-                const SizedBox(height: 4),
-                _buildRow(
-                  label: '1시간 전',
-                  value: _before1Hour,
-                  onChanged: (v) => setState(() => _before1Hour = v),
-                ),
-                _buildRow(
-                  label: '30분 전',
-                  value: _before30Min,
-                  onChanged: (v) => setState(() => _before30Min = v),
-                ),
-                _buildRow(
-                  label: '15분 전',
-                  value: _before15Min,
-                  onChanged: (v) => setState(() => _before15Min = v),
-                ),
-              ],
-            ],
-          ),
-        ),
       ),
     );
   }
