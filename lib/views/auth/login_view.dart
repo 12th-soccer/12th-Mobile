@@ -10,6 +10,7 @@ import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.d
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
+import 'package:twelfth_mobile/features/auth/presentation/google_oauth_launcher.dart';
 import 'package:twelfth_mobile/features/auth/presentation/providers/auth_provider.dart';
 
 class LoginView extends ConsumerStatefulWidget {
@@ -54,8 +55,15 @@ class _LoginViewState extends ConsumerState<LoginView> {
     }
   }
 
-  void _onGoogleLogin() {
-    // TODO: 서버 연결 후 Google OAuth 구현
+  Future<void> _onGoogleLogin() async {
+    try {
+      final success = await GoogleOAuthLauncher.open();
+      if (!mounted || !success) return;
+      context.go(AppRoutes.schedule);
+    } catch (_) {
+      if (!mounted) return;
+      context.showErrorSnackBar('구글 로그인을 시작하지 못했습니다.');
+    }
   }
 
   void _showError(String message) {
