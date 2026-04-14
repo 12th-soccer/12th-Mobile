@@ -1,5 +1,8 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:twelfth_mobile/constants/stadium_map.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
@@ -20,9 +23,17 @@ class TeamDetailBody extends StatelessWidget {
 
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  Future<void> _openStadium(String stadiumName) async {
+    final appUri = StadiumMap.naverMapUri(stadiumName);
+    if (await canLaunchUrl(appUri)) {
+      await launchUrl(appUri);
+      return;
     }
+    final webUri = StadiumMap.naverMapWebUri(stadiumName);
+    await launchUrl(webUri, mode: LaunchMode.externalApplication);
   }
 
   void _onMatchTap(BuildContext context, ClubMatch m) {
@@ -41,6 +52,8 @@ class TeamDetailBody extends StatelessWidget {
         matchDate: '${m.matchDate.month}/${m.matchDate.day}',
         matchTime:
             '${m.matchDate.hour.toString().padLeft(2, '0')}:${m.matchDate.minute.toString().padLeft(2, '0')}',
+        homeTeamId: m.homeTeamId,
+        awayTeamId: m.awayTeamId,
       ),
     );
   }
@@ -50,6 +63,9 @@ class TeamDetailBody extends StatelessWidget {
     final upcoming = detail.upcomingMatches;
     final past = detail.pastMatches;
     final socialLinks = TeamSocials.of(detail.clubName);
+    developer.log(
+      '[TeamDetail] clubName="${detail.clubName}" socialLinks=${socialLinks != null ? "found" : "null"}',
+    );
 
     return SingleChildScrollView(
       child: Column(
@@ -62,23 +78,28 @@ class TeamDetailBody extends StatelessWidget {
                 const SizedBox(height: 16),
                 Text(detail.clubName, style: CustomTextStyle.heading1),
                 const SizedBox(height: 8),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Symbols.location_on,
-                      size: 16,
-                      color: CustomColor.gray500,
-                      fill: 1,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      detail.stadiumName,
-                      style: CustomTextStyle.body3.copyWith(
-                        color: CustomColor.gray500,
+                GestureDetector(
+                  onTap: () => _openStadium(detail.stadiumName),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Symbols.location_on,
+                        size: 16,
+                        color: CustomColor.main,
+                        fill: 1,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 4),
+                      Text(
+                        detail.stadiumName,
+                        style: CustomTextStyle.body3.copyWith(
+                          color: CustomColor.main,
+                          decoration: TextDecoration.underline,
+                          decorationColor: CustomColor.main,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 if (socialLinks != null) ...[
                   const SizedBox(height: 28),
