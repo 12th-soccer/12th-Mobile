@@ -16,7 +16,12 @@ class ClubSearchResultModel {
       ClubSearchResultModel(
         clubId: json['clubId'] as int,
         name: (json['clubName'] ?? json['name']) as String,
-        logoUrl: (json['clubImageUrl'] ?? json['logoUrl']) as String?,
+        logoUrl:
+            (json['clubImageUrl'] ??
+                    json['logoUrl'] ??
+                    json['imageUrl'] ??
+                    json['image'])
+                as String?,
       );
 
   ClubSearchResult toEntity() =>
@@ -42,24 +47,33 @@ class PlayerSearchResultModel {
     this.clubName,
   });
 
-  factory PlayerSearchResultModel.fromJson(Map<String, dynamic> json) =>
-      PlayerSearchResultModel(
-        playerId: json['playerId'] as int,
-        name: json['name'] as String,
-        imageUrl: json['playerImageUrl'] as String?,
-        age: json['age'] as int?,
-        position: json['position'] as String?,
-        number: json['number'] as int?,
-        clubName: json['clubName'] as String?,
-      );
+  factory PlayerSearchResultModel.fromJson(Map<String, dynamic> json) {
+    final rawName = json['name'] as String? ?? '';
+    final rawImageUrl =
+        (json['playerImageUrl'] ??
+                json['imageUrl'] ??
+                json['image'] ??
+                json['profileImageUrl'])
+            as String?;
+    final isSwapped = rawName.startsWith('http');
+    return PlayerSearchResultModel(
+      playerId: json['playerId'] as int,
+      name: isSwapped ? (rawImageUrl ?? '') : rawName,
+      imageUrl: isSwapped ? rawName : rawImageUrl,
+      age: json['age'] as int?,
+      position: json['position'] as String?,
+      number: json['number'] as int?,
+      clubName: json['clubName'] as String?,
+    );
+  }
 
   PlayerSearchResult toEntity() => PlayerSearchResult(
-        playerId: playerId,
-        name: name,
-        imageUrl: imageUrl,
-        age: age,
-        position: position,
-        number: number,
-        clubName: clubName,
-      );
+    playerId: playerId,
+    name: name,
+    imageUrl: imageUrl,
+    age: age,
+    position: position,
+    number: number,
+    clubName: clubName,
+  );
 }
