@@ -1,7 +1,6 @@
-import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:dio/dio.dart';
 import 'package:twelfth_mobile/core/network/api_endpoints.dart';
+import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/features/auth/data/models/login_response_model.dart';
 import 'package:twelfth_mobile/features/auth/domain/entities/user_info.dart';
 
@@ -25,35 +24,33 @@ abstract interface class IAuthRemoteDataSource {
 }
 
 class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
-  final Dio _dio;
+  final ApiClient _apiClient;
 
-  const AuthRemoteDataSourceImpl(this._dio);
+  const AuthRemoteDataSourceImpl(this._apiClient);
 
   @override
   Future<LoginResponseModel> login({
     required String email,
     required String password,
   }) async {
-    final response = await _dio.post(
+    return _apiClient.post(
       ApiEndpoints.logIn,
       data: {'email': email, 'password': password},
+      decoder: (data) {
+        assert(() {
+          developer.log('[Auth] 로그인 응답 data type: ${data.runtimeType}');
+          return true;
+        }());
+        return LoginResponseModel.fromJson(data as Map<String, dynamic>);
+      },
     );
-    final rawData = response.data;
-    assert(() {
-      developer.log('[Auth] 로그인 응답 data type: ${rawData.runtimeType}');
-      return true;
-    }());
-    final Map<String, dynamic> jsonMap = rawData is String
-        ? jsonDecode(rawData) as Map<String, dynamic>
-        : rawData as Map<String, dynamic>;
-    return LoginResponseModel.fromJson(jsonMap);
   }
 
   @override
   Future<void> sendVerificationEmail(String email) async {
     developer.log('[Auth] 인증 이메일 발송 요청: $email');
-    final response = await _dio.post(ApiEndpoints.email, data: {'email': email});
-    developer.log('[Auth] 인증 이메일 발송 응답: status=${response.statusCode}, data=${response.data}');
+    await _apiClient.postVoid(ApiEndpoints.email, data: {'email': email});
+    developer.log('[Auth] 인증 이메일 발송 성공');
   }
 
   @override
@@ -62,7 +59,7 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
     required String code,
     required String password,
   }) async {
-    await _dio.post(
+    await _apiClient.postVoid(
       ApiEndpoints.signUp,
       data: {'email': email, 'code': code, 'password': password},
     );
@@ -71,29 +68,30 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
   @override
   Future<void> logout() async {
     developer.log('[Auth] 로그아웃 요청: DELETE ${ApiEndpoints.logOut}');
-    final response = await _dio.delete(ApiEndpoints.logOut);
-    developer.log('[Auth] 로그아웃 응답: status=${response.statusCode}');
+    await _apiClient.deleteVoid(ApiEndpoints.logOut);
+    developer.log('[Auth] 로그아웃 성공');
   }
 
   @override
   Future<UserInfo> getUserInfo() async {
     try {
       developer.log('[Auth] 유저 정보 요청: GET ${ApiEndpoints.userInfo}');
-      final response = await _dio.get(ApiEndpoints.userInfo);
-      developer.log('[Auth] 유저 정보 응답: status=${response.statusCode} | data=${response.data}');
-      final rawData = response.data;
-      final Map<String, dynamic> json = rawData is String
-          ? jsonDecode(rawData) as Map<String, dynamic>
-          : rawData as Map<String, dynamic>;
-      return UserInfo(
-        userId: json['userId'] as int,
-        email: json['email'] as String,
+      return await _apiClient.get(
+        ApiEndpoints.userInfo,
+        decoder: (data) {
+          developer.log('[Auth] 유저 정보 응답 data: $data');
+          final json = data as Map<String, dynamic>;
+          return UserInfo(
+            userId: json['userId'] as int,
+            email: json['email'] as String,
+          );
+        },
       );
-    } on DioException catch (e) {
+    } on ApiException catch (e) {
       developer.log(
-        '[Auth] 유저 정보 실패 (DioException)\n'
-        '  status: ${e.response?.statusCode}\n'
-        '  response: ${e.response?.data}',
+        '[Auth] 유저 정보 실패 (ApiException)\n'
+        '  status: ${e.statusCode}\n'
+        '  response: ${e.responseData}',
       );
       rethrow;
     } catch (e, stack) {

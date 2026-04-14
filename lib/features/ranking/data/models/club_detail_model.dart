@@ -1,4 +1,4 @@
-import 'package:twelfth_mobile/constants/club_id_map.dart';
+import 'package:twelfth_mobile/core/constants/club_id_map.dart';
 import 'package:twelfth_mobile/features/ranking/domain/entities/club_detail.dart';
 
 class ClubMatchModel {
@@ -79,14 +79,12 @@ class ClubDetailModel {
   });
 
   factory ClubDetailModel.fromJson(Map<String, dynamic> json) {
-    // 서버가 과거 경기와 미래 일정을 별도 필드로 내려줄 수 있음
-    // matches / schedules / upcomingMatches / schedule 키를 모두 수집
-    List<dynamic> _asList(dynamic v) =>
+    List<dynamic> asList(dynamic v) =>
         v is List ? v : [];
-    final pastList = _asList(json['matches']);
-    final scheduleList = _asList(json['schedules']) +
-        _asList(json['upcomingMatches']) +
-        _asList(json['schedule']);
+    final pastList = asList(json['matches']);
+    final scheduleList = asList(json['schedules']) +
+        asList(json['upcomingMatches']) +
+        asList(json['schedule']);
     final allMatches = [...pastList, ...scheduleList];
     return ClubDetailModel(
       clubId: json['clubId'] as int,

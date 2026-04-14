@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:twelfth_mobile/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/color.dart';
 
 class NetworkAvatar extends StatelessWidget {
   final String? imageUrl;

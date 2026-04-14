@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
+import 'package:twelfth_mobile/core/constants/color.dart';
 
 class TwelfthAccentTitle extends StatelessWidget {
   final String text;
@@ -19,7 +19,7 @@ class TwelfthAccentTitle extends StatelessWidget {
       children: [
         spacing,
         Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             border: Border(
               left: BorderSide(color: CustomColor.main, width: 12),
             ),

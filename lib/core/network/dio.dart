@@ -1,6 +1,7 @@
 import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
 import 'package:twelfth_mobile/core/config/app_env.dart';
+import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/core/network/token_storage.dart';
 
 class DioClient {
@@ -18,11 +19,14 @@ class DioClient {
       ),
     );
     _dio.interceptors.add(_AuthInterceptor());
+    _apiClient = DioApiClient(_dio);
   }
 
   late final Dio _dio;
+  late final ApiClient _apiClient;
 
   Dio get dio => _dio;
+  ApiClient get apiClient => _apiClient;
 }
 
 class _AuthInterceptor extends Interceptor {

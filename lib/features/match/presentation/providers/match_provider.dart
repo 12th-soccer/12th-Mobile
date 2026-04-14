@@ -1,5 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/core/network/dio.dart';
 import 'package:twelfth_mobile/features/match/data/datasources/match_remote_datasource.dart';
 import 'package:twelfth_mobile/features/match/data/repositories/match_repository_impl.dart';
@@ -8,10 +8,12 @@ import 'package:twelfth_mobile/features/match/domain/entities/match_event.dart';
 import 'package:twelfth_mobile/features/match/domain/repositories/i_match_repository.dart';
 import 'package:twelfth_mobile/features/match/domain/usecases/match_usecases.dart';
 
-final _dioProvider = Provider<Dio>((ref) => DioClient.instance.dio);
+final _apiClientProvider = Provider<ApiClient>(
+  (ref) => DioClient.instance.apiClient,
+);
 
 final _matchRemoteDataSourceProvider = Provider<IMatchRemoteDataSource>(
-  (ref) => MatchRemoteDataSourceImpl(ref.read(_dioProvider)),
+  (ref) => MatchRemoteDataSourceImpl(ref.read(_apiClientProvider)),
 );
 
 final matchRepositoryProvider = Provider<IMatchRepository>(

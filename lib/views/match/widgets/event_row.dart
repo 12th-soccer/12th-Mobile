@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
-import 'package:twelfth_mobile/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match_event.dart';
 
 class EventRow extends StatelessWidget {
   final MatchEvent event;
-
-  // true = 홈팀(왼쪽): 프로필 | 이름 | 시간 | 아이콘
-  // false = 어웨이팀(오른쪽): 아이콘 | 시간 | 이름 | 프로필
   final bool isHome;
   final VoidCallback? onTap;
 
@@ -47,7 +44,6 @@ class EventRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: isHome
-          // 홈팀 (왼쪽): 프로필 | 이름 → | 시간 | 아이콘
           ? Row(
               children: [
                 photo,
@@ -59,7 +55,6 @@ class EventRow extends StatelessWidget {
                 icon,
               ],
             )
-          // 어웨이팀 (오른쪽): 아이콘 | 시간 | ← 이름 | 프로필
           : Row(
               children: [
                 icon,

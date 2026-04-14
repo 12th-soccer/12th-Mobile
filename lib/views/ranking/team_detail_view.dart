@@ -1,22 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
-import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
-import 'package:twelfth_mobile/constants/color.dart';
-import 'package:twelfth_mobile/constants/team_social_links.dart';
+import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
-import 'package:twelfth_mobile/constants/twelfth_assets.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
-import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/features/favorites/presentation/providers/favorites_provider.dart';
-import 'package:twelfth_mobile/features/ranking/domain/entities/club_detail.dart';
 import 'package:twelfth_mobile/features/ranking/presentation/providers/ranking_provider.dart';
-import 'package:twelfth_mobile/views/match/match_detail_view.dart';
 import 'package:twelfth_mobile/views/ranking/widget/team_detail_body.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class TeamDetailView extends ConsumerWidget {
   final int clubId;

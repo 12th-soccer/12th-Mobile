@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:twelfth_mobile/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/color.dart';
 
 class OnboardingCheckbox extends StatelessWidget {
   final bool isSelected;

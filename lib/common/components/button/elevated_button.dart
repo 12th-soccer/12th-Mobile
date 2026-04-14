@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
+import 'package:twelfth_mobile/core/constants/color.dart';
 
 class TwelfthElevatedButton extends StatelessWidget {
   final Widget child;

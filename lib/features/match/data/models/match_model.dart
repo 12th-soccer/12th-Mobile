@@ -1,4 +1,4 @@
-import 'package:twelfth_mobile/constants/club_id_map.dart';
+import 'package:twelfth_mobile/core/constants/club_id_map.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match.dart';
 
 class MatchModel {

@@ -1,8 +1,7 @@
-import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:dio/dio.dart';
 import 'package:twelfth_mobile/common/providers/notification_settings_provider.dart';
 import 'package:twelfth_mobile/core/network/api_endpoints.dart';
+import 'package:twelfth_mobile/core/network/api_client.dart';
 
 abstract interface class IAlarmRemoteDataSource {
   Future<NotificationSettings> getSettings();
@@ -13,14 +12,9 @@ abstract interface class IAlarmRemoteDataSource {
 }
 
 class AlarmRemoteDataSourceImpl implements IAlarmRemoteDataSource {
-  final Dio _dio;
+  final ApiClient _apiClient;
 
-  const AlarmRemoteDataSourceImpl(this._dio);
-
-  Map<String, dynamic> _parseMap(dynamic raw) {
-    if (raw is String) return jsonDecode(raw) as Map<String, dynamic>;
-    return raw as Map<String, dynamic>;
-  }
+  const AlarmRemoteDataSourceImpl(this._apiClient);
 
   @override
   Future<NotificationSettings> getSettings() async {
@@ -28,14 +22,16 @@ class AlarmRemoteDataSourceImpl implements IAlarmRemoteDataSource {
       developer.log(
         '[Alarm] 알림 설정 조회: GET ${ApiEndpoints.notificationSettings}',
       );
-      final response = await _dio.get(ApiEndpoints.notificationSettings);
-      developer.log('[Alarm] 알림 설정 조회 응답 status: ${response.statusCode}');
-      return NotificationSettings.fromJson(_parseMap(response.data));
-    } on DioException catch (e) {
+      return await _apiClient.get(
+        ApiEndpoints.notificationSettings,
+        decoder: (data) =>
+            NotificationSettings.fromJson(data as Map<String, dynamic>),
+      );
+    } on ApiException catch (e) {
       developer.log(
         '[Alarm] 알림 설정 조회 실패\n'
-        '  status: ${e.response?.statusCode}\n'
-        '  response: ${e.response?.data}',
+        '  status: ${e.statusCode}\n'
+        '  response: ${e.responseData}',
       );
       return const NotificationSettings();
     } catch (e, stack) {
@@ -52,17 +48,17 @@ class AlarmRemoteDataSourceImpl implements IAlarmRemoteDataSource {
       developer.log(
         '[Alarm] 알림 설정 수정: PATCH ${ApiEndpoints.notificationSettings}',
       );
-      final response = await _dio.patch(
+      return await _apiClient.patch(
         ApiEndpoints.notificationSettings,
         data: settings.toJson(),
+        decoder: (data) =>
+            NotificationSettings.fromJson(data as Map<String, dynamic>),
       );
-      developer.log('[Alarm] 알림 설정 수정 응답 status: ${response.statusCode}');
-      return NotificationSettings.fromJson(_parseMap(response.data));
-    } on DioException catch (e) {
+    } on ApiException catch (e) {
       developer.log(
         '[Alarm] 알림 설정 수정 실패\n'
-        '  status: ${e.response?.statusCode}\n'
-        '  response: ${e.response?.data}',
+        '  status: ${e.statusCode}\n'
+        '  response: ${e.responseData}',
       );
       rethrow;
     } catch (e, stack) {
@@ -75,16 +71,16 @@ class AlarmRemoteDataSourceImpl implements IAlarmRemoteDataSource {
   Future<void> registerFcmToken(String token) async {
     try {
       developer.log('[Alarm] FCM 토큰 등록: POST ${ApiEndpoints.fcmTokens}');
-      final response = await _dio.post(
+      await _apiClient.postVoid(
         ApiEndpoints.fcmTokens,
         data: {'token': token},
       );
-      developer.log('[Alarm] FCM 토큰 등록 응답 status: ${response.statusCode}');
-    } on DioException catch (e) {
+      developer.log('[Alarm] FCM 토큰 등록 성공');
+    } on ApiException catch (e) {
       developer.log(
         '[Alarm] FCM 토큰 등록 실패\n'
-        '  status: ${e.response?.statusCode}\n'
-        '  response: ${e.response?.data}',
+        '  status: ${e.statusCode}\n'
+        '  response: ${e.responseData}',
       );
     } catch (e, stack) {
       developer.log('[Alarm] FCM 토큰 등록 실패 (Exception)\n  $e\n$stack');

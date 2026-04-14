@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/core/network/dio.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/features/favorites/data/datasources/favorites_remote_datasource.dart';
@@ -25,13 +26,14 @@ class _OnboardingPlayerViewState extends ConsumerState<OnboardingPlayerView> {
 
   late final ISearchRemoteDataSource _searchDs;
   late final IFavoritesRemoteDataSource _favoritesDs;
+  late final ApiClient _apiClient;
 
   @override
   void initState() {
     super.initState();
-    final dio = DioClient.instance.dio;
-    _searchDs = SearchRemoteDataSourceImpl(dio);
-    _favoritesDs = FavoritesRemoteDataSourceImpl(dio);
+    _apiClient = DioClient.instance.apiClient;
+    _searchDs = SearchRemoteDataSourceImpl(_apiClient);
+    _favoritesDs = FavoritesRemoteDataSourceImpl(_apiClient);
   }
 
   @override

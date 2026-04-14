@@ -1,6 +1,6 @@
 import 'dart:developer' as developer;
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/core/network/dio.dart';
 import 'package:twelfth_mobile/core/network/token_storage.dart';
 import 'package:twelfth_mobile/features/auth/data/datasources/auth_remote_datasource.dart';
@@ -10,9 +10,11 @@ import 'package:twelfth_mobile/features/auth/domain/repositories/i_auth_reposito
 import 'package:twelfth_mobile/features/auth/domain/usecases/auth_usecases.dart';
 import 'package:twelfth_mobile/features/auth/presentation/providers/auth_state.dart';
 
-final _dioProvider = Provider<Dio>((ref) => DioClient.instance.dio);
+final _apiClientProvider = Provider<ApiClient>(
+  (ref) => DioClient.instance.apiClient,
+);
 final _authRemoteDataSourceProvider = Provider<IAuthRemoteDataSource>(
-  (ref) => AuthRemoteDataSourceImpl(ref.read(_dioProvider)),
+  (ref) => AuthRemoteDataSourceImpl(ref.read(_apiClientProvider)),
 );
 
 final authRepositoryProvider = Provider<IAuthRepository>(
@@ -51,14 +53,14 @@ class AuthNotifier extends Notifier<AuthState> {
       state = state.copyWith(status: AuthStatus.success, signUpEmail: email);
       developer.log('[Auth] 인증 이메일 발송 성공');
       return true;
-    } on DioException catch (e) {
+    } on ApiException catch (e) {
       developer.log(
-        '[Auth] 인증 이메일 발송 실패 (DioException)\n'
+        '[Auth] 인증 이메일 발송 실패 (ApiException)\n'
         '  type: ${e.type}\n'
-        '  status: ${e.response?.statusCode}\n'
+        '  status: ${e.statusCode}\n'
         '  message: ${e.message}\n'
-        '  response: ${e.response?.data}\n'
-        '  URL: ${e.requestOptions.uri}',
+        '  response: ${e.responseData}\n'
+        '  URL: ${e.uri}',
       );
       state = state.copyWith(
         status: AuthStatus.error,
@@ -124,14 +126,14 @@ class AuthNotifier extends Notifier<AuthState> {
       developer.log('[Auth] 자동 로그인 성공 → 토큰 저장 완료');
       state = const AuthState(status: AuthStatus.success);
       return true;
-    } on DioException catch (e) {
+    } on ApiException catch (e) {
       developer.log(
-        '[Auth] 회원가입 실패 (DioException)\n'
+        '[Auth] 회원가입 실패 (ApiException)\n'
         '  type: ${e.type}\n'
-        '  status: ${e.response?.statusCode}\n'
+        '  status: ${e.statusCode}\n'
         '  message: ${e.message}\n'
-        '  response: ${e.response?.data}\n'
-        '  URL: ${e.requestOptions.uri}',
+        '  response: ${e.responseData}\n'
+        '  URL: ${e.uri}',
       );
       state = state.copyWith(
         status: AuthStatus.error,
@@ -158,14 +160,14 @@ class AuthNotifier extends Notifier<AuthState> {
       developer.log('[Auth] 로그인 성공');
       state = state.copyWith(status: AuthStatus.success);
       return true;
-    } on DioException catch (e) {
+    } on ApiException catch (e) {
       developer.log(
-        '[Auth] 로그인 실패 (DioException)\n'
+        '[Auth] 로그인 실패 (ApiException)\n'
         '  type: ${e.type}\n'
-        '  status: ${e.response?.statusCode}\n'
+        '  status: ${e.statusCode}\n'
         '  message: ${e.message}\n'
-        '  response: ${e.response?.data}\n'
-        '  URL: ${e.requestOptions.uri}',
+        '  response: ${e.responseData}\n'
+        '  URL: ${e.uri}',
       );
       state = state.copyWith(
         status: AuthStatus.error,
@@ -188,13 +190,13 @@ class AuthNotifier extends Notifier<AuthState> {
     try {
       await ref.read(_logoutUseCaseProvider).call();
       developer.log('[Auth] 로그아웃 성공 → 상태 초기화');
-    } on DioException catch (e) {
+    } on ApiException catch (e) {
       developer.log(
-        '[Auth] 로그아웃 실패 (DioException)\n'
+        '[Auth] 로그아웃 실패 (ApiException)\n'
         '  type: ${e.type}\n'
-        '  status: ${e.response?.statusCode}\n'
+        '  status: ${e.statusCode}\n'
         '  message: ${e.message}\n'
-        '  response: ${e.response?.data}',
+        '  response: ${e.responseData}',
       );
     } catch (e, stack) {
       developer.log('[Auth] 로그아웃 실패 (Exception)\n  $e\n$stack');
@@ -208,16 +210,16 @@ class AuthNotifier extends Notifier<AuthState> {
     state = state.copyWith(status: AuthStatus.initial, errorMessage: null);
   }
 
-  String _parseEmailError(DioException e) {
-    final status = e.response?.statusCode;
+  String _parseEmailError(ApiException e) {
+    final status = e.statusCode;
     if (status == 409 || status == 400) {
       return '이미 가입된 이메일 입니다.';
     }
     return _parseError(e);
   }
 
-  String _parseError(DioException e) {
-    switch (e.response?.statusCode) {
+  String _parseError(ApiException e) {
+    switch (e.statusCode) {
       case 400:
         return '입력 정보를 확인해 주세요';
       case 401:
@@ -231,9 +233,7 @@ class AuthNotifier extends Notifier<AuthState> {
       case 500:
         return '서버 오류가 발생했습니다';
       default:
-        if (e.type == DioExceptionType.connectionTimeout ||
-            e.type == DioExceptionType.receiveTimeout ||
-            e.type == DioExceptionType.sendTimeout) {
+        if (e.isTimeout) {
           return '네트워크 연결을 확인해 주세요';
         }
         return '오류가 발생했습니다. 다시 시도해 주세요';

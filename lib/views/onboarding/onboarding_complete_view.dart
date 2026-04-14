@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
-import 'package:twelfth_mobile/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
-import 'package:twelfth_mobile/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/twelfth_assets.dart';
 import 'package:twelfth_mobile/core/network/token_storage.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';

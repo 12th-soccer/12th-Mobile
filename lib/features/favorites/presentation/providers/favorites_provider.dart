@@ -1,5 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/core/network/dio.dart';
 import 'package:twelfth_mobile/features/favorites/data/datasources/favorites_remote_datasource.dart';
 import 'package:twelfth_mobile/features/favorites/data/repositories/favorites_repository_impl.dart';
@@ -8,10 +8,12 @@ import 'package:twelfth_mobile/features/favorites/domain/entities/favorite_playe
 import 'package:twelfth_mobile/features/favorites/domain/repositories/i_favorites_repository.dart';
 import 'package:twelfth_mobile/features/favorites/domain/usecases/get_favorite_clubs_usecase.dart';
 
-final _dioProvider = Provider<Dio>((ref) => DioClient.instance.dio);
+final _apiClientProvider = Provider<ApiClient>(
+  (ref) => DioClient.instance.apiClient,
+);
 
 final _favoritesRemoteDataSourceProvider = Provider<IFavoritesRemoteDataSource>(
-  (ref) => FavoritesRemoteDataSourceImpl(ref.read(_dioProvider)),
+  (ref) => FavoritesRemoteDataSourceImpl(ref.read(_apiClientProvider)),
 );
 
 final favoritesRepositoryProvider = Provider<IFavoritesRepository>(

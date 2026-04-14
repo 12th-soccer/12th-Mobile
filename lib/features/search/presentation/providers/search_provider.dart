@@ -1,5 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/core/network/dio.dart';
 import 'package:twelfth_mobile/features/search/data/datasources/search_remote_datasource.dart';
 import 'package:twelfth_mobile/features/search/data/repositories/search_repository_impl.dart';
@@ -7,10 +7,12 @@ import 'package:twelfth_mobile/features/search/domain/repositories/i_search_repo
 import 'package:twelfth_mobile/features/search/domain/usecases/search_usecases.dart';
 import 'package:twelfth_mobile/features/search/presentation/providers/search_state.dart';
 
-final _dioProvider = Provider<Dio>((ref) => DioClient.instance.dio);
+final _apiClientProvider = Provider<ApiClient>(
+  (ref) => DioClient.instance.apiClient,
+);
 
 final _searchRemoteDataSourceProvider = Provider<ISearchRemoteDataSource>(
-  (ref) => SearchRemoteDataSourceImpl(ref.read(_dioProvider)),
+  (ref) => SearchRemoteDataSourceImpl(ref.read(_apiClientProvider)),
 );
 
 final searchRepositoryProvider = Provider<ISearchRepository>(
@@ -70,7 +72,7 @@ class SearchNotifier extends Notifier<SearchState> {
             ? state.copyWith(status: SearchStatus.empty, players: [])
             : state.copyWith(status: SearchStatus.success, players: players);
       }
-    } on DioException catch (e) {
+    } on ApiException catch (e) {
       state = state.copyWith(
         status: SearchStatus.error,
         errorMessage: _parseError(e),
@@ -82,8 +84,8 @@ class SearchNotifier extends Notifier<SearchState> {
     state = SearchState(filter: state.filter, errorMessage: null);
   }
 
-  String _parseError(DioException e) {
-    switch (e.response?.statusCode) {
+  String _parseError(ApiException e) {
+    switch (e.statusCode) {
       case 400:
         return '해당 키워드가 없습니다';
       case 403:
@@ -91,8 +93,7 @@ class SearchNotifier extends Notifier<SearchState> {
       case 404:
         return '결과를 찾을 수 없습니다';
       default:
-        if (e.type == DioExceptionType.connectionTimeout ||
-            e.type == DioExceptionType.receiveTimeout) {
+        if (e.isTimeout) {
           return '네트워크 연결을 확인해 주세요';
         }
         return '오류가 발생했습니다. 다시 시도해 주세요';

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
-import 'package:twelfth_mobile/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.dart';
 import '../constants/onboarding_constants.dart';
 

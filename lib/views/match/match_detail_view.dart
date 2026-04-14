@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
-import 'package:twelfth_mobile/constants/color.dart';
-import 'package:twelfth_mobile/constants/stadium_map.dart';
+import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
+import 'package:twelfth_mobile/core/constants/stadium_map.dart';
 import 'package:twelfth_mobile/core/router/player_route_args.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/core/router/team_route_args.dart';
@@ -175,13 +175,11 @@ class _MatchHeader extends StatelessWidget {
   });
 
   Future<void> _openStadium(String stadiumName) async {
-    // 네이버 지도 앱 딥링크 우선 시도
     final appUri = StadiumMap.naverMapUri(stadiumName);
     if (await canLaunchUrl(appUri)) {
       await launchUrl(appUri);
       return;
     }
-    // 미설치 시 웹으로 폴백
     final webUri = StadiumMap.naverMapWebUri(stadiumName);
     await launchUrl(webUri, mode: LaunchMode.externalApplication);
   }

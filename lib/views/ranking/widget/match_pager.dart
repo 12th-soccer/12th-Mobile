@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:twelfth_mobile/features/ranking/domain/entities/club_detail.dart';
 import 'package:twelfth_mobile/views/ranking/widget/history_match_row.dart';
 import 'package:twelfth_mobile/views/ranking/widget/schedule_match_row.dart';
-
-import '../../../constants/color.dart';
+import 'package:twelfth_mobile/core/constants/color.dart';
 
 class MatchPager extends StatefulWidget {
   final List<ClubMatch> matches;

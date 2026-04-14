@@ -1,11 +1,16 @@
 import 'dart:developer' as developer;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/common/providers/notification_settings_provider.dart';
+import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/core/network/dio.dart';
 import 'package:twelfth_mobile/features/alarm/data/datasources/alarm_remote_datasource.dart';
 
+final _apiClientProvider = Provider<ApiClient>(
+  (ref) => DioClient.instance.apiClient,
+);
+
 final alarmRemoteDataSourceProvider = Provider<IAlarmRemoteDataSource>(
-  (ref) => AlarmRemoteDataSourceImpl(DioClient.instance.dio),
+  (ref) => AlarmRemoteDataSourceImpl(ref.read(_apiClientProvider)),
 );
 
 class NotificationSettingsNotifier extends AsyncNotifier<NotificationSettings> {

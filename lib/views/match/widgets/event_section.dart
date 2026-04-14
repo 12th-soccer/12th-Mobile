@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:twelfth_mobile/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match_event.dart';
 import 'package:twelfth_mobile/views/match/widgets/event_row.dart';

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:twelfth_mobile/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/views/match/match_detail_view.dart';
+import 'package:twelfth_mobile/core/constants/color.dart';
 
 class CenterSection extends StatelessWidget {
   final MatchState matchState;
