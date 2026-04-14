@@ -1,5 +1,6 @@
 import 'dart:developer' as developer;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:twelfth_mobile/core/network/api_endpoints.dart';
 import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/core/network/dio.dart';
 import 'package:twelfth_mobile/core/network/token_storage.dart';
@@ -211,11 +212,39 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 
   String _parseEmailError(ApiException e) {
-    final status = e.statusCode;
-    if (status == 409 || status == 400) {
-      return '이미 가입된 이메일 입니다.';
+    if (_isDuplicateEmailError(e)) {
+      return '이미 존재하는 이메일입니다.';
     }
     return _parseError(e);
+  }
+
+  bool _isDuplicateEmailError(ApiException e) {
+    final status = e.statusCode;
+    if (status == 409 || status == 400) return true;
+
+    final uriPath = e.uri?.path.toLowerCase() ?? '';
+    final isEmailVerificationRequest = uriPath.endsWith(ApiEndpoints.email);
+    if (!isEmailVerificationRequest) return false;
+
+    final responseText = _flattenErrorPayload(e.responseData).toLowerCase();
+    const duplicateKeywords = [
+      'already',
+      'exists',
+      'duplicate',
+      'registered',
+      '이미',
+      '존재',
+      '중복',
+      '가입된 이메일',
+      '등록된 이메일',
+    ];
+    return duplicateKeywords.any(responseText.contains);
+  }
+
+  String _flattenErrorPayload(Object? data) {
+    if (data == null) return '';
+    if (data is Map || data is List) return data.toString();
+    return '$data';
   }
 
   String _parseError(ApiException e) {
