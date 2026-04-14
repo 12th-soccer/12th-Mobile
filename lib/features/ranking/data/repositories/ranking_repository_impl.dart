@@ -2,6 +2,7 @@ import 'package:twelfth_mobile/features/ranking/data/datasources/ranking_remote_
 import 'package:twelfth_mobile/features/ranking/domain/entities/club_detail.dart';
 import 'package:twelfth_mobile/features/ranking/domain/entities/club_ranking.dart';
 import 'package:twelfth_mobile/features/ranking/domain/entities/player_detail.dart';
+import 'package:twelfth_mobile/features/ranking/domain/entities/player_goal.dart';
 import 'package:twelfth_mobile/features/ranking/domain/repositories/i_ranking_repository.dart';
 
 class RankingRepositoryImpl implements IRankingRepository {
@@ -34,4 +35,8 @@ class RankingRepositoryImpl implements IRankingRepository {
   @override
   Future<PlayerDetail> getPlayerDetail(int playerId) =>
       _dataSource.getPlayerDetail(playerId);
+
+  @override
+  Future<List<PlayerGoal>> getPlayerGoals(int playerId) =>
+      _dataSource.getPlayerGoals(playerId);
 }

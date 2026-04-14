@@ -6,6 +6,7 @@ import 'package:twelfth_mobile/features/ranking/data/repositories/ranking_reposi
 import 'package:twelfth_mobile/features/ranking/domain/entities/club_detail.dart';
 import 'package:twelfth_mobile/features/ranking/domain/entities/club_ranking.dart';
 import 'package:twelfth_mobile/features/ranking/domain/entities/player_detail.dart';
+import 'package:twelfth_mobile/features/ranking/domain/entities/player_goal.dart';
 import 'package:twelfth_mobile/features/ranking/domain/repositories/i_ranking_repository.dart';
 import 'package:twelfth_mobile/features/ranking/domain/usecases/get_club_detail_usecase.dart';
 import 'package:twelfth_mobile/features/ranking/domain/usecases/get_ranking_usecase.dart';
@@ -47,4 +48,11 @@ final playerDetailProvider = FutureProvider.family<PlayerDetail, int>((
   playerId,
 ) {
   return ref.read(rankingRepositoryProvider).getPlayerDetail(playerId);
+});
+
+final playerGoalsProvider = FutureProvider.family<List<PlayerGoal>, int>((
+  ref,
+  playerId,
+) {
+  return ref.read(rankingRepositoryProvider).getPlayerGoals(playerId);
 });
