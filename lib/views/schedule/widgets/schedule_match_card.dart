@@ -13,9 +13,10 @@ class ScheduleMatchCard extends StatelessWidget {
   final Match match;
 
   MatchState get _state {
+    final now = DateTime.now();
+    if (match.matchDate.isAfter(now)) return MatchState.upcoming;
     if (match.isFinished) return MatchState.finished;
-    if (match.matchDate.isBefore(DateTime.now())) return MatchState.live;
-    return MatchState.upcoming;
+    return MatchState.live;
   }
 
   String get _timeStr =>
