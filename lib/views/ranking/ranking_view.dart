@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -140,10 +141,15 @@ class _RankingViewState extends ConsumerState<RankingView> {
         favorites.valueOrNull?.any((c) => c.clubId == team.clubId) ?? false;
 
     return GestureDetector(
-      onTap: () => context.push(
-        AppRoutes.team,
-        extra: TeamRouteArgs(clubId: team.clubId, teamName: team.clubName),
-      ),
+      onTap: () {
+        developer.log(
+          '[TeamTap][Ranking] clubId=${team.clubId} clubName=${team.clubName}',
+        );
+        context.push(
+          AppRoutes.team,
+          extra: TeamRouteArgs(clubId: team.clubId, teamName: team.clubName),
+        );
+      },
       child: IntrinsicHeight(
         child: Row(
           children: [
@@ -164,7 +170,7 @@ class _RankingViewState extends ConsumerState<RankingView> {
                       ),
                     ),
                     _spacing,
-                    NetworkAvatar(imageUrl: team.imageUrl, size: 32),
+                    NetworkAvatar(imageUrl: team.clubImage, size: 32),
                     _spacing,
                     Expanded(
                       child: Text(
@@ -204,7 +210,8 @@ class _RankingViewState extends ConsumerState<RankingView> {
                               .read(favoritesNotifierProvider.notifier)
                               .toggleFavorite(team.clubId, team.clubName);
                         } catch (_) {
-                          if (context.mounted) {
+                          if (!mounted) return;
+                          {
                             context.showErrorSnackBar('관심 구단 설정에 실패했습니다.');
                           }
                         }

@@ -3,7 +3,7 @@ import 'package:twelfth_mobile/features/ranking/domain/entities/club_ranking.dar
 class ClubRankingModel {
   final int clubId;
   final String clubName;
-  final String? imageUrl;
+  final String? clubImage;
   final int win;
   final int lose;
   final int draw;
@@ -12,7 +12,7 @@ class ClubRankingModel {
   const ClubRankingModel({
     required this.clubId,
     required this.clubName,
-    this.imageUrl,
+    this.clubImage,
     required this.win,
     required this.lose,
     required this.draw,
@@ -23,7 +23,7 @@ class ClubRankingModel {
       ClubRankingModel(
         clubId: json['clubId'] as int,
         clubName: json['clubName'] as String,
-        imageUrl: (json['clubImageUrl'] ?? json['clubImage'] ?? json['imageUrl']) as String?,
+        clubImage: json['clubImage'] as String,
         win: json['win'] as int,
         lose: json['lose'] as int,
         draw: json['draw'] as int,
@@ -31,13 +31,13 @@ class ClubRankingModel {
       );
 
   ClubRanking toEntity({required int rank}) => ClubRanking(
-        clubId: clubId,
-        clubName: clubName,
-        imageUrl: imageUrl,
-        win: win,
-        lose: lose,
-        draw: draw,
-        point: point,
-        rank: rank,
-      );
+    clubId: clubId,
+    clubName: clubName,
+    clubImage: clubImage,
+    win: win,
+    lose: lose,
+    draw: draw,
+    point: point,
+    rank: rank,
+  );
 }
