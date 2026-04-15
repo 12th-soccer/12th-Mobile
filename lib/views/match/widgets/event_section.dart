@@ -8,14 +8,22 @@ import 'package:twelfth_mobile/views/match/widgets/event_row.dart';
 class EventsSection extends StatelessWidget {
   final AsyncValue<List<MatchEvent>> eventsAsync;
   final int? homeTeamId;
-  final void Function(int playerId, String playerName)? onPlayerTap;
+  final int? awayTeamId;
+  final void Function(MatchEvent event)? onPlayerTap;
 
   const EventsSection({
     super.key,
     required this.eventsAsync,
     this.homeTeamId,
+    this.awayTeamId,
     this.onPlayerTap,
   });
+
+  bool _resolveIsHome(MatchEvent event) {
+    if (homeTeamId != null && event.clubId == homeTeamId) return true;
+    if (awayTeamId != null && event.clubId == awayTeamId) return false;
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,16 +63,12 @@ class EventsSection extends StatelessWidget {
             widgets.add(const _HalfTimeDivider());
             halfTimeInserted = true;
           }
-          // clubId==0 means the API didn't return it — can't determine side
-          final isHome = (homeTeamId != null && event.clubId != 0)
-              ? event.clubId == homeTeamId
-              : true; // default left if undetermined
           widgets.add(
             EventRow(
               event: event,
-              isHome: isHome,
-              onTap: event.playerId != null
-                  ? () => onPlayerTap?.call(event.playerId!, event.playerName)
+              isHome: _resolveIsHome(event),
+              onTap: event.playerName.trim().isNotEmpty
+                  ? () => onPlayerTap?.call(event)
                   : null,
             ),
           );

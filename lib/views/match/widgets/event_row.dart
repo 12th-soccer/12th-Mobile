@@ -20,20 +20,12 @@ class EventRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final photo = GestureDetector(
-      onTap: onTap,
-      child: NetworkAvatar(imageUrl: event.playerImageUrl, size: 36),
-    );
-    final name = GestureDetector(
-      onTap: onTap,
-      child: Text(
-        event.playerName,
-        style: CustomTextStyle.body2.copyWith(
-          decoration: onTap != null ? TextDecoration.underline : null,
-          decorationColor: CustomColor.gray500,
-        ),
-        overflow: TextOverflow.ellipsis,
+    final photo = NetworkAvatar(imageUrl: event.playerImageUrl, size: 36);
+    final name = Text(
+      event.playerName,
+      style: CustomTextStyle.body2.copyWith(
       ),
+      overflow: TextOverflow.ellipsis,
     );
     final time = Text(
       _minuteStr,
@@ -41,33 +33,39 @@ class EventRow extends StatelessWidget {
     );
     final icon = _EventIcon(eventType: event.eventType);
 
+    final row = isHome
+        ? Row(
+            children: [
+              photo,
+              const SizedBox(width: 10),
+              Expanded(child: name),
+              const SizedBox(width: 12),
+              time,
+              const SizedBox(width: 10),
+              icon,
+            ],
+          )
+        : Row(
+            children: [
+              icon,
+              const SizedBox(width: 10),
+              time,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Align(alignment: Alignment.centerRight, child: name),
+              ),
+              const SizedBox(width: 10),
+              photo,
+            ],
+          );
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: isHome
-          ? Row(
-              children: [
-                photo,
-                const SizedBox(width: 10),
-                Expanded(child: name),
-                const SizedBox(width: 12),
-                time,
-                const SizedBox(width: 10),
-                icon,
-              ],
-            )
-          : Row(
-              children: [
-                icon,
-                const SizedBox(width: 10),
-                time,
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Align(alignment: Alignment.centerRight, child: name),
-                ),
-                const SizedBox(width: 10),
-                photo,
-              ],
-            ),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: row,
+      ),
     );
   }
 }

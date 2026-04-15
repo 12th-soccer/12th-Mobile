@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -120,13 +121,18 @@ class _FavoritesViewState extends ConsumerState<FavoritesView> {
         itemBuilder: (context, index) {
           final club = clubs[index];
           return GestureDetector(
-            onTap: () => context.push(
-              AppRoutes.team,
-              extra: TeamRouteArgs(
-                clubId: club.clubId,
-                teamName: club.clubName,
-              ),
-            ),
+            onTap: () {
+              developer.log(
+                '[TeamTap][Favorites] clubId=${club.clubId} clubName=${club.clubName}',
+              );
+              context.push(
+                AppRoutes.team,
+                extra: TeamRouteArgs(
+                  clubId: club.clubId,
+                  teamName: club.clubName,
+                ),
+              );
+            },
             child: Padding(
               padding: _itemPadding,
               child: Row(
