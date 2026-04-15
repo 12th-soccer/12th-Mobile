@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/club_id_map.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/features/ranking/domain/entities/club_detail.dart';
 
@@ -16,7 +17,7 @@ class ScheduleMatchRow extends StatelessWidget {
     required this.onTap,
   });
 
-  bool get _isHome => match.homeTeamName == clubName;
+  bool get _isHome => ClubIdMap.sameTeam(match.homeTeamName, clubName);
 
   String get _dateStr {
     final d = match.matchDate;

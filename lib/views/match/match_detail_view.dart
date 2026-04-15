@@ -3,14 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/club_id_map.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/core/constants/stadium_map.dart';
+import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/core/router/player_route_args.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/core/router/team_route_args.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match.dart';
+import 'package:twelfth_mobile/features/match/domain/entities/match_event.dart';
 import 'package:twelfth_mobile/features/match/presentation/providers/match_provider.dart';
+import 'package:twelfth_mobile/features/search/domain/entities/club_search_result.dart';
+import 'package:twelfth_mobile/features/search/domain/entities/player_search_result.dart';
+import 'package:twelfth_mobile/features/search/presentation/providers/search_provider.dart';
 import 'package:twelfth_mobile/views/match/widgets/center_section.dart';
 import 'package:twelfth_mobile/views/match/widgets/event_section.dart';
 import 'package:twelfth_mobile/views/match/widgets/lineup_section.dart';
@@ -51,6 +57,121 @@ class MatchDetailView extends ConsumerWidget {
     return MatchState.live;
   }
 
+  Future<void> _openPlayerDetail(
+    BuildContext context,
+    WidgetRef ref,
+    MatchEvent event,
+  ) async {
+    final playerName = event.playerName.trim();
+
+    if (playerName.isEmpty) {
+      context.showErrorSnackBar('선수 정보를 찾을 수 없습니다.');
+      return;
+    }
+
+    try {
+      final players = await ref
+          .read(searchRepositoryProvider)
+          .searchPlayers(playerName);
+      if (!context.mounted) return;
+
+      final resolvedPlayer = _resolvePlayerSearchResult(players, event);
+      if (resolvedPlayer == null) {
+        context.showErrorSnackBar('선수 상세 정보를 찾을 수 없습니다.');
+        return;
+      }
+
+      context.push(
+        AppRoutes.player,
+        extra: PlayerRouteArgs(
+          playerId: resolvedPlayer.playerId,
+          playerName: resolvedPlayer.name,
+        ),
+      );
+    } catch (_) {
+      if (!context.mounted) return;
+      context.showErrorSnackBar('선수 상세 정보를 불러오지 못했습니다.');
+    }
+  }
+
+  PlayerSearchResult? _resolvePlayerSearchResult(
+    List<PlayerSearchResult> players,
+    MatchEvent event,
+  ) {
+    if (players.isEmpty) return null;
+
+    final normalizedPlayerName = _normalize(event.playerName);
+
+    final exactNameMatches = players.where((player) {
+      return _normalize(player.name) == normalizedPlayerName;
+    }).toList();
+
+    return exactNameMatches.isNotEmpty ? exactNameMatches.first : players.first;
+  }
+
+  String _normalize(String? value) =>
+      (value ?? '').replaceAll(RegExp(r'\s+'), '').toLowerCase();
+
+  int? _resolveClubId(String teamName, int? fallbackClubId) {
+    return fallbackClubId ?? ClubIdMap.lookup(teamName);
+  }
+
+  ClubSearchResult? _resolveClubSearchResult(
+    List<ClubSearchResult> clubs,
+    String teamName,
+  ) {
+    if (clubs.isEmpty) return null;
+
+    final normalizedName = _normalize(teamName);
+    final exactMatches = clubs.where((club) {
+      return _normalize(club.name) == normalizedName;
+    }).toList();
+    if (exactMatches.isNotEmpty) return exactMatches.first;
+
+    for (final club in clubs) {
+      final normalizedClubName = _normalize(club.name);
+      if (normalizedClubName.contains(normalizedName) ||
+          normalizedName.contains(normalizedClubName)) {
+        return club;
+      }
+    }
+
+    return clubs.first;
+  }
+
+  Future<void> _openTeamDetail(
+    BuildContext context,
+    WidgetRef ref,
+    String teamName,
+    int? fallbackClubId,
+  ) async {
+    int? resolvedClubId = _resolveClubId(teamName, fallbackClubId);
+
+    try {
+      final searchedClubs = await ref.read(searchRepositoryProvider).searchClubs(
+        teamName,
+      );
+      if (!context.mounted) return;
+
+      final matchedClub = _resolveClubSearchResult(searchedClubs, teamName);
+      if (matchedClub != null) {
+        resolvedClubId = matchedClub.clubId;
+      }
+    } catch (_) {
+      if (!context.mounted) return;
+    }
+
+    if (resolvedClubId == null) {
+      context.showErrorSnackBar('구단 정보를 찾을 수 없습니다.');
+      return;
+    }
+
+    context.push(
+      AppRoutes.team,
+      extra: TeamRouteArgs(clubId: resolvedClubId, teamName: teamName),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(matchDetailProvider(extra.matchId));
@@ -79,6 +200,14 @@ class MatchDetailView extends ConsumerWidget {
               ),
               data: (match) {
                 final state = _resolveState(match);
+                final resolvedHomeClubId = _resolveClubId(
+                  match.homeTeamName,
+                  match.homeTeamId,
+                );
+                final resolvedAwayClubId = _resolveClubId(
+                  match.awayTeamName,
+                  match.awayTeamId,
+                );
                 final dateStr =
                     '${match.matchDate.month}/${match.matchDate.day}';
                 final timeStr =
@@ -91,24 +220,18 @@ class MatchDetailView extends ConsumerWidget {
                   awayScore: match.awayTeamScore,
                   dateStr: dateStr,
                   timeStr: timeStr,
-                  onHomeTap: match.homeTeamId != null
-                      ? () => context.push(
-                          AppRoutes.team,
-                          extra: TeamRouteArgs(
-                            clubId: match.homeTeamId!,
-                            teamName: match.homeTeamName,
-                          ),
-                        )
-                      : null,
-                  onAwayTap: match.awayTeamId != null
-                      ? () => context.push(
-                          AppRoutes.team,
-                          extra: TeamRouteArgs(
-                            clubId: match.awayTeamId!,
-                            teamName: match.awayTeamName,
-                          ),
-                        )
-                      : null,
+                  onHomeTap: () => _openTeamDetail(
+                    context,
+                    ref,
+                    match.homeTeamName,
+                    resolvedHomeClubId,
+                  ),
+                  onAwayTap: () => _openTeamDetail(
+                    context,
+                    ref,
+                    match.awayTeamName,
+                    resolvedAwayClubId,
+                  ),
                   homeImageUrl: match.homeTeamImageUrl,
                   awayImageUrl: match.awayTeamImageUrl,
                 );
@@ -128,13 +251,9 @@ class MatchDetailView extends ConsumerWidget {
                 eventsAsync: eventsAsync,
                 homeTeamId:
                     detailAsync.valueOrNull?.homeTeamId ?? extra.homeTeamId,
-                onPlayerTap: (playerId, playerName) => context.push(
-                  AppRoutes.player,
-                  extra: PlayerRouteArgs(
-                    playerId: playerId,
-                    playerName: playerName,
-                  ),
-                ),
+                awayTeamId:
+                    detailAsync.valueOrNull?.awayTeamId ?? extra.awayTeamId,
+                onPlayerTap: (event) => _openPlayerDetail(context, ref, event),
               ),
               const SizedBox(height: 20),
               const LineupSection(),

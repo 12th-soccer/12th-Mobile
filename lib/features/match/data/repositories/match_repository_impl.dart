@@ -11,7 +11,23 @@ class MatchRepositoryImpl implements IMatchRepository {
   @override
   Future<List<Match>> getMatchesByDate(String date) async {
     final models = await _dataSource.getMatchesByDate(date);
-    return models.map((m) => m.toEntity()).toList();
+    final matches = models.map((m) => m.toEntity()).toList();
+    final requestedDate = DateTime.tryParse(date);
+
+    if (requestedDate == null) {
+      return matches;
+    }
+
+    final targetDate = DateTime(
+      requestedDate.year,
+      requestedDate.month,
+      requestedDate.day,
+    );
+
+    return matches.where((match) {
+      final matchDate = match.matchDate.toLocal();
+      return _isSameDate(matchDate, targetDate);
+    }).toList();
   }
 
   @override
@@ -24,5 +40,9 @@ class MatchRepositoryImpl implements IMatchRepository {
   Future<List<MatchEvent>> getMatchEvents(int matchId) async {
     final models = await _dataSource.getMatchEvents(matchId);
     return models.map((m) => m.toEntity()).toList();
+  }
+
+  bool _isSameDate(DateTime lhs, DateTime rhs) {
+    return lhs.year == rhs.year && lhs.month == rhs.month && lhs.day == rhs.day;
   }
 }
