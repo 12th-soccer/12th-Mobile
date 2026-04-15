@@ -1,3 +1,5 @@
+import 'package:twelfth_mobile/core/constants/team_social_links.dart';
+
 abstract final class ClubIdMap {
   static const Map<String, int> _data = {
     'FC 서울': 1,
@@ -35,11 +37,37 @@ abstract final class ClubIdMap {
   };
 
   static int? lookup(String teamName) {
+    final canonical = TeamSocials.canonicalName(teamName);
+    if (canonical != null && _data.containsKey(canonical)) {
+      return _data[canonical];
+    }
+
     if (_data.containsKey(teamName)) return _data[teamName];
-    final noSpace = teamName.replaceAll(' ', '');
+    final normalizedInput = normalize(teamName);
     for (final entry in _data.entries) {
-      if (entry.key.replaceAll(' ', '') == noSpace) return entry.value;
+      if (normalize(entry.key) == normalizedInput) return entry.value;
     }
     return null;
+  }
+
+  static bool sameTeam(String? a, String? b) {
+    final normalizedA = normalize(a);
+    final normalizedB = normalize(b);
+    if (normalizedA.isEmpty || normalizedB.isEmpty) return false;
+    return normalizedA == normalizedB;
+  }
+
+  static String normalize(String? teamName) {
+    final value = (teamName ?? '').trim().toLowerCase();
+    if (value.isEmpty) return '';
+
+    var normalized = value.replaceAll(RegExp(r'[^a-z0-9가-힣]'), '');
+    if (normalized.startsWith('fc')) {
+      normalized = normalized.substring(2);
+    }
+    if (normalized.endsWith('fc')) {
+      normalized = normalized.substring(0, normalized.length - 2);
+    }
+    return normalized;
   }
 }
