@@ -214,6 +214,7 @@ abstract final class TeamSocials {
     '김해 FC': '김해FC2008',
 
     '파주 프런티어 FC': '파주프런티어FC',
+    '파주 프런티어': '파주프런티어FC',
     '파주프런티어': '파주프런티어FC',
     '파주 FC': '파주프런티어FC',
     '파주FC': '파주프런티어FC',
@@ -224,6 +225,10 @@ abstract final class TeamSocials {
   };
 
   static TeamSocialLinks? of(String teamName) {
+    final canonical = canonicalName(teamName);
+    if (canonical != null && _data.containsKey(canonical)) {
+      return _data[canonical];
+    }
     if (_data.containsKey(teamName)) return _data[teamName];
     final aliasKey =
         _aliases[teamName] ?? _aliases[teamName.replaceAll(' ', '')];
@@ -234,5 +239,44 @@ abstract final class TeamSocials {
       if (key.replaceAll(' ', '') == noSpace) return _data[key];
     }
     return null;
+  }
+
+  static String? canonicalName(String? teamName) {
+    if (teamName == null) return null;
+    if (_data.containsKey(teamName)) return teamName;
+
+    final trimmed = teamName.trim();
+    if (_data.containsKey(trimmed)) return trimmed;
+
+    final aliasKey = _aliases[trimmed] ?? _aliases[trimmed.replaceAll(' ', '')];
+    if (aliasKey != null) return aliasKey;
+
+    final noSpace = trimmed.replaceAll(' ', '');
+    if (_data.containsKey(noSpace)) return noSpace;
+
+    for (final key in _data.keys) {
+      if (key.replaceAll(' ', '') == noSpace) return key;
+    }
+
+    final normalizedInput = _normalizeForLookup(trimmed);
+    for (final key in _data.keys) {
+      if (_normalizeForLookup(key) == normalizedInput) return key;
+    }
+
+    return trimmed.isEmpty ? null : trimmed;
+  }
+
+  static String _normalizeForLookup(String value) {
+    var normalized = value.trim().toLowerCase().replaceAll(
+      RegExp(r'[^a-z0-9가-힣]'),
+      '',
+    );
+    if (normalized.startsWith('fc')) {
+      normalized = normalized.substring(2);
+    }
+    if (normalized.endsWith('fc')) {
+      normalized = normalized.substring(0, normalized.length - 2);
+    }
+    return normalized;
   }
 }

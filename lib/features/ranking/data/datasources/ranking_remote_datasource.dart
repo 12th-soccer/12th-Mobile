@@ -156,7 +156,9 @@ class RankingRemoteDataSourceImpl implements IRankingRemoteDataSource {
         '  URL: ${e.uri}\n'
         '  response: ${e.responseData}',
       );
-      if (status == 400 || status == 404) return [];
+      if (status == 400 || status == 404 || (status != null && status >= 500)) {
+        return [];
+      }
       rethrow;
     } catch (e, stack) {
       developer.log('[Player] 선수 골 기록 실패 (Exception)\n  $e\n$stack');

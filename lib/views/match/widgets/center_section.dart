@@ -48,10 +48,6 @@ class CenterSection extends StatelessWidget {
                 color: onStadiumTap != null
                     ? CustomColor.main
                     : CustomColor.gray500,
-                decoration: onStadiumTap != null
-                    ? TextDecoration.underline
-                    : null,
-                decorationColor: CustomColor.main,
               ),
             ),
           ],

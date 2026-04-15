@@ -93,8 +93,6 @@ class TeamDetailBody extends StatelessWidget {
                         detail.stadiumName,
                         style: CustomTextStyle.body3.copyWith(
                           color: CustomColor.main,
-                          decoration: TextDecoration.underline,
-                          decorationColor: CustomColor.main,
                         ),
                       ),
                     ],

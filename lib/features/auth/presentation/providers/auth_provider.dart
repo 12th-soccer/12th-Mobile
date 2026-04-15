@@ -120,7 +120,6 @@ class AuthNotifier extends Notifier<AuthState> {
             password: password,
           );
       developer.log('[Auth] 회원가입 성공 → 자동 로그인 시도');
-      // 회원가입 후 바로 토큰을 받아야 온보딩에서 API 호출 가능
       await ref
           .read(_loginUseCaseProvider)
           .call(email: state.signUpEmail, password: password);
@@ -257,10 +256,8 @@ class AuthNotifier extends Notifier<AuthState> {
         return '권한이 없습니다';
       case 404:
         return '해당 이메일을 가진 유저를 찾을 수 없습니다';
-      case 409:
-        return '이미 등록된 이메일입니다.';
       case 500:
-        return '서버 오류가 발생했습니다';
+        return '이미 등록된 이메일입니다.';
       default:
         if (e.isTimeout) {
           return '네트워크 연결을 확인해 주세요';
