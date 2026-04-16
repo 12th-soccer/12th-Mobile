@@ -1,62 +1,45 @@
+import 'dart:developer' as developer;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
-import 'package:twelfth_mobile/constants/color.dart';
-import 'package:twelfth_mobile/constants/twelfth_assets.dart';
-import 'package:twelfth_mobile/views/main_app.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/router/router.dart';
+import 'package:twelfth_mobile/firebase_options.dart';
 
-void main() {
-  runApp(const MyApp());
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  developer.log(
+    '[FCM] 백그라운드 메시지 수신\n'
+    '  title: ${message.notification?.title}\n'
+    '  body: ${message.notification?.body}',
+  );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-  // This widget is the root of your application.
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  runApp(const ProviderScope(child: TwelfthApp()));
+}
+
+class TwelfthApp extends StatelessWidget {
+  const TwelfthApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(scaffoldBackgroundColor: TwelfthColor.background),
-      // home: TwelfthMainApp(),
-      // home: TwelfthSplashView(),
-      home: Scaffold(
-        body: Center(
-          /*child: Column(
-            children: [
-              const SizedBox(height: 50),
-              TwelfthElevatedButton(
-                backgroundColor: TwelfthColor.yellow,
-                onPressed: () {
-                  print('단색 버튼 활성 클릭');
-                },
-                textColor: TwelfthColor.black,
-                imgPath: TwelfthAssets.kakao,
-                child: const Text('Kakao 로그인'),
-              ),
-              const SizedBox(height: 20),
-              TwelfthElevatedButton(
-                backgroundColor: TwelfthColor.white,
-                onPressed: null,
-                textColor: TwelfthColor.black,
-                imgPath: TwelfthAssets.kakao,
-                child: const Text('Kakao 로그인 (비활성)'),
-              ),
-            ],
-          ),*/
-          child: TwelfthElevatedButton(
-            imgPath: TwelfthAssets.kakao,
-            child: Text('kakao 로그인 ㄱ?'),
-          ),
-          /*child: TwelfthElevatedButton(
-            imgPath: TwelfthAssets.kakao,
-            gradient: TwelfthGradient.horizontal(TwelfthColor.silverGradient),
-            onPressed: () {
-              print('눌림!!!');
-            },
-            child: const Text('kakao 로그인 ㄱ?'),
-          ),*/
-        ),
-      ),
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(scaffoldBackgroundColor: CustomColor.background),
+      routerConfig: appRouter,
     );
   }
 }

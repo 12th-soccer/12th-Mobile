@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 
 class CustomTextStyle {
+  /// title
+  static TextStyle title = defaultTextStyle.copyWith(
+    fontSize: 28,
+    fontWeight: FontWeight.w600
+  );
+
   /// heading
   static TextStyle heading1 = defaultTextStyle.copyWith(
     fontSize:20,

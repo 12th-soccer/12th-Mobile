@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
-import 'package:twelfth_mobile/core/constants/text_style.dart';
 
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController controller;
@@ -128,8 +128,8 @@ class CustomTextFormField extends StatelessWidget {
       counter: decoration?.counter,
       counterText: decoration?.counterText,
       counterStyle: decoration?.counterStyle,
-      filled: decoration?.filled,
-      fillColor: decoration?.fillColor,
+      filled: decoration?.filled ?? true,
+      fillColor: decoration?.fillColor ?? CustomColor.gray900,
       focusColor: decoration?.focusColor,
       hoverColor: decoration?.hoverColor,
       disabledBorder: decoration?.disabledBorder,
@@ -139,7 +139,7 @@ class CustomTextFormField extends StatelessWidget {
       alignLabelWithHint: decoration?.alignLabelWithHint,
       constraints: decoration?.constraints,
 
-      enabledBorder: OutlineInputBorder(
+      enabledBorder: decoration?.enabledBorder ?? OutlineInputBorder(
         borderSide: BorderSide(
           color: CustomColor.gray900,
           width: 1,
@@ -147,7 +147,7 @@ class CustomTextFormField extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
 
-      focusedBorder: OutlineInputBorder(
+      focusedBorder: decoration?.focusedBorder ?? OutlineInputBorder(
         borderSide: BorderSide(
           color: CustomColor.white,
           width: 1,
@@ -178,6 +178,7 @@ class CustomTextFormField extends StatelessWidget {
         TextFormField(
           autocorrect: autocorrect,
           showCursor: showCursor,
+          cursorColor: CustomColor.main,
           controller: controller,
           initialValue: initialValue,
           focusNode: focusNode,
@@ -189,7 +190,7 @@ class CustomTextFormField extends StatelessWidget {
           autofocus: autofocus,
           readOnly: readOnly,
           obscureText: obscureText,
-          maxLines: maxLines,
+          maxLines: obscureText ? 1 : maxLines,
           minLines: minLines,
           expands: expands,
           maxLength: maxLength,

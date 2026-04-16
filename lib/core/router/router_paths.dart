@@ -1,0 +1,25 @@
+abstract final class AppRoutes {
+  static const splash = '/splash';
+  static const login = '/login';
+  static const signUpEmail = '/signup/email';
+  static const signUpVerify = '/signup/verify';
+  static const signUpPassword = '/signup/password';
+  static const signUpSuccess = '/signup/success';
+  static const onboardingWelcome = '/onboarding/welcome';
+  static const onboardingPlayer = '/onboarding/player';
+  static const onboardingTeam = '/onboarding/team';
+  static const onboardingComplete = '/onboarding/complete';
+
+  // Shell tabs (bottom nav visible)
+  static const ranking = '/ranking';
+  static const search = '/search';
+  static const schedule = '/schedule';
+  static const favorites = '/favorites';
+  static const profile = '/profile';
+
+  // Detail views (no bottom nav)
+  static const match = '/match';
+  static const team = '/team';
+  static const player = '/player';
+  static const notifications = '/notifications';
+}
