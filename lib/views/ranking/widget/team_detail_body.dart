@@ -127,29 +127,31 @@ class TeamDetailBody extends StatelessWidget {
             ),
           ),
 
-          if (upcoming.isNotEmpty) ...[
-            _SectionHeader(title: '일정'),
-            const SizedBox(height: 4),
+          _SectionHeader(title: '일정'),
+          const SizedBox(height: 4),
+          if (upcoming.isNotEmpty)
             MatchPager(
               matches: upcoming,
               clubName: detail.clubName,
               isHistory: false,
               onTap: (m) => _onMatchTap(context, m),
-            ),
-            const SizedBox(height: 24),
-          ],
+            )
+          else
+            _EmptySection(message: '해당 구단의 경기 일정이 없습니다.'),
+          const SizedBox(height: 24),
 
-          if (past.isNotEmpty) ...[
-            _SectionHeader(title: '경기 내역'),
-            const SizedBox(height: 4),
+          _SectionHeader(title: '경기 내역'),
+          const SizedBox(height: 4),
+          if (past.isNotEmpty)
             MatchPager(
               matches: past,
               clubName: detail.clubName,
               isHistory: true,
               onTap: (m) => _onMatchTap(context, m),
-            ),
-            const SizedBox(height: 24),
-          ],
+            )
+          else
+            _EmptySection(message: '해당 구단의 경기 내역이 없습니다.'),
+          const SizedBox(height: 24),
 
           const SizedBox(height: 16),
         ],
@@ -170,6 +172,22 @@ class _SectionHeader extends StatelessWidget {
       child: Align(
         alignment: Alignment.centerLeft,
         child: Text(title, style: CustomTextStyle.heading3),
+      ),
+    );
+  }
+}
+
+class _EmptySection extends StatelessWidget {
+  final String message;
+  const _EmptySection({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+      child: Text(
+        message,
+        style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
       ),
     );
   }
