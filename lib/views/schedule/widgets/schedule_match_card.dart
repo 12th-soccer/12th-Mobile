@@ -34,6 +34,8 @@ class ScheduleMatchCard extends StatelessWidget {
         matchState: _state,
         matchDate: _dateStr,
         matchTime: _timeStr,
+        homeTeamId: match.homeTeamId,
+        awayTeamId: match.awayTeamId,
       ),
     );
   }

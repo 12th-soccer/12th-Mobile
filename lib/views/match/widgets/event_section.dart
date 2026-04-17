@@ -20,8 +20,13 @@ class EventsSection extends StatelessWidget {
   });
 
   bool _resolveIsHome(MatchEvent event) {
-    if (homeTeamId != null && event.clubId == homeTeamId) return true;
-    if (awayTeamId != null && event.clubId == awayTeamId) return false;
+    if (event.clubId == 0) return true;
+    if (homeTeamId != null) {
+      return event.clubId == homeTeamId;
+    }
+    if (awayTeamId != null) {
+      return event.clubId != awayTeamId;
+    }
     return true;
   }
 

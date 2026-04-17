@@ -1,4 +1,3 @@
-import 'dart:developer' as developer;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/common/providers/notification_settings_provider.dart';
 import 'package:twelfth_mobile/core/network/api_client.dart';
@@ -28,7 +27,6 @@ class NotificationSettingsNotifier extends AsyncNotifier<NotificationSettings> {
       state = AsyncData(updated);
       return true;
     } catch (e, st) {
-      developer.log('[AlarmProvider] 설정 저장 실패: $e');
       state = AsyncError(e, st);
       return false;
     }

@@ -1,4 +1,3 @@
-import 'dart:developer' as developer;
 import 'package:twelfth_mobile/core/network/api_endpoints.dart';
 import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/features/auth/data/models/login_response_model.dart';
@@ -36,21 +35,14 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
     return _apiClient.post(
       ApiEndpoints.logIn,
       data: {'email': email, 'password': password},
-      decoder: (data) {
-        assert(() {
-          developer.log('[Auth] 로그인 응답 data type: ${data.runtimeType}');
-          return true;
-        }());
-        return LoginResponseModel.fromJson(data as Map<String, dynamic>);
-      },
+      decoder: (data) =>
+          LoginResponseModel.fromJson(data as Map<String, dynamic>),
     );
   }
 
   @override
   Future<void> sendVerificationEmail(String email) async {
-    developer.log('[Auth] 인증 이메일 발송 요청: $email');
     await _apiClient.postVoid(ApiEndpoints.email, data: {'email': email});
-    developer.log('[Auth] 인증 이메일 발송 성공');
   }
 
   @override
@@ -67,19 +59,15 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
 
   @override
   Future<void> logout() async {
-    developer.log('[Auth] 로그아웃 요청: DELETE ${ApiEndpoints.logOut}');
     await _apiClient.deleteVoid(ApiEndpoints.logOut);
-    developer.log('[Auth] 로그아웃 성공');
   }
 
   @override
   Future<UserInfo> getUserInfo() async {
     try {
-      developer.log('[Auth] 유저 정보 요청: GET ${ApiEndpoints.userInfo}');
       return await _apiClient.get(
         ApiEndpoints.userInfo,
         decoder: (data) {
-          developer.log('[Auth] 유저 정보 응답 data: $data');
           final json = data as Map<String, dynamic>;
           return UserInfo(
             userId: json['userId'] as int,
@@ -87,15 +75,9 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
           );
         },
       );
-    } on ApiException catch (e) {
-      developer.log(
-        '[Auth] 유저 정보 실패 (ApiException)\n'
-        '  status: ${e.statusCode}\n'
-        '  response: ${e.responseData}',
-      );
+    } on ApiException {
       rethrow;
-    } catch (e, stack) {
-      developer.log('[Auth] 유저 정보 실패 (Exception)\n  $e\n$stack');
+    } catch (_) {
       rethrow;
     }
   }

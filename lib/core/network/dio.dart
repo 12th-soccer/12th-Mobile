@@ -1,4 +1,3 @@
-import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
 import 'package:twelfth_mobile/core/config/app_env.dart';
 import 'package:twelfth_mobile/core/network/api_client.dart';
@@ -36,7 +35,6 @@ class _AuthInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     final token = await TokenStorage.instance.getAccessToken();
-    developer.log('[Dio] ${options.method} ${options.path} | authHeader: ${token != null && token.isNotEmpty ? 'set' : 'unset'}');
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     }

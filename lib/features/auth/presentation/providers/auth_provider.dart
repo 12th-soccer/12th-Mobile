@@ -1,4 +1,3 @@
-import 'dart:developer' as developer;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/core/network/api_endpoints.dart';
 import 'package:twelfth_mobile/core/network/api_client.dart';
@@ -49,27 +48,16 @@ class AuthNotifier extends Notifier<AuthState> {
   Future<bool> sendVerificationEmail(String email) async {
     state = state.copyWith(status: AuthStatus.loading);
     try {
-      developer.log('[Auth] 인증 이메일 발송: $email');
       await ref.read(_sendVerificationEmailUseCaseProvider).call(email);
       state = state.copyWith(status: AuthStatus.success, signUpEmail: email);
-      developer.log('[Auth] 인증 이메일 발송 성공');
       return true;
     } on ApiException catch (e) {
-      developer.log(
-        '[Auth] 인증 이메일 발송 실패 (ApiException)\n'
-        '  type: ${e.type}\n'
-        '  status: ${e.statusCode}\n'
-        '  message: ${e.message}\n'
-        '  response: ${e.responseData}\n'
-        '  URL: ${e.uri}',
-      );
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: _parseEmailError(e),
       );
       return false;
     } catch (e, stack) {
-      developer.log('[Auth] 인증 이메일 발송 실패 (Exception)\n  $e\n$stack');
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: '오류가 발생했습니다. 다시 시도해 주세요',
@@ -81,16 +69,13 @@ class AuthNotifier extends Notifier<AuthState> {
   Future<bool> confirmVerificationCode(String code, String email) async {
     state = state.copyWith(status: AuthStatus.loading);
     try {
-      developer.log('[Auth] 인증 코드 저장: email=$email, code=$code');
       state = state.copyWith(
         verificationCode: code,
         signUpEmail: email,
         status: AuthStatus.success,
       );
-      developer.log('[Auth] 인증 코드 저장 완료');
       return true;
     } catch (e, stack) {
-      developer.log('[Auth] 인증 코드 저장 실패 (Exception)\n  $e\n$stack');
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: '오류가 발생했습니다. 다시 시도해 주세요',
@@ -109,9 +94,6 @@ class AuthNotifier extends Notifier<AuthState> {
     }
     state = state.copyWith(status: AuthStatus.loading);
     try {
-      developer.log(
-        '[Auth] 회원가입 시작: email=${state.signUpEmail}, code=${state.verificationCode}',
-      );
       await ref
           .read(_signUpUseCaseProvider)
           .call(
@@ -119,29 +101,18 @@ class AuthNotifier extends Notifier<AuthState> {
             code: state.verificationCode,
             password: password,
           );
-      developer.log('[Auth] 회원가입 성공 → 자동 로그인 시도');
       await ref
           .read(_loginUseCaseProvider)
           .call(email: state.signUpEmail, password: password);
-      developer.log('[Auth] 자동 로그인 성공 → 토큰 저장 완료');
       state = const AuthState(status: AuthStatus.success);
       return true;
     } on ApiException catch (e) {
-      developer.log(
-        '[Auth] 회원가입 실패 (ApiException)\n'
-        '  type: ${e.type}\n'
-        '  status: ${e.statusCode}\n'
-        '  message: ${e.message}\n'
-        '  response: ${e.responseData}\n'
-        '  URL: ${e.uri}',
-      );
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: _parseError(e),
       );
       return false;
     } catch (e, stack) {
-      developer.log('[Auth] 회원가입 실패 (Exception)\n  $e\n$stack');
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: '오류가 발생했습니다. 다시 시도해 주세요',
@@ -153,29 +124,18 @@ class AuthNotifier extends Notifier<AuthState> {
   Future<bool> login({required String email, required String password}) async {
     state = state.copyWith(status: AuthStatus.loading);
     try {
-      developer.log('[Auth] 로그인 시작: email=$email');
       await ref
           .read(_loginUseCaseProvider)
           .call(email: email, password: password);
-      developer.log('[Auth] 로그인 성공');
       state = state.copyWith(status: AuthStatus.success);
       return true;
     } on ApiException catch (e) {
-      developer.log(
-        '[Auth] 로그인 실패 (ApiException)\n'
-        '  type: ${e.type}\n'
-        '  status: ${e.statusCode}\n'
-        '  message: ${e.message}\n'
-        '  response: ${e.responseData}\n'
-        '  URL: ${e.uri}',
-      );
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: _parseError(e),
       );
       return false;
     } catch (e, stack) {
-      developer.log('[Auth] 로그인 실패 (Exception)\n  $e\n$stack');
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: '오류가 발생했습니다. 다시 시도해 주세요',
@@ -185,23 +145,12 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 
   Future<void> logout() async {
-    developer.log('[Auth] 로그아웃 시작');
     state = state.copyWith(status: AuthStatus.loading);
     try {
       await ref.read(_logoutUseCaseProvider).call();
-      developer.log('[Auth] 로그아웃 성공 → 상태 초기화');
     } on ApiException catch (e) {
-      developer.log(
-        '[Auth] 로그아웃 실패 (ApiException)\n'
-        '  type: ${e.type}\n'
-        '  status: ${e.statusCode}\n'
-        '  message: ${e.message}\n'
-        '  response: ${e.responseData}',
-      );
     } catch (e, stack) {
-      developer.log('[Auth] 로그아웃 실패 (Exception)\n  $e\n$stack');
     } finally {
-      developer.log('[Auth] 로그아웃 finally → 토큰 초기화');
       state = const AuthState();
     }
   }
