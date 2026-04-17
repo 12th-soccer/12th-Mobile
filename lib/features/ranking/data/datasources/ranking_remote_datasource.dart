@@ -103,10 +103,11 @@ class RankingRemoteDataSourceImpl implements IRankingRemoteDataSource {
         ApiEndpoints.player(playerId.toString()),
         decoder: (data) {
           final json = data as Map<String, dynamic>;
+          developer.log('[Player] 선수 상세 응답 전체: $json');
           final rawName = json['name'] as String? ?? '';
           final rawImageUrl = json['playerImageUrl'] as String?;
           final isSwapped = rawName.startsWith('http');
-          return PlayerDetail(
+          final detail = PlayerDetail(
             playerId: json['playerId'] as int,
             name: isSwapped ? (rawImageUrl ?? '') : rawName,
             imageUrl: isSwapped ? rawName : rawImageUrl,
@@ -115,6 +116,8 @@ class RankingRemoteDataSourceImpl implements IRankingRemoteDataSource {
             number: json['number'] as int?,
             clubName: json['clubName'] as String?,
           );
+          developer.log('[Player] 파싱 결과: name=${detail.name} club=${detail.clubName} pos=${detail.position} num=${detail.number}');
+          return detail;
         },
       );
     } on ApiException catch (e) {

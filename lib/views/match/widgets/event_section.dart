@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
@@ -20,8 +21,13 @@ class EventsSection extends StatelessWidget {
   });
 
   bool _resolveIsHome(MatchEvent event) {
-    if (homeTeamId != null && event.clubId == homeTeamId) return true;
-    if (awayTeamId != null && event.clubId == awayTeamId) return false;
+    if (event.clubId == 0) return true;
+    if (homeTeamId != null) {
+      return event.clubId == homeTeamId;
+    }
+    if (awayTeamId != null) {
+      return event.clubId != awayTeamId;
+    }
     return true;
   }
 
@@ -50,6 +56,11 @@ class EventsSection extends StatelessWidget {
               style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
             ),
           );
+        }
+
+        developer.log('[Events] homeTeamId=$homeTeamId awayTeamId=$awayTeamId');
+        for (final e in events) {
+          developer.log('[Events]  player=${e.playerName} clubId=${e.clubId} min=${e.eventMinute}');
         }
 
         final sorted = [...events]

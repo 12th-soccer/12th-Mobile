@@ -60,7 +60,13 @@ class MatchRemoteDataSourceImpl implements IMatchRemoteDataSource {
       developer.log('[Match] 경기 상세 조회: matchId=$matchId');
       return await _apiClient.get(
         ApiEndpoints.match(matchId.toString()),
-        decoder: (data) => MatchModel.fromJson(data as Map<String, dynamic>),
+        decoder: (data) {
+          final json = data as Map<String, dynamic>;
+          developer.log(
+            '[Match] 경기 상세 응답: homeTeam=${json['homeTeamName']} homeTeamId=${json['homeTeamId']} awayTeam=${json['awayTeamName']} awayTeamId=${json['awayTeamId']}',
+          );
+          return MatchModel.fromJson(json);
+        },
       );
     } on ApiException catch (e) {
       developer.log(
