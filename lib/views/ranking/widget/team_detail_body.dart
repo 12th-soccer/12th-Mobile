@@ -1,4 +1,3 @@
-import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:twelfth_mobile/core/constants/stadium_map.dart';
@@ -62,9 +61,6 @@ class TeamDetailBody extends StatelessWidget {
     final upcoming = detail.upcomingMatches;
     final past = detail.pastMatches;
     final socialLinks = TeamSocials.of(detail.clubName);
-    developer.log(
-      '[TeamDetail] clubName="${detail.clubName}" socialLinks=${socialLinks != null ? "found" : "null"}',
-    );
 
     return SingleChildScrollView(
       child: Column(

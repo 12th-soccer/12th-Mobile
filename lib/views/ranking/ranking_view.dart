@@ -1,4 +1,3 @@
-import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -142,9 +141,6 @@ class _RankingViewState extends ConsumerState<RankingView> {
 
     return GestureDetector(
       onTap: () {
-        developer.log(
-          '[TeamTap][Ranking] clubId=${team.clubId} clubName=${team.clubName}',
-        );
         context.push(
           AppRoutes.team,
           extra: TeamRouteArgs(clubId: team.clubId, teamName: team.clubName),

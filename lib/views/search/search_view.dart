@@ -1,4 +1,3 @@
-import 'dart:developer' as developer;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -181,9 +180,6 @@ class _SearchViewState extends ConsumerState<SearchView> {
         final club = clubs[index];
         return GestureDetector(
           onTap: () {
-            developer.log(
-              '[TeamTap][Search] clubId=${club.clubId} clubName=${club.name}',
-            );
             context.push(
               AppRoutes.team,
               extra: TeamRouteArgs(clubId: club.clubId, teamName: club.name),

@@ -1,4 +1,3 @@
-import 'dart:developer' as developer;
 import 'package:twelfth_mobile/core/network/api_endpoints.dart';
 import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/features/match/data/models/match_event_model.dart';
@@ -20,7 +19,6 @@ class MatchRemoteDataSourceImpl implements IMatchRemoteDataSource {
   @override
   Future<List<MatchModel>> getMatchesByDate(String date) async {
     try {
-      developer.log('[Match] 날짜별 경기 조회: date=$date');
       return await _apiClient.get(
         ApiEndpoints.matchByDate,
         queryParameters: {'date': date},
@@ -43,13 +41,9 @@ class MatchRemoteDataSourceImpl implements IMatchRemoteDataSource {
       );
     } on ApiException catch (e) {
       final status = e.statusCode;
-      developer.log(
-        '[Match] 날짜별 경기 실패 (ApiException)\n  status: $status\n  URL: ${e.uri}\n  response: ${e.responseData}',
-      );
       if (status == 400 || status == 404) return [];
       rethrow;
     } catch (e, stack) {
-      developer.log('[Match] 날짜별 경기 실패 (Exception)\n  $e\n$stack');
       rethrow;
     }
   }
@@ -57,24 +51,14 @@ class MatchRemoteDataSourceImpl implements IMatchRemoteDataSource {
   @override
   Future<MatchModel> getMatchDetail(int matchId) async {
     try {
-      developer.log('[Match] 경기 상세 조회: matchId=$matchId');
       return await _apiClient.get(
         ApiEndpoints.match(matchId.toString()),
-        decoder: (data) {
-          final json = data as Map<String, dynamic>;
-          developer.log(
-            '[Match] 경기 상세 응답: homeTeam=${json['homeTeamName']} homeTeamId=${json['homeTeamId']} awayTeam=${json['awayTeamName']} awayTeamId=${json['awayTeamId']}',
-          );
-          return MatchModel.fromJson(json);
-        },
+        decoder: (data) =>
+            MatchModel.fromJson(data as Map<String, dynamic>),
       );
-    } on ApiException catch (e) {
-      developer.log(
-        '[Match] 경기 상세 실패 (ApiException)\n  status: ${e.statusCode}\n  URL: ${e.uri}\n  response: ${e.responseData}',
-      );
+    } on ApiException {
       rethrow;
-    } catch (e, stack) {
-      developer.log('[Match] 경기 상세 실패 (Exception)\n  $e\n$stack');
+    } catch (_) {
       rethrow;
     }
   }
@@ -82,7 +66,6 @@ class MatchRemoteDataSourceImpl implements IMatchRemoteDataSource {
   @override
   Future<List<MatchEventModel>> getMatchEvents(int matchId) async {
     try {
-      developer.log('[Match] 경기 이벤트 조회: matchId=$matchId');
       return await _apiClient.get(
         ApiEndpoints.event(matchId.toString()),
         decoder: (data) {
@@ -95,13 +78,9 @@ class MatchRemoteDataSourceImpl implements IMatchRemoteDataSource {
       );
     } on ApiException catch (e) {
       final status = e.statusCode;
-      developer.log(
-        '[Match] 경기 이벤트 실패 (ApiException)\n  status: $status\n  URL: ${e.uri}\n  response: ${e.responseData}',
-      );
       if (status == 400 || status == 404) return [];
       rethrow;
-    } catch (e, stack) {
-      developer.log('[Match] 경기 이벤트 실패 (Exception)\n  $e\n$stack');
+    } catch (_) {
       rethrow;
     }
   }

@@ -1,4 +1,3 @@
-import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
@@ -56,11 +55,6 @@ class EventsSection extends StatelessWidget {
               style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
             ),
           );
-        }
-
-        developer.log('[Events] homeTeamId=$homeTeamId awayTeamId=$awayTeamId');
-        for (final e in events) {
-          developer.log('[Events]  player=${e.playerName} clubId=${e.clubId} min=${e.eventMinute}');
         }
 
         final sorted = [...events]
