@@ -7,6 +7,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
+import 'package:twelfth_mobile/features/favorites/presentation/providers/favorites_provider.dart';
 import 'package:twelfth_mobile/features/match/presentation/providers/match_provider.dart';
 import 'package:twelfth_mobile/views/schedule/widgets/league_tabs.dart';
 import 'package:twelfth_mobile/views/schedule/widgets/schedule_calendar.dart';
@@ -143,6 +144,12 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
   Widget _buildMatchList() {
     final matchesAsync = ref.watch(matchesByDateProvider(_dateKey));
     final leagueFilter = _leagueTabIndex == 0 ? 'K1' : 'K2';
+    final favoriteClubNames = ref
+            .watch(favoritesNotifierProvider)
+            .valueOrNull
+            ?.map((c) => c.clubName)
+            .toSet() ??
+        {};
 
     return matchesAsync.when(
       loading: () => const Center(
@@ -166,12 +173,22 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
             child: Center(
               child: Text(
                 '해당 날짜에 경기가 없습니다',
-                style:
-                    CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
+                style: CustomTextStyle.body2
+                    .copyWith(color: CustomColor.gray500),
               ),
             ),
           );
         }
+
+        // 관심 구단 경기 상단 고정
+        bool _isFavoriteMatch(m) =>
+            favoriteClubNames.contains(m.homeTeamName) ||
+            favoriteClubNames.contains(m.awayTeamName);
+
+        final sorted = [
+          ...filtered.where(_isFavoriteMatch),
+          ...filtered.where((m) => !_isFavoriteMatch(m)),
+        ];
 
         return RefreshIndicator(
           onRefresh: _onRefresh,
@@ -180,9 +197,9 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
           child: ListView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: filtered.length,
+            itemCount: sorted.length,
             itemBuilder: (context, index) =>
-                ScheduleMatchCard(match: filtered[index]),
+                ScheduleMatchCard(match: sorted[index]),
           ),
         );
       },
