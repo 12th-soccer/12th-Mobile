@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
     <application
         android:label="12th"
         android:name="${applicationName}"
@@ -36,6 +38,10 @@
                 <data android:scheme="twelfth"/>
             </intent-filter>
         </activity>
+        <!-- FCM 백그라운드 알림이 포그라운드 채널과 동일한 채널을 사용하도록 -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="twelfth_default" />
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
