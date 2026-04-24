@@ -13,6 +13,7 @@ import 'package:twelfth_mobile/views/onboarding/onboarding_complete_view.dart';
 import 'package:twelfth_mobile/views/onboarding/onboarding_player_view.dart';
 import 'package:twelfth_mobile/views/onboarding/onboarding_team_view.dart';
 import 'package:twelfth_mobile/views/onboarding/onboarding_welcome_view.dart';
+import 'package:twelfth_mobile/views/profile/no_spoiler_settings_view.dart';
 import 'package:twelfth_mobile/views/profile/notification_settings_view.dart';
 import 'package:twelfth_mobile/views/profile/profile_view.dart';
 import 'package:twelfth_mobile/views/ranking/player_detail_view.dart';
@@ -150,6 +151,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.notifications,
       builder: (context, state) => const NotificationSettingsView(),
+    ),
+    GoRoute(
+      path: AppRoutes.noSpoiler,
+      builder: (context, state) => const NoSpoilerSettingsView(),
     ),
   ],
 );

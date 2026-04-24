@@ -26,7 +26,6 @@ abstract final class FcmService {
 
     final token = await messaging.getToken();
     if (token != null) {
-      debugPrint('[FCM] token: $token');
       await _registerToken(ref, token);
     }
 

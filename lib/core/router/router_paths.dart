@@ -22,4 +22,5 @@ abstract final class AppRoutes {
   static const team = '/team';
   static const player = '/player';
   static const notifications = '/notifications';
+  static const noSpoiler = '/no-spoiler';
 }
