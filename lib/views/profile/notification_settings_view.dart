@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
 import 'package:twelfth_mobile/common/providers/notification_settings_provider.dart';
+import 'package:twelfth_mobile/features/alarm/presentation/providers/alarm_provider.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
-import 'package:twelfth_mobile/features/alarm/presentation/providers/alarm_provider.dart';
 
 class NotificationSettingsView extends ConsumerWidget {
   const NotificationSettingsView({super.key});
@@ -14,14 +14,18 @@ class NotificationSettingsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settingsAsync = ref.watch(notificationSettingsNotifierProvider);
 
-    return Scaffold(
-      backgroundColor: CustomColor.background,
-      appBar: const TwelfthAppBar(title: '알림 설정'),
-      body: settingsAsync.when(
-        loading: () => const Center(
+    return settingsAsync.when(
+      loading: () => Scaffold(
+        backgroundColor: CustomColor.background,
+        appBar: const TwelfthAppBar(title: '알림 설정'),
+        body: const Center(
           child: CircularProgressIndicator(color: CustomColor.white),
         ),
-        error: (e, _) => Center(
+      ),
+      error: (e, _) => Scaffold(
+        backgroundColor: CustomColor.background,
+        appBar: const TwelfthAppBar(title: '알림 설정'),
+        body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -45,8 +49,8 @@ class NotificationSettingsView extends ConsumerWidget {
             ],
           ),
         ),
-        data: (settings) => _SettingsForm(settings: settings),
       ),
+      data: (settings) => _SettingsForm(settings: settings),
     );
   }
 }
@@ -100,76 +104,64 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 8),
-                  _buildRow(
-                    label: '알림',
-                    value: _notificationEnabled,
-                    onChanged: (v) => setState(() => _notificationEnabled = v),
-                  ),
-                  if (_notificationEnabled) ...[
-                    const SizedBox(height: 8),
-                    const Divider(color: CustomColor.gray900, height: 1),
-                    const SizedBox(height: 8),
-                    _buildRow(
-                      label: '경기 시작',
-                      value: _matchStartEnabled,
-                      onChanged: (v) => setState(() => _matchStartEnabled = v),
-                      sublabel: '기본 알림으로 끄기 가능합니다.',
-                    ),
-                    const SizedBox(height: 4),
-                    _buildRow(
-                      label: '1시간 전',
-                      value: _oneHourBefore,
-                      onChanged: (v) => setState(() => _oneHourBefore = v),
-                    ),
-                    _buildRow(
-                      label: '30분 전',
-                      value: _thirtyMinsBefore,
-                      onChanged: (v) => setState(() => _thirtyMinsBefore = v),
-                    ),
-                    _buildRow(
-                      label: '15분 전',
-                      value: _fifteenMinsBefore,
-                      onChanged: (v) => setState(() => _fifteenMinsBefore = v),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _save,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: CustomColor.main,
-                  foregroundColor: CustomColor.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  '저장',
-                  style: CustomTextStyle.body1.copyWith(
-                    color: CustomColor.black,
-                  ),
-                ),
+    return Scaffold(
+      backgroundColor: CustomColor.background,
+      appBar: TwelfthAppBar(
+        title: '알림 설정',
+        actions: [
+          TextButton(
+            onPressed: _save,
+            child: Text(
+              '저장',
+              style: CustomTextStyle.body1.copyWith(
+                color: CustomColor.blue,
               ),
             ),
           ),
         ],
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 8),
+              _buildRow(
+                label: '알림',
+                value: _notificationEnabled,
+                onChanged: (v) => setState(() => _notificationEnabled = v),
+              ),
+              if (_notificationEnabled) ...[
+                const SizedBox(height: 8),
+                const Divider(color: CustomColor.gray900, height: 1),
+                const SizedBox(height: 8),
+                _buildRow(
+                  label: '경기 시작',
+                  value: _matchStartEnabled,
+                  onChanged: (v) => setState(() => _matchStartEnabled = v),
+                  sublabel: '기본 알림으로 끄기 가능합니다.',
+                ),
+                const SizedBox(height: 4),
+                _buildRow(
+                  label: '1시간 전',
+                  value: _oneHourBefore,
+                  onChanged: (v) => setState(() => _oneHourBefore = v),
+                ),
+                _buildRow(
+                  label: '30분 전',
+                  value: _thirtyMinsBefore,
+                  onChanged: (v) => setState(() => _thirtyMinsBefore = v),
+                ),
+                _buildRow(
+                  label: '15분 전',
+                  value: _fifteenMinsBefore,
+                  onChanged: (v) => setState(() => _fifteenMinsBefore = v),
+                ),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
