@@ -70,6 +70,11 @@ class ProfileView extends ConsumerWidget {
           onTap: () => context.push(AppRoutes.notifications),
         ),
         _buildMenuItem(
+          icon: Symbols.visibility_off,
+          label: '노 스포일러',
+          onTap: () => context.push(AppRoutes.noSpoiler),
+        ),
+        _buildMenuItem(
           icon: Symbols.exit_to_app,
           label: '로그아웃',
           onTap: () async {
