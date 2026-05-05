@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/features/favorites/presentation/providers/favorites_provider.dart';
@@ -109,7 +110,7 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
 
   Widget _buildSearchBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: AppPadding.screenH,
       child: GestureDetector(
         onTap: () => context.push(AppRoutes.search),
         child: Container(
@@ -196,7 +197,7 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
           backgroundColor: CustomColor.gray900,
           child: ListView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: AppPadding.listV,
             itemCount: sorted.length,
             itemBuilder: (context, index) =>
                 ScheduleMatchCard(match: sorted[index]),

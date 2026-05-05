@@ -8,6 +8,7 @@ import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/constants/twelfth_assets.dart';
 import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/features/auth/presentation/google_oauth_launcher.dart';
@@ -26,9 +27,9 @@ class _LoginViewState extends ConsumerState<LoginView> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
-  static const _smallSpacing = SizedBox(height: 5);
-  static const _middleSpacing = SizedBox(height: 10);
-  static const _bigSpacing = SizedBox(height: 20);
+  static const _smallSpacing = AppSpacing.h8;
+  static const _middleSpacing = AppSpacing.h10;
+  static const _bigSpacing = AppSpacing.h20;
 
   @override
   void dispose() {
@@ -83,7 +84,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: AppPadding.screenH,
             child: Form(
               key: _formKey,
               child: Column(
@@ -91,7 +92,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 children: [
                   const Spacer(flex: 2),
                   Center(child: SvgPicture.asset(TwelfthAssets.logo)),
-                  const SizedBox(height: 48),
+                  AppSpacing.h48,
                   _buildLabel('이메일'),
                   _smallSpacing,
                   CustomTextFormField(

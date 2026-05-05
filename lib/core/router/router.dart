@@ -22,6 +22,10 @@ import 'package:twelfth_mobile/core/router/player_route_args.dart';
 import 'package:twelfth_mobile/core/router/team_route_args.dart';
 import 'package:twelfth_mobile/views/ranking/team_detail_view.dart';
 import 'package:twelfth_mobile/views/schedule/schedule_view.dart';
+import 'package:twelfth_mobile/views/fan_finder/fan_finder_detail_view.dart';
+import 'package:twelfth_mobile/views/fan_finder/fan_finder_view.dart';
+import 'package:twelfth_mobile/views/fan_finder/fan_finder_write_view.dart';
+import 'package:twelfth_mobile/views/fan_finder/model/fan_post.dart';
 import 'package:twelfth_mobile/views/splash_view.dart';
 
 final appRouter = GoRouter(
@@ -155,6 +159,21 @@ final appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.noSpoiler,
       builder: (context, state) => const NoSpoilerSettingsView(),
+    ),
+    GoRoute(
+      path: AppRoutes.fanFinder,
+      builder: (context, state) => const FanFinderView(),
+    ),
+    GoRoute(
+      path: AppRoutes.fanFinderWrite,
+      builder: (context, state) => const FanFinderWriteView(),
+    ),
+    GoRoute(
+      path: AppRoutes.fanFinderDetail,
+      builder: (context, state) {
+        final post = state.extra as FanPost;
+        return FanFinderDetailView(post: post);
+      },
     ),
   ],
 );

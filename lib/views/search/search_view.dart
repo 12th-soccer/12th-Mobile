@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/router/player_route_args.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
@@ -269,7 +270,7 @@ class _FilterDropdown extends StatelessWidget {
         color: Colors.transparent,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: AppRadius.sm,
           side: const BorderSide(color: CustomColor.main),
         ),
         offset: const Offset(0, 36),
@@ -289,10 +290,10 @@ class _FilterDropdown extends StatelessWidget {
         child: SizedBox(
           width: 72,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), // 고유값
             decoration: BoxDecoration(
               border: Border.all(color: CustomColor.main),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppRadius.sm,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,

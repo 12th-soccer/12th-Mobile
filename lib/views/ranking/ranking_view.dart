@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
@@ -65,7 +66,7 @@ class _RankingViewState extends ConsumerState<RankingView> {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 16),
+                      AppSpacing.h16,
                       GestureDetector(
                         onTap: () =>
                             ref.invalidate(rankingProvider(_currentLeague)),
@@ -126,7 +127,7 @@ class _RankingViewState extends ConsumerState<RankingView> {
       color: CustomColor.white,
       backgroundColor: CustomColor.gray900,
       child: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: AppPadding.listV,
         itemCount: teams.length,
         itemBuilder: (context, index) => _buildTeamItem(teams[index]),
       ),

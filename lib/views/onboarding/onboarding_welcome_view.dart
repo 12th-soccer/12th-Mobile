@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:go_router/go_router.dart';
-import 'package:twelfth_mobile/core/router/router.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart' show AppRoutes;
 
 class OnboardingWelcomeView extends StatelessWidget {
@@ -15,7 +15,7 @@ class OnboardingWelcomeView extends StatelessWidget {
       backgroundColor: CustomColor.background,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: AppPadding.screenH,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -24,7 +24,7 @@ class OnboardingWelcomeView extends StatelessWidget {
                 '오신 것을 환영해요',
                 style: CustomTextStyle.title,
               ),
-              const SizedBox(height: 10),
+              AppSpacing.h10,
               Text(
                 '12th와 함께 K리그를 더 가깝게 즐겨보세요.\n시작하기 전 간단한 설문과 함께 좋아하는 팀과 선수를 설정해 드릴게요.',
                 style: CustomTextStyle.body2.copyWith(

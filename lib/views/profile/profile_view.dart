@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
@@ -40,7 +41,7 @@ class ProfileView extends ConsumerWidget {
               shape: BoxShape.circle,
             ),
           ),
-          const SizedBox(height: 12),
+          AppSpacing.h12,
           userInfoAsync.when(
             loading: () => const SizedBox(
               height: 20,

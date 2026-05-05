@@ -4,6 +4,7 @@ import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
 import 'package:twelfth_mobile/common/providers/notification_settings_provider.dart';
 import 'package:twelfth_mobile/features/alarm/presentation/providers/alarm_provider.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 
@@ -35,7 +36,7 @@ class NotificationSettingsView extends ConsumerWidget {
                   color: CustomColor.gray500,
                 ),
               ),
-              const SizedBox(height: 16),
+              AppSpacing.h16,
               GestureDetector(
                 onTap: () =>
                     ref.invalidate(notificationSettingsNotifierProvider),
@@ -122,27 +123,27 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: AppPadding.cardH,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 8),
+              AppSpacing.h8,
               _buildRow(
                 label: '알림',
                 value: _notificationEnabled,
                 onChanged: (v) => setState(() => _notificationEnabled = v),
               ),
               if (_notificationEnabled) ...[
-                const SizedBox(height: 8),
+                AppSpacing.h8,
                 const Divider(color: CustomColor.gray900, height: 1),
-                const SizedBox(height: 8),
+                AppSpacing.h8,
                 _buildRow(
                   label: '경기 시작',
                   value: _matchStartEnabled,
                   onChanged: (v) => setState(() => _matchStartEnabled = v),
                   sublabel: '기본 알림으로 끄기 가능합니다.',
                 ),
-                const SizedBox(height: 4),
+                AppSpacing.h4,
                 _buildRow(
                   label: '1시간 전',
                   value: _oneHourBefore,
@@ -173,7 +174,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     String? sublabel,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: AppPadding.itemV12,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
