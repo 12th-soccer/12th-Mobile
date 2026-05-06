@@ -9,7 +9,7 @@ class AgeVerificationDialog extends StatelessWidget {
     return showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withValues(alpha: 0.7),
+      barrierColor: CustomColor.black.withValues(alpha: 0.7),
       builder: (_) => const AgeVerificationDialog(),
     );
   }

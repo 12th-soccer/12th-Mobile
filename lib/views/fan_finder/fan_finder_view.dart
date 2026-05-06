@@ -44,9 +44,29 @@ class _FanFinderViewState extends State<FanFinderView> {
 
   List<FanPost> get _filteredPosts {
     if (_selectedFilters.isEmpty) return mockFanPosts;
-    return mockFanPosts
-        .where((p) => p.tags.any((t) => _selectedFilters.contains(t)))
-        .toList();
+
+    final categories = [
+      FanFinderConstants.ageOptions,
+      FanFinderConstants.genderOptions,
+      FanFinderConstants.k1Teams,
+      FanFinderConstants.k2Teams,
+    ];
+
+    final selectionsByCategory = <int, Set<String>>{};
+    for (final filter in _selectedFilters) {
+      for (var i = 0; i < categories.length; i++) {
+        if (categories[i].contains(filter)) {
+          selectionsByCategory.putIfAbsent(i, () => {}).add(filter);
+          break;
+        }
+      }
+    }
+
+    return mockFanPosts.where((post) {
+      return selectionsByCategory.values.every(
+        (categoryTags) => post.tags.any(categoryTags.contains),
+      );
+    }).toList();
   }
 
   @override
