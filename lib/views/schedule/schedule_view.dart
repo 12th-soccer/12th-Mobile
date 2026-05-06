@@ -2,12 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
-import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/features/favorites/presentation/providers/favorites_provider.dart';
 import 'package:twelfth_mobile/features/match/presentation/providers/match_provider.dart';
 import 'package:twelfth_mobile/views/schedule/widgets/league_tabs.dart';
@@ -78,7 +75,6 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
       body: SafeArea(
         child: Column(
           children: [
-            _buildSearchBar(context),
             const SizedBox(height: 20),
             ScheduleCalendar(
               focusedMonth: _focusedMonth,
@@ -103,40 +99,6 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
             ),
             Expanded(child: _buildMatchList()),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSearchBar(BuildContext context) {
-    return Padding(
-      padding: AppPadding.screenH,
-      child: GestureDetector(
-        onTap: () => context.push(AppRoutes.search),
-        child: Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: CustomColor.gray800,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: CustomColor.gray800),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Row(
-            children: [
-              const Icon(
-                Symbols.search,
-                color: CustomColor.gray600,
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '선수이름, 구단이름으로 검색',
-                style: CustomTextStyle.body2.copyWith(
-                  color: CustomColor.gray600,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -181,14 +143,13 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
           );
         }
 
-        // 관심 구단 경기 상단 고정
-        bool _isFavoriteMatch(m) =>
+        bool isFavoriteMatch(m) =>
             favoriteClubNames.contains(m.homeTeamName) ||
             favoriteClubNames.contains(m.awayTeamName);
 
         final sorted = [
-          ...filtered.where(_isFavoriteMatch),
-          ...filtered.where((m) => !_isFavoriteMatch(m)),
+          ...filtered.where(isFavoriteMatch),
+          ...filtered.where((m) => !isFavoriteMatch(m)),
         ];
 
         return RefreshIndicator(
