@@ -43,7 +43,7 @@ class RankingRemoteDataSourceImpl implements IRankingRemoteDataSource {
   Future<ClubDetailModel> getClubDetail(int clubId) async {
     try {
       return await _apiClient.get(
-        ApiEndpoints.club(clubId.toString()),
+        ApiEndpoints.team(clubId.toString()),
         decoder: (data) =>
             ClubDetailModel.fromJson(data as Map<String, dynamic>),
       );

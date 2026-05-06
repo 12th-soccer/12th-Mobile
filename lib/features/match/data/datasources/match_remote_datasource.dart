@@ -19,9 +19,9 @@ class MatchRemoteDataSourceImpl implements IMatchRemoteDataSource {
   @override
   Future<List<MatchModel>> getMatchesByDate(String date) async {
     try {
+      final season = date.split('-').first;
       return await _apiClient.get(
-        ApiEndpoints.matchByDate,
-        queryParameters: {'date': date},
+        ApiEndpoints.matchByDate(season, date),
         decoder: (data) {
           if (data == null) return <MatchModel>[];
           final List<dynamic> list;

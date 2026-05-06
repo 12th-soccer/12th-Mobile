@@ -20,7 +20,7 @@ class FavoritesRemoteDataSourceImpl implements IFavoritesRemoteDataSource {
   Future<List<FavoriteClubModel>> getFavoriteClubs() async {
     try {
       return await _apiClient.get(
-        ApiEndpoints.clubFavorite,
+        ApiEndpoints.teamFavorite,
         decoder: (data) {
           final list = data as List<dynamic>;
           return list
@@ -63,7 +63,7 @@ class FavoritesRemoteDataSourceImpl implements IFavoritesRemoteDataSource {
   Future<List<FavoritePlayerModel>> getFavoritePlayers() async {
     try {
       return await _apiClient.get(
-        ApiEndpoints.playerInterest,
+        ApiEndpoints.playerFavorite,
         decoder: (data) {
           final list = data as List<dynamic>;
           return list

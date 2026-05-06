@@ -17,7 +17,7 @@ class SearchRemoteDataSourceImpl implements ISearchRemoteDataSource {
   Future<List<ClubSearchResultModel>> searchClubs(String keyword) async {
     try {
       return await _apiClient.get(
-        ApiEndpoints.clubSearch,
+        ApiEndpoints.teamSearch,
         queryParameters: {'keyword': keyword},
         decoder: (data) {
           final json = data as Map<String, dynamic>;
