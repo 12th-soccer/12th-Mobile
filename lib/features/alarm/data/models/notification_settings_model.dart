@@ -1,11 +1,13 @@
-class NotificationSettings {
+import 'package:twelfth_mobile/features/alarm/domain/entities/notification_settings.dart';
+
+class NotificationSettingsModel {
   final bool notificationEnabled;
   final bool oneHourBeforeEnabled;
   final bool thirtyMinutesBeforeEnabled;
   final bool fifteenMinutesBeforeEnabled;
   final bool matchStartEnabled;
 
-  const NotificationSettings({
+  const NotificationSettingsModel({
     this.notificationEnabled = true,
     this.oneHourBeforeEnabled = true,
     this.thirtyMinutesBeforeEnabled = true,
@@ -13,8 +15,8 @@ class NotificationSettings {
     this.matchStartEnabled = true,
   });
 
-  factory NotificationSettings.fromJson(Map<String, dynamic> json) =>
-      NotificationSettings(
+  factory NotificationSettingsModel.fromJson(Map<String, dynamic> json) =>
+      NotificationSettingsModel(
         notificationEnabled: json['notificationEnabled'] as bool? ?? true,
         oneHourBeforeEnabled: json['oneHourBeforeEnabled'] as bool? ?? true,
         thirtyMinutesBeforeEnabled:
@@ -22,6 +24,15 @@ class NotificationSettings {
         fifteenMinutesBeforeEnabled:
             json['fifteenMinutesBeforeEnabled'] as bool? ?? true,
         matchStartEnabled: json['matchStartEnabled'] as bool? ?? true,
+      );
+
+  factory NotificationSettingsModel.fromEntity(NotificationSettings entity) =>
+      NotificationSettingsModel(
+        notificationEnabled: entity.notificationEnabled,
+        oneHourBeforeEnabled: entity.oneHourBeforeEnabled,
+        thirtyMinutesBeforeEnabled: entity.thirtyMinutesBeforeEnabled,
+        fifteenMinutesBeforeEnabled: entity.fifteenMinutesBeforeEnabled,
+        matchStartEnabled: entity.matchStartEnabled,
       );
 
   Map<String, dynamic> toJson() => {
@@ -32,20 +43,11 @@ class NotificationSettings {
         'matchStartEnabled': matchStartEnabled,
       };
 
-  NotificationSettings copyWith({
-    bool? notificationEnabled,
-    bool? oneHourBeforeEnabled,
-    bool? thirtyMinutesBeforeEnabled,
-    bool? fifteenMinutesBeforeEnabled,
-    bool? matchStartEnabled,
-  }) =>
-      NotificationSettings(
-        notificationEnabled: notificationEnabled ?? this.notificationEnabled,
-        oneHourBeforeEnabled: oneHourBeforeEnabled ?? this.oneHourBeforeEnabled,
-        thirtyMinutesBeforeEnabled:
-            thirtyMinutesBeforeEnabled ?? this.thirtyMinutesBeforeEnabled,
-        fifteenMinutesBeforeEnabled:
-            fifteenMinutesBeforeEnabled ?? this.fifteenMinutesBeforeEnabled,
-        matchStartEnabled: matchStartEnabled ?? this.matchStartEnabled,
+  NotificationSettings toEntity() => NotificationSettings(
+        notificationEnabled: notificationEnabled,
+        oneHourBeforeEnabled: oneHourBeforeEnabled,
+        thirtyMinutesBeforeEnabled: thirtyMinutesBeforeEnabled,
+        fifteenMinutesBeforeEnabled: fifteenMinutesBeforeEnabled,
+        matchStartEnabled: matchStartEnabled,
       );
 }

@@ -1,12 +1,10 @@
-import 'package:twelfth_mobile/common/providers/notification_settings_provider.dart';
+import 'package:twelfth_mobile/features/alarm/data/models/notification_settings_model.dart';
 import 'package:twelfth_mobile/core/network/api_endpoints.dart';
 import 'package:twelfth_mobile/core/network/api_client.dart';
 
 abstract interface class IAlarmRemoteDataSource {
-  Future<NotificationSettings> getSettings();
-
-  Future<NotificationSettings> updateSettings(NotificationSettings settings);
-
+  Future<NotificationSettingsModel> getSettings();
+  Future<NotificationSettingsModel> updateSettings(NotificationSettingsModel settings);
   Future<void> registerFcmToken(String token);
 }
 
@@ -16,30 +14,30 @@ class AlarmRemoteDataSourceImpl implements IAlarmRemoteDataSource {
   const AlarmRemoteDataSourceImpl(this._apiClient);
 
   @override
-  Future<NotificationSettings> getSettings() async {
+  Future<NotificationSettingsModel> getSettings() async {
     try {
       return await _apiClient.get(
         ApiEndpoints.notificationSettings,
         decoder: (data) =>
-            NotificationSettings.fromJson(data as Map<String, dynamic>),
+            NotificationSettingsModel.fromJson(data as Map<String, dynamic>),
       );
     } on ApiException catch (e) {
-      return const NotificationSettings();
+      return const NotificationSettingsModel();
     } catch (e, stack) {
-      return const NotificationSettings();
+      return const NotificationSettingsModel();
     }
   }
 
   @override
-  Future<NotificationSettings> updateSettings(
-    NotificationSettings settings,
+  Future<NotificationSettingsModel> updateSettings(
+    NotificationSettingsModel settings,
   ) async {
     try {
       return await _apiClient.patch(
         ApiEndpoints.notificationSettings,
         data: settings.toJson(),
         decoder: (data) =>
-            NotificationSettings.fromJson(data as Map<String, dynamic>),
+            NotificationSettingsModel.fromJson(data as Map<String, dynamic>),
       );
     } on ApiException catch (e) {
       rethrow;
@@ -55,7 +53,6 @@ class AlarmRemoteDataSourceImpl implements IAlarmRemoteDataSource {
         ApiEndpoints.fcmTokens,
         data: {'token': token},
       );
-    } catch (e, stack) {
-    }
+    } catch (e, stack) {}
   }
 }

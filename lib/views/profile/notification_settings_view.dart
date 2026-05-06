@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
-import 'package:twelfth_mobile/common/providers/notification_settings_provider.dart';
-import 'package:twelfth_mobile/features/alarm/presentation/providers/alarm_provider.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
+import 'package:twelfth_mobile/features/alarm/domain/entities/notification_settings.dart';
+import 'package:twelfth_mobile/features/alarm/presentation/providers/alarm_provider.dart';
 
 class NotificationSettingsView extends ConsumerWidget {
   const NotificationSettingsView({super.key});

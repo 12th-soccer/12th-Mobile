@@ -37,6 +37,6 @@ abstract final class FcmService {
   }
 
   static Future<void> _registerToken(WidgetRef ref, String token) async {
-    await ref.read(alarmRemoteDataSourceProvider).registerFcmToken(token);
+    await registerFcmToken(ref, token);
   }
 }
