@@ -16,37 +16,40 @@ class ApiEndpoints {
   static String ranking(String leagueType) => "/ranking?leagueType=$leagueType";
 
   /// teams
+  static const teamSearch = '/teams/search';
   static String team(String teamId) => "/teams/$teamId";
-  static const teamSearch = "/teams/search";
-  static const teamFavorite = "/teams/favorite";
   static String teamsKleague1(String season) => "/teams/kleague1?season=$season";
   static String teamsKleague2(String season) => "/teams/kleague2?season=$season";
 
   /// matches
   static String match(String matchId) => "/matches/$matchId";
-  static String matchByDate(String season, String date) =>
+  static String matchDateKleague1(String season, String date) =>
       "/matches/kleague1?date=$date&season=$season";
+  static String matchDateKleague2(String season, String date) =>
+      "/matches/kleague2?date=$date&season=$season";
 
   /// player
+  static const playerSearch = '/player/search';
   static String player(String playerId, {String? season}) =>
       season != null ? "/player/$playerId?season=$season" : "/player/$playerId";
-  static const playerFavorite = "/player/favorite";
-  static const playerSearch = "/player/search";
   static String playersKleague1(String season, int page) =>
       "/player/kleague1?season=$season&page=$page";
   static String playersKleague2(String season, int page) =>
       "/player/kleague2?season=$season&page=$page";
+  static String playerDetail(String season) => '/player/{playerId}?season=$season';
 
   /// favorite
-  static String favoriteClub(String clubId) => "/favorite/club/$clubId";
+  static const favoriteTeams = "/favorite/team";
+  static String favoriteTeam(String teamId) => "/favorite/team/$teamId";
+  static String favoritePlayerRegister(String playerId, String season) =>
+      "/favorite/player/$playerId?season=$season";
   static String favoritePlayer(String playerId) => "/favorite/player/$playerId";
-  static String favoriteSchedule(String clubId) => "/favorite/schedule/$clubId";
+  static const favoritePlayers = "/favorite/player";
 
   /// notifications
   static const notificationSettings = "/notifications/settings";
   static const fcmTokens = "/fcm/tokens";
 
-  /// goal & event
+  /// goal
   static String goal(String playerId) => "/goal/$playerId";
-  static String event(String matchId) => "/event/$matchId";
 }
