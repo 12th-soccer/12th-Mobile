@@ -34,11 +34,10 @@ class ApiEndpoints {
   /// player
   static String player(String playerId, {String? season}) =>
       season != null ? "/player/$playerId?season=$season" : "/player/$playerId";
-  static String playersKleague1(String season, int page) =>
+  static String playersKleague1(String season, {int page = 1}) =>
       "/player/kleague1?season=$season&page=$page";
-  static String playersKleague2(String season, int page) =>
+  static String playersKleague2(String season, {int page = 1}) =>
       "/player/kleague2?season=$season&page=$page";
-  static String playerDetail(String season) => '/player/{playerId}?season=$season';
 
   /// favorite
   static const favoriteTeams = "/favorite/team";
