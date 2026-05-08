@@ -15,8 +15,12 @@ class ApiEndpoints {
   /// ranking
   static String ranking(String leagueType) => "/ranking?leagueType=$leagueType";
 
+  /// search
+      "/search/team?keyword=$keyword&season=$season&page=$page";
+  static String searchPlayer(String keyword, String season, {int page = 1}) =>
+      "/search/player?keyword=$keyword&season=$season&page=$page";
+
   /// teams
-  static const teamSearch = '/teams/search';
   static String team(String teamId) => "/teams/$teamId";
   static String teamsKleague1(String season) => "/teams/kleague1?season=$season";
   static String teamsKleague2(String season) => "/teams/kleague2?season=$season";
@@ -29,7 +33,6 @@ class ApiEndpoints {
       "/matches/kleague2?date=$date&season=$season";
 
   /// player
-  static const playerSearch = '/player/search';
   static String player(String playerId, {String? season}) =>
       season != null ? "/player/$playerId?season=$season" : "/player/$playerId";
   static String playersKleague1(String season, int page) =>
@@ -50,6 +53,7 @@ class ApiEndpoints {
   static const notificationSettings = "/notifications/settings";
   static const fcmTokens = "/fcm/tokens";
 
-  /// goal
-  static String goal(String playerId) => "/goal/$playerId";
+  /// goals
+  static String goals(String playerId, String season, String league) =>
+      "/goals/$playerId?season=$season&league=$league";
 }
