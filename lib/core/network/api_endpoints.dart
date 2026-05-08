@@ -13,9 +13,10 @@ class ApiEndpoints {
   static const userInfo = "/user/info";
 
   /// ranking
-  static String ranking(String leagueType) => "/ranking?leagueType=$leagueType";
+  static String ranking(String season, String league) => "/ranking?season=$season&league=$league";
 
   /// search
+  static String searchTeam(String keyword, String season, {int page = 1}) =>
       "/search/team?keyword=$keyword&season=$season&page=$page";
   static String searchPlayer(String keyword, String season, {int page = 1}) =>
       "/search/player?keyword=$keyword&season=$season&page=$page";
