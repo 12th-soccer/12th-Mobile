@@ -90,8 +90,6 @@ class _NoSpoilerSettingsViewState extends ConsumerState<NoSpoilerSettingsView> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Divider(color: CustomColor.gray900, height: 1),
-                  const SizedBox(height: 16),
                   Text(
                     '설정 시 경기 결과가 바로 보이지 않습니다. 해당 경기를 클릭해야 해당 경기의 스코어가 보여집니다. 한번 본 경기 결과는 계속해서 보여지며, 이외의 경기에는 영향을 주지 않습니다.',
                     style: CustomTextStyle.body2.copyWith(
