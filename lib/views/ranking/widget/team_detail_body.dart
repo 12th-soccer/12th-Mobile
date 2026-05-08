@@ -69,12 +69,12 @@ class TeamDetailBody extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
             child: Column(
               children: [
-                NetworkAvatar(imageUrl: detail.imageUrl, size: 100),
+                NetworkAvatar(imageUrl: detail.logo, size: 100),
                 const SizedBox(height: 16),
                 Text(detail.clubName, style: CustomTextStyle.heading1),
                 const SizedBox(height: 8),
                 GestureDetector(
-                  onTap: () => _openStadium(detail.stadiumName),
+                  onTap: () => _openStadium(detail.venueName),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -86,7 +86,7 @@ class TeamDetailBody extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        detail.stadiumName,
+                        detail.venueName,
                         style: CustomTextStyle.body3.copyWith(
                           color: CustomColor.main,
                         ),

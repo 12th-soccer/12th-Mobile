@@ -28,4 +28,5 @@ abstract final class AppRoutes {
   static const fanFinder = '/fan-finder';
   static const fanFinderWrite = '/fan-finder/write';
   static const fanFinderDetail = '/fan-finder/detail';
+  static const fanFinderChat = '/fan-finder/chat';
 }

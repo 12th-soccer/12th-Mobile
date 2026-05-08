@@ -11,6 +11,7 @@ class ScheduleCalendar extends StatelessWidget {
     required this.onPrevMonth,
     required this.onNextMonth,
     required this.onDateSelected,
+    required this.onHeaderTap,
   });
 
   final DateTime focusedMonth;
@@ -18,6 +19,7 @@ class ScheduleCalendar extends StatelessWidget {
   final VoidCallback onPrevMonth;
   final VoidCallback onNextMonth;
   final ValueChanged<DateTime> onDateSelected;
+  final VoidCallback? onHeaderTap;
 
   static const _weekLabels = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -50,7 +52,10 @@ class ScheduleCalendar extends StatelessWidget {
                     ),
                   ),
                 ),
-                Text('$month월', style: CustomTextStyle.heading2),
+                GestureDetector(
+                  onTap: onHeaderTap,
+                  child: Text('$year년 $month월', style: CustomTextStyle.heading2),
+                ),
                 GestureDetector(
                   onTap: onNextMonth,
                   behavior: HitTestBehavior.opaque,

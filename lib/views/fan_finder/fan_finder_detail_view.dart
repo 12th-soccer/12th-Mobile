@@ -4,6 +4,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/snack_bar/custom_snack_bar.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/views/fan_finder/fan_finder_constants.dart';
 import 'package:twelfth_mobile/views/fan_finder/model/fan_post.dart';
 
@@ -82,31 +83,46 @@ class FanFinderDetailView extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 32),
               child: Column(
                 children: [
-                  if (isFull)
-                    Text(
-                      '모집이 마감되었습니다',
-                      style: CustomTextStyle.body2.copyWith(
-                        color: CustomColor.gray600,
-                      ),
+                  if (isFull) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '인원이 모두 찼습니다! 채팅방이 생성되었습니다',
+                          style: CustomTextStyle.body3.copyWith(
+                            color: CustomColor.main,
+                          ),
+                        ),
+                      ],
                     ),
-                  FanFinderConstants.spaceS,
+                    FanFinderConstants.spaceS,
+                  ],
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: isFull ? null : () => _joinPost(context),
+                      onPressed: isFull
+                          ? () => context.push(
+                                AppRoutes.fanFinderChat,
+                                extra: post,
+                              )
+                          : () => _joinPost(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: CustomColor.main,
-                        disabledBackgroundColor: CustomColor.gray800,
                         padding: FanFinderConstants.buttonVerticalPadding,
                         shape: RoundedRectangleBorder(
                           borderRadius: FanFinderConstants.buttonRadius,
                         ),
                       ),
-                      child: Text(
-                        isFull ? '마감' : '참가하기',
-                        style: CustomTextStyle.heading2.copyWith(
-                          color: isFull ? CustomColor.gray600 : CustomColor.black,
-                        ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            isFull ? '채팅방 입장' : '참가하기',
+                            style: CustomTextStyle.heading2.copyWith(
+                              color: CustomColor.black,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

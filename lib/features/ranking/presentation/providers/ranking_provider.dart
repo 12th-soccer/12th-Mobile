@@ -31,11 +31,13 @@ final _getClubDetailUseCaseProvider = Provider<GetClubDetailUseCase>(
   (ref) => GetClubDetailUseCase(ref.read(rankingRepositoryProvider)),
 );
 
-final rankingProvider = FutureProvider.family<List<ClubRanking>, String>((
+typedef RankingArgs = ({String league, String season});
+
+final rankingProvider = FutureProvider.family<List<ClubRanking>, RankingArgs>((
   ref,
-  leagueType,
+  args,
 ) {
-  return ref.read(_getRankingUseCaseProvider).call(leagueType);
+  return ref.read(_getRankingUseCaseProvider).call(args.league, args.season);
 });
 
 final clubDetailProvider = FutureProvider.family<ClubDetail, int>((
@@ -52,7 +54,7 @@ final playerDetailProvider = FutureProvider.family<PlayerDetail, int>((
   return ref.read(rankingRepositoryProvider).getPlayerDetail(playerId);
 });
 
-final playerGoalsProvider = FutureProvider.family<List<PlayerGoal>, int>((
+final playerGoalsProvider = FutureProvider.family<PlayerGoal?, int>((
   ref,
   playerId,
 ) {

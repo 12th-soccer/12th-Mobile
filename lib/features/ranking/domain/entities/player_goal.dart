@@ -1,17 +1,15 @@
 class PlayerGoal {
-  final int id;
   final int playerId;
   final String playerName;
-  final DateTime matchDate;
-  final int goalTime;
-  final String? goalType;
+  final int season;
+  final String league;
+  final int goalCount;
 
   const PlayerGoal({
-    required this.id,
     required this.playerId,
     required this.playerName,
-    required this.matchDate,
-    required this.goalTime,
-    this.goalType,
+    required this.season,
+    required this.league,
+    required this.goalCount,
   });
 }

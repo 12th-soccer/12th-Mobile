@@ -16,6 +16,6 @@ class SearchPlayersUseCase {
 
   const SearchPlayersUseCase(this._repository);
 
-  Future<List<PlayerSearchResult>> call(String keyword) =>
-      _repository.searchPlayers(keyword);
+  Future<List<PlayerSearchResult>> call(String keyword, {String? season}) =>
+      _repository.searchPlayers(keyword, season: season);
 }

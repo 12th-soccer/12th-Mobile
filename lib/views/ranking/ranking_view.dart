@@ -22,8 +22,14 @@ class RankingView extends ConsumerStatefulWidget {
 
 class _RankingViewState extends ConsumerState<RankingView> {
   int _tabIndex = 0;
+  late int _selectedYear;
   static const _tabs = ['K1', 'K2'];
   static const _spacing = SizedBox(width: 10);
+
+  static List<int> get _years {
+    final current = DateTime.now().year;
+    return List.generate(current - 2020 + 1, (i) => current - i);
+  }
 
   Color? _rankBarColor(int rank) {
     if (_tabIndex == 0) {
@@ -41,15 +47,23 @@ class _RankingViewState extends ConsumerState<RankingView> {
   String get _currentLeague => _tabs[_tabIndex];
 
   @override
+  void initState() {
+    super.initState();
+    _selectedYear = DateTime.now().year;
+  }
+
+  RankingArgs get _rankingArgs => (league: _currentLeague, season: '$_selectedYear');
+
+  @override
   Widget build(BuildContext context) {
-    final rankingAsync = ref.watch(rankingProvider(_currentLeague));
+    final rankingAsync = ref.watch(rankingProvider(_rankingArgs));
 
     return Scaffold(
       backgroundColor: CustomColor.background,
       body: SafeArea(
         child: Column(
           children: [
-            _buildTabs(),
+            _buildHeader(),
             Expanded(
               child: rankingAsync.when(
                 loading: () => const Center(
@@ -69,7 +83,7 @@ class _RankingViewState extends ConsumerState<RankingView> {
                       AppSpacing.h16,
                       GestureDetector(
                         onTap: () =>
-                            ref.invalidate(rankingProvider(_currentLeague)),
+                            ref.invalidate(rankingProvider(_rankingArgs)),
                         child: Text(
                           '다시 시도',
                           style: CustomTextStyle.body2.copyWith(
@@ -86,6 +100,81 @@ class _RankingViewState extends ConsumerState<RankingView> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      children: [
+        _buildTabs(),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              PopupMenuButton<int>(
+                onSelected: (y) => setState(() => _selectedYear = y),
+                color: CustomColor.gray900,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: const BorderSide(color: CustomColor.gray600),
+                ),
+                offset: const Offset(0, 40),
+                itemBuilder: (_) => _years
+                    .map(
+                      (y) => PopupMenuItem<int>(
+                        value: y,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 2,
+                        ),
+                        child: Text(
+                          '$y년',
+                          style: CustomTextStyle.body2.copyWith(
+                            color: y == _selectedYear
+                                ? CustomColor.main
+                                : CustomColor.white,
+                            fontWeight: y == _selectedYear
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 7,
+                  ),
+                  decoration: BoxDecoration(
+                    color: CustomColor.main,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '$_selectedYear년',
+                        style: CustomTextStyle.body3.copyWith(
+                          color: CustomColor.black,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(
+                        Symbols.expand_more,
+                        color: CustomColor.black,
+                        size: 16,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -123,7 +212,7 @@ class _RankingViewState extends ConsumerState<RankingView> {
 
   Widget _buildRankingList(List<ClubRanking> teams) {
     return RefreshIndicator(
-      onRefresh: () async => ref.invalidate(rankingProvider(_currentLeague)),
+      onRefresh: () async => ref.invalidate(rankingProvider(_rankingArgs)),
       color: CustomColor.white,
       backgroundColor: CustomColor.gray900,
       child: ListView.builder(

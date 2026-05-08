@@ -63,8 +63,12 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
     );
   }
 
+  String get _leagueType => _leagueTabIndex == 0 ? 'K1' : 'K2';
+
   Future<void> _onRefresh() async {
-    ref.invalidate(matchesByDateProvider(_dateKey));
+    ref.invalidate(
+      matchesByDateProvider((date: _dateKey, leagueType: _leagueType)),
+    );
     _resetToToday();
   }
 
@@ -92,6 +96,7 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
                 ),
               ),
               onDateSelected: (date) => setState(() => _selectedDate = date),
+              onHeaderTap: _resetToToday,
             ),
             LeagueTabs(
               selectedIndex: _leagueTabIndex,
@@ -105,8 +110,9 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
   }
 
   Widget _buildMatchList() {
-    final matchesAsync = ref.watch(matchesByDateProvider(_dateKey));
-    final leagueFilter = _leagueTabIndex == 0 ? 'K1' : 'K2';
+    final matchesAsync = ref.watch(
+      matchesByDateProvider((date: _dateKey, leagueType: _leagueType)),
+    );
     final favoriteClubNames = ref
             .watch(favoritesNotifierProvider)
             .valueOrNull
@@ -127,9 +133,7 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
         ),
       ),
       data: (matches) {
-        final filtered = matches
-            .where((m) => m.leagueType == null || m.leagueType == leagueFilter)
-            .toList();
+        final filtered = matches;
 
         if (filtered.isEmpty) {
           return _buildRefreshList(

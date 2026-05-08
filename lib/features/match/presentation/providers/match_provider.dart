@@ -5,6 +5,7 @@ import 'package:twelfth_mobile/features/match/data/datasources/match_remote_data
 import 'package:twelfth_mobile/features/match/data/repositories/match_repository_impl.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match_event.dart';
+import 'package:twelfth_mobile/features/match/domain/entities/match_lineup.dart';
 import 'package:twelfth_mobile/features/match/domain/repositories/i_match_repository.dart';
 import 'package:twelfth_mobile/features/match/domain/usecases/match_usecases.dart';
 
@@ -32,11 +33,17 @@ final _getMatchEventsUseCaseProvider = Provider<GetMatchEventsUseCase>(
   (ref) => GetMatchEventsUseCase(ref.read(matchRepositoryProvider)),
 );
 
-final matchesByDateProvider = FutureProvider.family<List<Match>, String>((
-  ref,
-  date,
-) {
-  return ref.read(_getMatchesByDateUseCaseProvider).call(date);
+final _getMatchLineupsUseCaseProvider = Provider<GetMatchLineupsUseCase>(
+  (ref) => GetMatchLineupsUseCase(ref.read(matchRepositoryProvider)),
+);
+
+typedef MatchesByDateArgs = ({String date, String leagueType});
+
+final matchesByDateProvider =
+    FutureProvider.family<List<Match>, MatchesByDateArgs>((ref, args) {
+  return ref
+      .read(_getMatchesByDateUseCaseProvider)
+      .call(args.date, args.leagueType);
 });
 
 final matchDetailProvider = FutureProvider.family<Match, int>((ref, matchId) {
@@ -48,4 +55,11 @@ final matchEventsProvider = FutureProvider.family<List<MatchEvent>, int>((
   matchId,
 ) {
   return ref.read(_getMatchEventsUseCaseProvider).call(matchId);
+});
+
+final matchLineupsProvider = FutureProvider.family<List<MatchLineup>, int>((
+  ref,
+  matchId,
+) {
+  return ref.read(_getMatchLineupsUseCaseProvider).call(matchId);
 });

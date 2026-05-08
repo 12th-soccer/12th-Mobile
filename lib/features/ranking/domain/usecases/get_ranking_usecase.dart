@@ -6,6 +6,6 @@ class GetRankingUseCase {
 
   const GetRankingUseCase(this._repository);
 
-  Future<List<ClubRanking>> call(String leagueType) =>
-      _repository.getRanking(leagueType);
+  Future<List<ClubRanking>> call(String leagueType, String season) =>
+      _repository.getRanking(leagueType, season);
 }

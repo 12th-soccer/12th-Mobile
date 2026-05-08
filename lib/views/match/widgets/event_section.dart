@@ -9,6 +9,7 @@ class EventsSection extends StatelessWidget {
   final AsyncValue<List<MatchEvent>> eventsAsync;
   final int? homeTeamId;
   final int? awayTeamId;
+  final String? homeTeamName;
   final void Function(MatchEvent event)? onPlayerTap;
 
   const EventsSection({
@@ -16,16 +17,17 @@ class EventsSection extends StatelessWidget {
     required this.eventsAsync,
     this.homeTeamId,
     this.awayTeamId,
+    this.homeTeamName,
     this.onPlayerTap,
   });
 
   bool _resolveIsHome(MatchEvent event) {
-    if (event.clubId == 0) return true;
-    if (homeTeamId != null) {
-      return event.clubId == homeTeamId;
+    if (homeTeamName != null && event.teamName.isNotEmpty) {
+      return event.teamName == homeTeamName;
     }
-    if (awayTeamId != null) {
-      return event.clubId != awayTeamId;
+    if (event.clubId != 0) {
+      if (homeTeamId != null) return event.clubId == homeTeamId;
+      if (awayTeamId != null) return event.clubId != awayTeamId;
     }
     return true;
   }

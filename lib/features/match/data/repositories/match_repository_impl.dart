@@ -1,6 +1,7 @@
 import 'package:twelfth_mobile/features/match/data/datasources/match_remote_datasource.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match_event.dart';
+import 'package:twelfth_mobile/features/match/domain/entities/match_lineup.dart';
 import 'package:twelfth_mobile/features/match/domain/repositories/i_match_repository.dart';
 
 class MatchRepositoryImpl implements IMatchRepository {
@@ -9,14 +10,12 @@ class MatchRepositoryImpl implements IMatchRepository {
   const MatchRepositoryImpl(this._dataSource);
 
   @override
-  Future<List<Match>> getMatchesByDate(String date) async {
-    final models = await _dataSource.getMatchesByDate(date);
+  Future<List<Match>> getMatchesByDate(String date, String leagueType) async {
+    final models = await _dataSource.getMatchesByDate(date, leagueType);
     final matches = models.map((m) => m.toEntity()).toList();
     final requestedDate = DateTime.tryParse(date);
 
-    if (requestedDate == null) {
-      return matches;
-    }
+    if (requestedDate == null) return matches;
 
     final targetDate = DateTime(
       requestedDate.year,
@@ -25,8 +24,12 @@ class MatchRepositoryImpl implements IMatchRepository {
     );
 
     return matches.where((match) {
-      final matchDate = match.matchDate.toLocal();
-      return _isSameDate(matchDate, targetDate);
+      if (!_isSameDate(match.matchDate.toLocal(), targetDate)) return false;
+      final lt = match.leagueType?.toLowerCase();
+      if (lt == null) return true;
+      return leagueType == 'K2'
+          ? lt.contains('kleague2') || lt == 'k2'
+          : lt.contains('kleague1') || lt == 'k1';
     }).toList();
   }
 
@@ -39,6 +42,12 @@ class MatchRepositoryImpl implements IMatchRepository {
   @override
   Future<List<MatchEvent>> getMatchEvents(int matchId) async {
     final models = await _dataSource.getMatchEvents(matchId);
+    return models.map((m) => m.toEntity()).toList();
+  }
+
+  @override
+  Future<List<MatchLineup>> getMatchLineups(int matchId) async {
+    final models = await _dataSource.getMatchLineups(matchId);
     return models.map((m) => m.toEntity()).toList();
   }
 

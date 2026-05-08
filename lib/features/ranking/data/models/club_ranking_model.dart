@@ -21,13 +21,13 @@ class ClubRankingModel {
 
   factory ClubRankingModel.fromJson(Map<String, dynamic> json) =>
       ClubRankingModel(
-        clubId: json['clubId'] as int,
-        clubName: json['clubName'] as String,
-        clubImage: json['clubImage'] as String,
+        clubId: (json['teamId'] ?? json['clubId']) as int,
+        clubName: (json['teamName'] ?? json['clubName']) as String,
+        clubImage: (json['teamLogo'] ?? json['clubImage']) as String?,
         win: json['win'] as int,
         lose: json['lose'] as int,
         draw: json['draw'] as int,
-        point: json['point'] as int,
+        point: (json['points'] ?? json['point']) as int,
       );
 
   ClubRanking toEntity({required int rank}) => ClubRanking(

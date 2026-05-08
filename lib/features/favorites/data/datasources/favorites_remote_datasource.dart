@@ -20,7 +20,7 @@ class FavoritesRemoteDataSourceImpl implements IFavoritesRemoteDataSource {
   Future<List<FavoriteClubModel>> getFavoriteClubs() async {
     try {
       return await _apiClient.get(
-        ApiEndpoints.teamFavorite,
+        ApiEndpoints.favoriteTeams,
         decoder: (data) {
           final list = data as List<dynamic>;
           return list
@@ -40,7 +40,7 @@ class FavoritesRemoteDataSourceImpl implements IFavoritesRemoteDataSource {
   @override
   Future<void> addFavoriteClub(int clubId) async {
     try {
-      await _apiClient.postVoid(ApiEndpoints.favoriteClub(clubId.toString()));
+      await _apiClient.postVoid(ApiEndpoints.favoriteTeam(clubId.toString()));
     } on ApiException catch (e) {
       rethrow;
     } catch (e, stack) {
@@ -51,7 +51,9 @@ class FavoritesRemoteDataSourceImpl implements IFavoritesRemoteDataSource {
   @override
   Future<void> removeFavoriteClub(int clubId) async {
     try {
-      await _apiClient.deleteVoid(ApiEndpoints.favoriteClub(clubId.toString()));
+      await _apiClient.deleteVoid(
+        ApiEndpoints.favoriteTeam(clubId.toString()),
+      );
     } on ApiException catch (e) {
       rethrow;
     } catch (e, stack) {
@@ -63,7 +65,7 @@ class FavoritesRemoteDataSourceImpl implements IFavoritesRemoteDataSource {
   Future<List<FavoritePlayerModel>> getFavoritePlayers() async {
     try {
       return await _apiClient.get(
-        ApiEndpoints.playerFavorite,
+        ApiEndpoints.favoritePlayers,
         decoder: (data) {
           final list = data as List<dynamic>;
           return list
@@ -83,9 +85,7 @@ class FavoritesRemoteDataSourceImpl implements IFavoritesRemoteDataSource {
   @override
   Future<void> addFavoritePlayer(int playerId) async {
     try {
-      await _apiClient.postVoid(
-        ApiEndpoints.favoritePlayer(playerId.toString()),
-      );
+      await _apiClient.postVoid(ApiEndpoints.favoritePlayerRegister(playerId.toString()));
     } on ApiException catch (e) {
       rethrow;
     } catch (e, stack) {

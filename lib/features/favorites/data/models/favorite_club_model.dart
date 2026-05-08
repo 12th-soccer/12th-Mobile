@@ -13,9 +13,9 @@ class FavoriteClubModel {
 
   factory FavoriteClubModel.fromJson(Map<String, dynamic> json) =>
       FavoriteClubModel(
-        clubId: json['clubId'] as int,
-        clubName: json['clubName'] as String,
-        imageUrl: json['clubImageUrl'] as String?,
+        clubId: json['teamId'] as int,
+        clubName: json['teamName'] as String,
+        imageUrl: (json['teamImageUrl'] ?? json['teamLogo'] ?? json['logo']) as String?,
       );
 
   FavoriteClub toEntity() =>

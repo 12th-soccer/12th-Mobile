@@ -24,6 +24,7 @@ class _OnboardingTeamViewState extends ConsumerState<OnboardingTeamView> {
   List<ClubSearchResult> _results = [];
   ClubSearchResult? _selected;
   bool _isSearching = false;
+  bool _isProcessing = false;
 
   late final ISearchRemoteDataSource _searchDs;
   late final IFavoritesRemoteDataSource _favoritesDs;
@@ -62,10 +63,14 @@ class _OnboardingTeamViewState extends ConsumerState<OnboardingTeamView> {
   }
 
   Future<void> _onNext() async {
+    if (_isProcessing) return;
+    setState(() => _isProcessing = true);
     if (_selected != null) {
       try {
         await _favoritesDs.addFavoriteClub(_selected!.clubId);
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('[Onboarding] addFavoriteClub failed: $e');
+      }
     }
     if (mounted) context.push(AppRoutes.onboardingComplete);
   }
@@ -100,6 +105,7 @@ class _OnboardingTeamViewState extends ConsumerState<OnboardingTeamView> {
         return OnboardingSelectableTile(
           title: club.name,
           isSelected: isSelected,
+          imageUrl: club.logoUrl,
         );
       },
     );

@@ -72,12 +72,18 @@ class _SearchViewState extends ConsumerState<SearchView> {
     }
   }
 
+  static List<String> get _seasons {
+    final current = DateTime.now().year;
+    return List.generate(5, (i) => (current - i).toString());
+  }
+
   @override
   Widget build(BuildContext context) {
     final searchState = ref.watch(searchNotifierProvider);
     final showResults =
         searchState.status != SearchStatus.initial ||
         _searchController.text.isNotEmpty;
+    final isPlayerFilter = searchState.filter == SearchFilter.player;
 
     return GestureDetector(
       onTap: () => _focusNode.unfocus(),
@@ -89,6 +95,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
             children: [
               _buildTopBar(searchState),
               const Divider(color: CustomColor.main, height: 1),
+              if (isPlayerFilter) _buildSeasonSelector(searchState),
               Expanded(
                 child: showResults
                     ? _buildResultsSection(searchState)
@@ -97,6 +104,51 @@ class _SearchViewState extends ConsumerState<SearchView> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSeasonSelector(SearchState state) {
+    return SizedBox(
+      height: 44,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        itemCount: _seasons.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (_, i) {
+          final season = _seasons[i];
+          final isSelected = state.selectedSeason == season;
+          return GestureDetector(
+            onTap: () {
+              ref.read(searchNotifierProvider.notifier).setSeason(season);
+              final q = _searchController.text.trim();
+              if (q.isNotEmpty) {
+                ref.read(searchNotifierProvider.notifier).search(q);
+              }
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                color: isSelected ? CustomColor.main : Colors.transparent,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isSelected ? CustomColor.main : CustomColor.gray600,
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  season,
+                  style: CustomTextStyle.body3.copyWith(
+                    color: isSelected ? CustomColor.black : CustomColor.gray500,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

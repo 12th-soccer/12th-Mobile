@@ -15,8 +15,8 @@ class SearchRepositoryImpl implements ISearchRepository {
   }
 
   @override
-  Future<List<PlayerSearchResult>> searchPlayers(String keyword) async {
-    final models = await _dataSource.searchPlayers(keyword);
+  Future<List<PlayerSearchResult>> searchPlayers(String keyword, {String? season}) async {
+    final models = await _dataSource.searchPlayers(keyword, season: season);
     return models.map((m) => m.toEntity()).toList();
   }
 }

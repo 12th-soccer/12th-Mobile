@@ -4,5 +4,5 @@ import 'package:twelfth_mobile/features/search/domain/entities/player_search_res
 abstract interface class ISearchRepository {
   Future<List<ClubSearchResult>> searchClubs(String keyword);
 
-  Future<List<PlayerSearchResult>> searchPlayers(String keyword);
+  Future<List<PlayerSearchResult>> searchPlayers(String keyword, {String? season});
 }

@@ -104,6 +104,7 @@ class AuthNotifier extends Notifier<AuthState> {
       await ref
           .read(_loginUseCaseProvider)
           .call(email: state.signUpEmail, password: password);
+      ref.invalidate(userInfoProvider);
       state = const AuthState(status: AuthStatus.success);
       return true;
     } on ApiException catch (e) {
@@ -127,6 +128,7 @@ class AuthNotifier extends Notifier<AuthState> {
       await ref
           .read(_loginUseCaseProvider)
           .call(email: email, password: password);
+      ref.invalidate(userInfoProvider);
       state = state.copyWith(status: AuthStatus.success);
       return true;
     } on ApiException catch (e) {
@@ -151,6 +153,7 @@ class AuthNotifier extends Notifier<AuthState> {
     } on ApiException catch (e) {
     } catch (e, stack) {
     } finally {
+      ref.invalidate(userInfoProvider);
       state = const AuthState();
     }
   }
@@ -167,12 +170,12 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 
   bool _isDuplicateEmailError(ApiException e) {
-    final status = e.statusCode;
-    if (status == 409 || status == 400) return true;
-
     final uriPath = e.uri?.path.toLowerCase() ?? '';
     final isEmailVerificationRequest = uriPath.endsWith(ApiEndpoints.email);
     if (!isEmailVerificationRequest) return false;
+
+    final status = e.statusCode;
+    if (status == 409) return true;
 
     final responseText = _flattenErrorPayload(e.responseData).toLowerCase();
     const duplicateKeywords = [
@@ -206,7 +209,7 @@ class AuthNotifier extends Notifier<AuthState> {
       case 404:
         return '해당 이메일을 가진 유저를 찾을 수 없습니다';
       case 500:
-        return '이미 등록된 이메일입니다.';
+        return '서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요';
       default:
         if (e.isTimeout) {
           return '네트워크 연결을 확인해 주세요';

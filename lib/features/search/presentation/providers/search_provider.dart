@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/core/network/dio.dart';
@@ -31,7 +32,7 @@ class SearchNotifier extends Notifier<SearchState> {
   int _requestId = 0;
 
   @override
-  SearchState build() => const SearchState();
+  SearchState build() => SearchState();
 
   void setFilter(SearchFilter filter) {
     state = state.copyWith(
@@ -39,6 +40,15 @@ class SearchNotifier extends Notifier<SearchState> {
       status: SearchStatus.initial,
       errorMessage: null,
       clubs: [],
+      players: [],
+    );
+  }
+
+  void setSeason(String season) {
+    if (state.selectedSeason == season) return;
+    state = state.copyWith(
+      selectedSeason: season,
+      status: SearchStatus.initial,
       players: [],
     );
   }
@@ -62,26 +72,41 @@ class SearchNotifier extends Notifier<SearchState> {
       if (state.filter == SearchFilter.club) {
         final clubs = await ref.read(_searchClubsUseCaseProvider).call(q);
         if (requestId != _requestId) return;
+        debugPrint('[Search] clubs count: ${clubs.length}');
         state = clubs.isEmpty
             ? state.copyWith(status: SearchStatus.empty, clubs: [])
             : state.copyWith(status: SearchStatus.success, clubs: clubs);
       } else {
-        final players = await ref.read(_searchPlayersUseCaseProvider).call(q);
+        final players = await ref
+            .read(_searchPlayersUseCaseProvider)
+            .call(q, season: state.selectedSeason);
         if (requestId != _requestId) return;
+        debugPrint('[Search] players count: ${players.length}');
         state = players.isEmpty
             ? state.copyWith(status: SearchStatus.empty, players: [])
             : state.copyWith(status: SearchStatus.success, players: players);
       }
     } on ApiException catch (e) {
+      debugPrint('[Search] ApiException: $e');
       state = state.copyWith(
         status: SearchStatus.error,
         errorMessage: _parseError(e),
+      );
+    } catch (e, stack) {
+      debugPrint('[Search] unexpected error: $e\n$stack');
+      state = state.copyWith(
+        status: SearchStatus.error,
+        errorMessage: '오류가 발생했습니다. 다시 시도해 주세요',
       );
     }
   }
 
   void reset() {
-    state = SearchState(filter: state.filter, errorMessage: null);
+    state = SearchState(
+      filter: state.filter,
+      selectedSeason: state.selectedSeason,
+      errorMessage: null,
+    );
   }
 
   String _parseError(ApiException e) {

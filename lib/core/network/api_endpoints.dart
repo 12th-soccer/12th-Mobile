@@ -16,20 +16,22 @@ class ApiEndpoints {
   static String ranking(String season, String league) => "/ranking?season=$season&league=$league";
 
   /// search
-  static String searchTeam(String keyword) => "/search/team?keyword=$keyword";
-  static String searchPlayer(String keyword) => "/search/player?keyword=$keyword";
+  static String searchTeam(String keyword, {String? season, int page = 1}) =>
+      "/search/team?keyword=$keyword&season=${season ?? DateTime.now().year}&page=$page";
+  static String searchPlayer(String keyword, {String? season, int page = 1}) =>
+      "/search/player?keyword=$keyword&season=${season ?? DateTime.now().year}&page=$page";
 
   /// teams
   static String team(String teamId) => "/teams/$teamId";
   static String teamsKleague1(String season) => "/teams/kleague1?season=$season";
   static String teamsKleague2(String season) => "/teams/kleague2?season=$season";
 
-  /// matches
-  static String match(String matchId) => "/matches/$matchId";
-  static String matchDateKleague1(String season, String date) =>
-      "/matches/kleague1?date=$date&season=$season";
-  static String matchDateKleague2(String season, String date) =>
-      "/matches/kleague2?date=$date&season=$season";
+  /// match
+  static String match(String matchId) => "/match/$matchId";
+  static String matchDateKleague1(String date) =>
+      "/match/kleague1?season=${date.split('-').first}&date=$date";
+  static String matchDateKleague2(String date) =>
+      "/match/kleague2?season=${date.split('-').first}&date=$date";
 
   /// player
   static String player(String playerId, {String? season}) =>
@@ -42,8 +44,7 @@ class ApiEndpoints {
   /// favorite
   static const favoriteTeams = "/favorite/team";
   static String favoriteTeam(String teamId) => "/favorite/team/$teamId";
-  static String favoritePlayerRegister(String playerId, String season) =>
-      "/favorite/player/$playerId?season=$season";
+  static String favoritePlayerRegister(String playerId) => "/favorite/player/$playerId?season=${DateTime.now().year}";
   static String favoritePlayer(String playerId) => "/favorite/player/$playerId";
   static const favoritePlayers = "/favorite/player";
 

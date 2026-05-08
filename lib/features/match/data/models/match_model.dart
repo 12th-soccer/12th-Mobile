@@ -29,21 +29,33 @@ class MatchModel {
   });
 
   factory MatchModel.fromJson(Map<String, dynamic> json) {
-    final homeRaw = json['homeTeamName'] as String;
-    final awayRaw = json['awayTeamName'] as String;
+    final homeRaw = (json['homeTeamName'] ?? json['homeTeam']) as String;
+    final awayRaw = (json['awayTeamName'] ?? json['awayTeam']) as String;
+    final homeImageUrl = (json['homeTeamImageUrl'] ?? json['homeTeamLogo']) as String?;
+    final awayImageUrl = (json['awayTeamImageUrl'] ?? json['awayTeamLogo']) as String?;
     return MatchModel(
       matchId: json['matchId'] as int,
       leagueType: json['leagueType'] as String?,
       matchDate: json['matchDate'] as String,
       homeTeamName: homeRaw,
       awayTeamName: awayRaw,
-      homeTeamScore: json['homeTeamScore'] as int?,
-      awayTeamScore: json['awayTeamScore'] as int?,
-      homeTeamId: json['homeTeamId'] as int? ?? ClubIdMap.lookup(homeRaw),
-      awayTeamId: json['awayTeamId'] as int? ?? ClubIdMap.lookup(awayRaw),
-      homeTeamImageUrl: json['homeTeamImageUrl'] as String?,
-      awayTeamImageUrl: json['awayTeamImageUrl'] as String?,
+      homeTeamScore: (json['homeTeamScore'] ?? json['homeScore']) as int?,
+      awayTeamScore: (json['awayTeamScore'] ?? json['awayScore']) as int?,
+      homeTeamId: json['homeTeamId'] as int? ??
+          _extractIdFromUrl(homeImageUrl) ??
+          ClubIdMap.lookup(homeRaw),
+      awayTeamId: json['awayTeamId'] as int? ??
+          _extractIdFromUrl(awayImageUrl) ??
+          ClubIdMap.lookup(awayRaw),
+      homeTeamImageUrl: homeImageUrl,
+      awayTeamImageUrl: awayImageUrl,
     );
+  }
+
+  static int? _extractIdFromUrl(String? url) {
+    if (url == null) return null;
+    final m = RegExp(r'/teams/(\d+)\.').firstMatch(url);
+    return m != null ? int.tryParse(m.group(1)!) : null;
   }
 
   Match toEntity() {

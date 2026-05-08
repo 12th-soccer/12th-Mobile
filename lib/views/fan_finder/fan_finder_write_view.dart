@@ -19,6 +19,8 @@ class _FanFinderWriteViewState extends State<FanFinderWriteView> {
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
   final Set<String> _selectedTags = {};
+  int _maxParticipants = FanFinderConstants.minParticipants;
+  DateTime? _expiryDate;
 
   @override
   void dispose() {
@@ -29,7 +31,8 @@ class _FanFinderWriteViewState extends State<FanFinderWriteView> {
 
   bool get _canSubmit =>
       _titleController.text.trim().isNotEmpty &&
-      _contentController.text.trim().isNotEmpty;
+      _contentController.text.trim().isNotEmpty &&
+      _expiryDate != null;
 
   void _onToggleTag(String tag) =>
       setState(() => _selectedTags.contains(tag)
@@ -102,9 +105,20 @@ class _FanFinderWriteViewState extends State<FanFinderWriteView> {
               onToggleItem: _onToggleTag,
             ),
             const Divider(color: CustomColor.gray800, height: 1),
+            AppSpacing.h16,
+            _buildParticipantsStepper(),
             AppSpacing.h8,
             Text(
               '최소 인원은 5명이며, 최소 인원 달성 시 자동으로 채팅방이 생성됩니다.',
+              style: CustomTextStyle.body3.copyWith(color: CustomColor.gray600),
+            ),
+            AppSpacing.h16,
+            const Divider(color: CustomColor.gray800, height: 1),
+            AppSpacing.h16,
+            _buildDatePicker(),
+            AppSpacing.h8,
+            Text(
+              '선택한 날짜가 지나면 채팅방이 자동으로 삭제됩니다.',
               style: CustomTextStyle.body3.copyWith(color: CustomColor.gray600),
             ),
             AppSpacing.h16,
@@ -117,6 +131,107 @@ class _FanFinderWriteViewState extends State<FanFinderWriteView> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _pickDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _expiryDate ?? now.add(const Duration(days: 7)),
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 365)),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.dark(
+            primary: CustomColor.main,
+            onPrimary: CustomColor.white,
+            surface: CustomColor.gray900,
+            onSurface: CustomColor.white,
+          ),
+          dialogBackgroundColor: CustomColor.background,
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) {
+      setState(() => _expiryDate = picked);
+    }
+  }
+
+  Widget _buildDatePicker() {
+    final label = _expiryDate == null
+        ? '채팅방 만료 날짜 선택'
+        : '만료 날짜: ${_expiryDate!.year}.${_expiryDate!.month.toString().padLeft(2, '0')}.${_expiryDate!.day.toString().padLeft(2, '0')}';
+
+    return GestureDetector(
+      onTap: _pickDate,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: CustomColor.gray800,
+          borderRadius: FanFinderConstants.buttonRadius,
+          border: _expiryDate == null
+              ? Border.all(color: CustomColor.main.withOpacity(0.4))
+              : null,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.calendar_today_outlined,
+              size: 18,
+              color: _expiryDate == null ? CustomColor.main : CustomColor.white,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              label,
+              style: CustomTextStyle.body2.copyWith(
+                color: _expiryDate == null ? CustomColor.gray500 : CustomColor.white,
+              ),
+            ),
+            const Spacer(),
+            if (_expiryDate != null)
+              GestureDetector(
+                onTap: () => setState(() => _expiryDate = null),
+                child: const Icon(Icons.close, size: 16, color: CustomColor.gray600),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildParticipantsStepper() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          '최대 인원',
+          style: CustomTextStyle.body2.copyWith(color: CustomColor.white),
+        ),
+        Row(
+          children: [
+            _StepperButton(
+              icon: Icons.remove,
+              onPressed: _maxParticipants > FanFinderConstants.minParticipants
+                  ? () => setState(() => _maxParticipants--)
+                  : null,
+            ),
+            SizedBox(
+              width: 48,
+              child: Text(
+                '$_maxParticipants명',
+                textAlign: TextAlign.center,
+                style: CustomTextStyle.body2.copyWith(color: CustomColor.white),
+              ),
+            ),
+            _StepperButton(
+              icon: Icons.add,
+              onPressed: () => setState(() => _maxParticipants++),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -142,6 +257,34 @@ class _FanFinderWriteViewState extends State<FanFinderWriteView> {
         ),
       ),
       onChanged: (_) => setState(() {}),
+    );
+  }
+}
+
+class _StepperButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback? onPressed;
+
+  const _StepperButton({required this.icon, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final isEnabled = onPressed != null;
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          color: isEnabled ? CustomColor.gray800 : CustomColor.gray800,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          icon,
+          size: 18,
+          color: isEnabled ? CustomColor.white : CustomColor.gray600,
+        ),
+      ),
     );
   }
 }

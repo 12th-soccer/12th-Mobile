@@ -60,6 +60,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
     try {
       final success = await GoogleOAuthLauncher.open();
       if (!mounted || !success) return;
+      ref.invalidate(userInfoProvider);
       context.go(AppRoutes.schedule);
     } catch (_) {
       if (!mounted) return;

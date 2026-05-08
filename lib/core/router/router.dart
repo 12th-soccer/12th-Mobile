@@ -22,6 +22,7 @@ import 'package:twelfth_mobile/core/router/player_route_args.dart';
 import 'package:twelfth_mobile/core/router/team_route_args.dart';
 import 'package:twelfth_mobile/views/ranking/team_detail_view.dart';
 import 'package:twelfth_mobile/views/schedule/schedule_view.dart';
+import 'package:twelfth_mobile/views/fan_finder/chat/chat_view.dart';
 import 'package:twelfth_mobile/views/fan_finder/fan_finder_detail_view.dart';
 import 'package:twelfth_mobile/views/fan_finder/fan_finder_view.dart';
 import 'package:twelfth_mobile/views/fan_finder/fan_finder_write_view.dart';
@@ -173,6 +174,13 @@ final appRouter = GoRouter(
       builder: (context, state) {
         final post = state.extra as FanPost;
         return FanFinderDetailView(post: post);
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.fanFinderChat,
+      builder: (context, state) {
+        final post = state.extra as FanPost;
+        return ChatView(post: post);
       },
     ),
   ],

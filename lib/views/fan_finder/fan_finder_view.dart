@@ -42,8 +42,10 @@ class _FanFinderViewState extends State<FanFinderView> {
           ? _selectedFilters.remove(item)
           : _selectedFilters.add(item));
 
+  final List<FanPost> _posts = [];
+
   List<FanPost> get _filteredPosts {
-    if (_selectedFilters.isEmpty) return mockFanPosts;
+    if (_selectedFilters.isEmpty) return _posts;
 
     final categories = [
       FanFinderConstants.ageOptions,
@@ -62,7 +64,7 @@ class _FanFinderViewState extends State<FanFinderView> {
       }
     }
 
-    return mockFanPosts.where((post) {
+    return _posts.where((post) {
       return selectionsByCategory.values.every(
         (categoryTags) => post.tags.any(categoryTags.contains),
       );

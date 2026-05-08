@@ -23,6 +23,7 @@ class _OnboardingPlayerViewState extends ConsumerState<OnboardingPlayerView> {
   List<PlayerSearchResult> _results = [];
   PlayerSearchResult? _selected;
   bool _isSearching = false;
+  bool _isProcessing = false;
 
   late final ISearchRemoteDataSource _searchDs;
   late final IFavoritesRemoteDataSource _favoritesDs;
@@ -61,10 +62,14 @@ class _OnboardingPlayerViewState extends ConsumerState<OnboardingPlayerView> {
   }
 
   Future<void> _onNext() async {
+    if (_isProcessing) return;
+    setState(() => _isProcessing = true);
     if (_selected != null) {
       try {
         await _favoritesDs.addFavoritePlayer(_selected!.playerId);
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('[Onboarding] addFavoritePlayer failed: $e');
+      }
     }
     if (mounted) context.push(AppRoutes.onboardingTeam, extra: _selected?.name);
   }
@@ -100,6 +105,7 @@ class _OnboardingPlayerViewState extends ConsumerState<OnboardingPlayerView> {
           title: player.name,
           subtitle: player.clubName,
           isSelected: isSelected,
+          imageUrl: player.imageUrl,
         );
       },
     );

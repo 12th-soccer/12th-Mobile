@@ -31,18 +31,28 @@ class ClubMatch {
 class ClubDetail {
   final int clubId;
   final String clubName;
-  final String? imageUrl;
-  final String? leagueType;
-  final String stadiumName;
+  final String? logo;
+  final String? country;
+  final int? founded;
+  final int? venueId;
+  final String venueName;
+  final String? venueAddress;
+  final String? venueCity;
+  final int? venueCapacity;
   final List<ClubMatch> matches;
 
   const ClubDetail({
     required this.clubId,
     required this.clubName,
-    this.imageUrl,
-    this.leagueType,
-    required this.stadiumName,
-    required this.matches,
+    this.logo,
+    this.country,
+    this.founded,
+    this.venueId,
+    required this.venueName,
+    this.venueAddress,
+    this.venueCity,
+    this.venueCapacity,
+    this.matches = const [],
   });
 
   List<ClubMatch> get pastMatches =>

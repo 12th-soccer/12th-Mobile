@@ -15,7 +15,7 @@ class FavoritePlayerModel {
       FavoritePlayerModel(
         playerId: json['playerId'] as int,
         playerName: json['playerName'] as String,
-        imageUrl: json['playerImageUrl'] as String?,
+        imageUrl: (json['playerImgUrl'] ?? json['photo'] ?? json['imageUrl']) as String?,
       );
 
   FavoritePlayer toEntity() => FavoritePlayer(

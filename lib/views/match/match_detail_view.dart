@@ -15,7 +15,6 @@ import 'package:twelfth_mobile/features/match/domain/entities/match.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match_event.dart';
 import 'package:twelfth_mobile/features/match/presentation/providers/match_provider.dart';
 import 'package:twelfth_mobile/features/search/domain/entities/club_search_result.dart';
-import 'package:twelfth_mobile/features/search/domain/entities/player_search_result.dart';
 import 'package:twelfth_mobile/features/search/presentation/providers/search_provider.dart';
 import 'package:twelfth_mobile/views/match/widgets/center_section.dart';
 import 'package:twelfth_mobile/views/match/widgets/event_section.dart';
@@ -62,8 +61,18 @@ class MatchDetailView extends ConsumerWidget {
     WidgetRef ref,
     MatchEvent event,
   ) async {
-    final playerName = event.playerName.trim();
+    if (event.playerId != null && event.playerName.isNotEmpty) {
+      context.push(
+        AppRoutes.player,
+        extra: PlayerRouteArgs(
+          playerId: event.playerId!,
+          playerName: event.playerName,
+        ),
+      );
+      return;
+    }
 
+    final playerName = event.playerName.trim();
     if (playerName.isEmpty) {
       context.showErrorSnackBar('선수 정보를 찾을 수 없습니다.');
       return;
@@ -75,38 +84,25 @@ class MatchDetailView extends ConsumerWidget {
           .searchPlayers(playerName);
       if (!context.mounted) return;
 
-      final resolvedPlayer = _resolvePlayerSearchResult(players, event);
-      if (resolvedPlayer == null) {
+      if (players.isEmpty) {
         context.showErrorSnackBar('선수 상세 정보를 찾을 수 없습니다.');
         return;
       }
 
+      final normalizedTarget = _normalize(playerName);
+      final match = players.firstWhere(
+        (p) => _normalize(p.name) == normalizedTarget,
+        orElse: () => players.first,
+      );
+
       context.push(
         AppRoutes.player,
-        extra: PlayerRouteArgs(
-          playerId: resolvedPlayer.playerId,
-          playerName: resolvedPlayer.name,
-        ),
+        extra: PlayerRouteArgs(playerId: match.playerId, playerName: match.name),
       );
     } catch (_) {
       if (!context.mounted) return;
       context.showErrorSnackBar('선수 상세 정보를 불러오지 못했습니다.');
     }
-  }
-
-  PlayerSearchResult? _resolvePlayerSearchResult(
-    List<PlayerSearchResult> players,
-    MatchEvent event,
-  ) {
-    if (players.isEmpty) return null;
-
-    final normalizedPlayerName = _normalize(event.playerName);
-
-    final exactNameMatches = players.where((player) {
-      return _normalize(player.name) == normalizedPlayerName;
-    }).toList();
-
-    return exactNameMatches.isNotEmpty ? exactNameMatches.first : players.first;
   }
 
   String _normalize(String? value) =>
@@ -176,6 +172,7 @@ class MatchDetailView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(matchDetailProvider(extra.matchId));
     final eventsAsync = ref.watch(matchEventsProvider(extra.matchId));
+    final lineupsAsync = ref.watch(matchLineupsProvider(extra.matchId));
 
     return Scaffold(
       backgroundColor: CustomColor.background,
@@ -253,10 +250,11 @@ class MatchDetailView extends ConsumerWidget {
                     detailAsync.valueOrNull?.homeTeamId ?? extra.homeTeamId,
                 awayTeamId:
                     detailAsync.valueOrNull?.awayTeamId ?? extra.awayTeamId,
+                homeTeamName: detailAsync.valueOrNull?.homeTeamName ?? extra.homeTeam,
                 onPlayerTap: (event) => _openPlayerDetail(context, ref, event),
               ),
               const SizedBox(height: 20),
-              const LineupSection(),
+              LineupSection(lineupsAsync: lineupsAsync),
               const SizedBox(height: 32),
             ],
           ],
