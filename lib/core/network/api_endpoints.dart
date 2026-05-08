@@ -16,10 +16,8 @@ class ApiEndpoints {
   static String ranking(String season, String league) => "/ranking?season=$season&league=$league";
 
   /// search
-  static String searchTeam(String keyword, String season, {int page = 1}) =>
-      "/search/team?keyword=$keyword&season=$season&page=$page";
-  static String searchPlayer(String keyword, String season, {int page = 1}) =>
-      "/search/player?keyword=$keyword&season=$season&page=$page";
+  static String searchTeam(String keyword) => "/search/team?keyword=$keyword";
+  static String searchPlayer(String keyword) => "/search/player?keyword=$keyword";
 
   /// teams
   static String team(String teamId) => "/teams/$teamId";
