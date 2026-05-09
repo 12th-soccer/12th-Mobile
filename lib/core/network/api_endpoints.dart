@@ -22,7 +22,8 @@ class ApiEndpoints {
       "/search/player?keyword=$keyword&season=${season ?? DateTime.now().year}&page=$page";
 
   /// teams
-  static String team(String teamId) => "/teams/$teamId";
+  static String team(String teamId, {String? season}) =>
+      "/teams/$teamId?season=${season ?? DateTime.now().year}";
   static String teamsKleague1(String season) => "/teams/kleague1?season=$season";
   static String teamsKleague2(String season) => "/teams/kleague2?season=$season";
 
