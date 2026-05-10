@@ -49,6 +49,12 @@ class ApiEndpoints {
   static String favoritePlayer(String playerId) => "/favorite/player/$playerId";
   static const favoritePlayers = "/favorite/player";
 
+  /// recruitment
+  static const recruitmentCreate = '/recruitment';
+  static String recruitments({int page = 0, int size = 10}) =>
+      '/recruitment?page=$page&size=$size';
+  static String recruitmentDetail(String id) => '/recruitment/$id';
+
   /// notifications
   static const notificationSettings = "/notifications/settings";
   static const fcmTokens = "/fcm/tokens";
