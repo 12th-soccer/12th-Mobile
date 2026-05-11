@@ -19,7 +19,8 @@ class FanPost {
     required this.currentParticipants,
     required this.maxParticipants,
     this.expiryDate,
-  }) : assert(maxParticipants >= FanFinderConstants.minParticipants);
+  })  : assert(maxParticipants >= FanFinderConstants.minParticipants),
+        assert(maxParticipants <= FanFinderConstants.maxParticipants);
 
   bool get isExpired {
     if (expiryDate == null) return false;

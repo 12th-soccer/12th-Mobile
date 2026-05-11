@@ -28,6 +28,7 @@ abstract final class FanFinderConstants {
   static const filterRowHeight = 44.0;
   static const tagRowHeight = 36.0;
   static const minParticipants = 4;
+  static const maxParticipants = 10;
 
   /// 필터/태그 옵션
   static const ageOptions = ['#20대', '#30대', '#40대', '#50대+'];

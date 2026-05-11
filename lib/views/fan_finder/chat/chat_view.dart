@@ -160,12 +160,12 @@ class _ChatViewState extends State<ChatView> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: isExpired
-            ? CustomColor.red.withOpacity(0.12)
-            : CustomColor.gray800.withOpacity(0.7),
+            ? CustomColor.red.withValues(alpha: 0.12)
+            : CustomColor.gray800.withValues(alpha: 0.7),
         border: Border(
           bottom: BorderSide(
             color: isExpired
-                ? CustomColor.red.withOpacity(0.3)
+                ? CustomColor.red.withValues(alpha: 0.3)
                 : CustomColor.gray800,
             width: 0.5,
           ),
@@ -175,7 +175,7 @@ class _ChatViewState extends State<ChatView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
-            Icons.info_outline,
+            Symbols.info_i,
             size: 14,
             color: isExpired ? CustomColor.red : CustomColor.gray500,
           ),
@@ -226,7 +226,7 @@ class _ChatViewState extends State<ChatView> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
             decoration: BoxDecoration(
-              color: CustomColor.gray800.withOpacity(0.6),
+              color: CustomColor.gray800.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(

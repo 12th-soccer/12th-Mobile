@@ -26,6 +26,7 @@ import 'package:twelfth_mobile/views/fan_finder/chat/chat_view.dart';
 import 'package:twelfth_mobile/views/fan_finder/fan_finder_detail_view.dart';
 import 'package:twelfth_mobile/views/fan_finder/fan_finder_view.dart';
 import 'package:twelfth_mobile/views/fan_finder/fan_finder_write_view.dart';
+import 'package:twelfth_mobile/features/recruitment/domain/entities/recruitment.dart';
 import 'package:twelfth_mobile/views/fan_finder/model/fan_post.dart';
 import 'package:twelfth_mobile/views/splash_view.dart';
 
@@ -172,8 +173,8 @@ final appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.fanFinderDetail,
       builder: (context, state) {
-        final post = state.extra as FanPost;
-        return FanFinderDetailView(post: post);
+        final recruitment = state.extra as Recruitment;
+        return FanFinderDetailView(recruitment: recruitment);
       },
     ),
     GoRoute(
