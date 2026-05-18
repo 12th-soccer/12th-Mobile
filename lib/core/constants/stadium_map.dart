@@ -38,6 +38,7 @@ abstract final class StadiumMap {
     }
     return null;
   }
+
   static Uri naverMapUri(String stadiumName) {
     return Uri.parse(
       'nmap://search?query=${Uri.encodeComponent(stadiumName)}&appname=com.example.twelfth_mobile',
