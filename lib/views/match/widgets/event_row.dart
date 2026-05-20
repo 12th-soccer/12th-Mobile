@@ -1,30 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match_event.dart';
+import 'package:twelfth_mobile/features/match/presentation/providers/match_provider.dart';
 
-class EventRow extends StatelessWidget {
+class EventRow extends ConsumerWidget {
   final MatchEvent event;
   final bool isHome;
+  final String? teamImageUrl;
   final VoidCallback? onTap;
 
   const EventRow({
     super.key,
     required this.event,
     required this.isHome,
+    this.teamImageUrl,
     this.onTap,
   });
 
   String get _minuteStr => "${event.eventMinute}'";
 
   @override
-  Widget build(BuildContext context) {
-    final photo = NetworkAvatar(imageUrl: event.playerImageUrl, size: 36);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final playerImageAsync = event.playerId != null
+        ? ref.watch(playerImageProvider(event.playerId!))
+        : null;
+
+    final resolvedImageUrl = playerImageAsync?.valueOrNull ?? teamImageUrl;
+
+    final photo = NetworkAvatar(imageUrl: resolvedImageUrl, size: 36);
     final name = Text(
       event.playerName,
-      style: CustomTextStyle.body2.copyWith(
-      ),
+      style: CustomTextStyle.body2.copyWith(),
       overflow: TextOverflow.ellipsis,
     );
     final time = Text(

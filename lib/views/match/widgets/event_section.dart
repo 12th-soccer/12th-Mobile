@@ -10,6 +10,8 @@ class EventsSection extends StatelessWidget {
   final int? homeTeamId;
   final int? awayTeamId;
   final String? homeTeamName;
+  final String? homeTeamImageUrl;
+  final String? awayTeamImageUrl;
   final void Function(MatchEvent event)? onPlayerTap;
 
   const EventsSection({
@@ -18,6 +20,8 @@ class EventsSection extends StatelessWidget {
     this.homeTeamId,
     this.awayTeamId,
     this.homeTeamName,
+    this.homeTeamImageUrl,
+    this.awayTeamImageUrl,
     this.onPlayerTap,
   });
 
@@ -70,10 +74,12 @@ class EventsSection extends StatelessWidget {
             widgets.add(const _HalfTimeDivider());
             halfTimeInserted = true;
           }
+          final isHome = _resolveIsHome(event);
           widgets.add(
             EventRow(
               event: event,
-              isHome: _resolveIsHome(event),
+              isHome: isHome,
+              teamImageUrl: isHome ? homeTeamImageUrl : awayTeamImageUrl,
               onTap: event.playerName.trim().isNotEmpty
                   ? () => onPlayerTap?.call(event)
                   : null,
