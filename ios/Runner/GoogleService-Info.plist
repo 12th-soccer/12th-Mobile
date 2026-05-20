@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyAAGxwEQDA5wZkSlkE5TAFhEyz0qgoY1Kk</string>
+	<string>AIzaSyBTxnxMk8Z_RLVUL-ZpRQTX5SXLdjthL-s</string>
 	<key>GCM_SENDER_ID</key>
-	<string>407207243400</string>
+	<string>1093866987806</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.twelfthMobile</string>
+	<string>com.twelfth.app</string>
 	<key>PROJECT_ID</key>
-	<string>th-d0255</string>
+	<string>thfcm-e99a9</string>
 	<key>STORAGE_BUCKET</key>
-	<string>th-d0255.firebasestorage.app</string>
+	<string>thfcm-e99a9.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:407207243400:ios:c640ff373735bb5394b93d</string>
+	<string>1:1093866987806:ios:a86aa601458effdff5e90f</string>
 </dict>
 </plist>

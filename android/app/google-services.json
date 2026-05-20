@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "407207243400",
-    "project_id": "th-d0255",
-    "storage_bucket": "th-d0255.firebasestorage.app"
+    "project_number": "1093866987806",
+    "project_id": "thfcm-e99a9",
+    "storage_bucket": "thfcm-e99a9.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:407207243400:android:0f56811d291c3a5d94b93d",
+        "mobilesdk_app_id": "1:1093866987806:android:21b024c47a497e15f5e90f",
         "android_client_info": {
-          "package_name": "com.example.twelfth_mobile"
+          "package_name": "com.twelfth.app"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDtMFzFfqgYtQfra-xQ8lTZ0EdQ8nB9qDg"
+          "current_key": "AIzaSyCQsyWmsLSoZ1UdmMfSwK4R5Jgs27fVixE"
         }
       ],
       "services": {
