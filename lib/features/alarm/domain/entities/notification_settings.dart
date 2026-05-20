@@ -4,6 +4,7 @@ class NotificationSettings {
   final bool thirtyMinutesBeforeEnabled;
   final bool fifteenMinutesBeforeEnabled;
   final bool matchStartEnabled;
+  final bool favoriteTeamMatchEnabled;
 
   const NotificationSettings({
     this.notificationEnabled = true,
@@ -11,6 +12,7 @@ class NotificationSettings {
     this.thirtyMinutesBeforeEnabled = true,
     this.fifteenMinutesBeforeEnabled = true,
     this.matchStartEnabled = true,
+    this.favoriteTeamMatchEnabled = true,
   });
 
   NotificationSettings copyWith({
@@ -19,6 +21,7 @@ class NotificationSettings {
     bool? thirtyMinutesBeforeEnabled,
     bool? fifteenMinutesBeforeEnabled,
     bool? matchStartEnabled,
+    bool? favoriteTeamMatchEnabled,
   }) =>
       NotificationSettings(
         notificationEnabled: notificationEnabled ?? this.notificationEnabled,
@@ -28,5 +31,7 @@ class NotificationSettings {
         fifteenMinutesBeforeEnabled:
             fifteenMinutesBeforeEnabled ?? this.fifteenMinutesBeforeEnabled,
         matchStartEnabled: matchStartEnabled ?? this.matchStartEnabled,
+        favoriteTeamMatchEnabled:
+            favoriteTeamMatchEnabled ?? this.favoriteTeamMatchEnabled,
       );
 }

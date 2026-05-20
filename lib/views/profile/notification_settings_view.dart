@@ -71,6 +71,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
   late bool _oneHourBefore;
   late bool _thirtyMinsBefore;
   late bool _fifteenMinsBefore;
+  late bool _favoriteTeamMatch;
 
   @override
   void initState() {
@@ -80,6 +81,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     _oneHourBefore = widget.settings.oneHourBeforeEnabled;
     _thirtyMinsBefore = widget.settings.thirtyMinutesBeforeEnabled;
     _fifteenMinsBefore = widget.settings.fifteenMinutesBeforeEnabled;
+    _favoriteTeamMatch = widget.settings.favoriteTeamMatchEnabled;
   }
 
   Future<void> _save() async {
@@ -89,6 +91,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
       oneHourBeforeEnabled: _oneHourBefore,
       thirtyMinutesBeforeEnabled: _thirtyMinsBefore,
       fifteenMinutesBeforeEnabled: _fifteenMinsBefore,
+      favoriteTeamMatchEnabled: _favoriteTeamMatch,
     );
 
     final success = await ref
@@ -158,6 +161,14 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
                   label: '15분 전',
                   value: _fifteenMinsBefore,
                   onChanged: (v) => setState(() => _fifteenMinsBefore = v),
+                ),
+                const Divider(color: CustomColor.gray900, height: 1),
+                AppSpacing.h4,
+                _buildRow(
+                  label: '관심 구단 경기',
+                  value: _favoriteTeamMatch,
+                  onChanged: (v) => setState(() => _favoriteTeamMatch = v),
+                  sublabel: '관심 등록한 구단의 경기 알림',
                 ),
               ],
             ],
