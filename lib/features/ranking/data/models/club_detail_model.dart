@@ -29,36 +29,38 @@ class ClubMatchModel {
   });
 
   factory ClubMatchModel.fromJson(Map<String, dynamic> json) {
-    final homeRaw = json['homeTeamName'] as String;
-    final awayRaw = json['awayTeamName'] as String;
+    final homeRaw = (json['homeTeam'] ?? json['homeTeamName'] ?? '') as String;
+    final awayRaw = (json['awayTeam'] ?? json['awayTeamName'] ?? '') as String;
     return ClubMatchModel(
       matchId: json['matchId'] as int,
       matchDate: DateTime.parse(json['matchDate'] as String),
       homeTeamName: homeRaw,
       awayTeamName: awayRaw,
-      homeTeamScore: json['homeTeamScore'] as int?,
-      awayTeamScore: json['awayTeamScore'] as int?,
+      homeTeamScore: (json['homeScore'] ?? json['homeTeamScore']) as int?,
+      awayTeamScore: (json['awayScore'] ?? json['awayTeamScore']) as int?,
       homeTeamId: json['homeTeamId'] as int? ?? ClubIdMap.lookup(homeRaw),
       awayTeamId: json['awayTeamId'] as int? ?? ClubIdMap.lookup(awayRaw),
-      homeTeamImageUrl: json['homeTeamImageUrl'] as String?,
-      awayTeamImageUrl: json['awayTeamImageUrl'] as String?,
+      homeTeamImageUrl:
+          (json['homeTeamLogo'] ?? json['homeTeamImageUrl']) as String?,
+      awayTeamImageUrl:
+          (json['awayTeamLogo'] ?? json['awayTeamImageUrl']) as String?,
       matchStatus: (json['matchStatus'] ?? json['status']) as String?,
     );
   }
 
   ClubMatch toEntity() => ClubMatch(
-        matchId: matchId,
-        matchDate: matchDate,
-        homeTeamName: homeTeamName,
-        awayTeamName: awayTeamName,
-        homeTeamScore: homeTeamScore,
-        awayTeamScore: awayTeamScore,
-        homeTeamId: homeTeamId,
-        awayTeamId: awayTeamId,
-        homeTeamImageUrl: homeTeamImageUrl,
-        awayTeamImageUrl: awayTeamImageUrl,
-        matchStatus: matchStatus,
-      );
+    matchId: matchId,
+    matchDate: matchDate,
+    homeTeamName: homeTeamName,
+    awayTeamName: awayTeamName,
+    homeTeamScore: homeTeamScore,
+    awayTeamScore: awayTeamScore,
+    homeTeamId: homeTeamId,
+    awayTeamId: awayTeamId,
+    homeTeamImageUrl: homeTeamImageUrl,
+    awayTeamImageUrl: awayTeamImageUrl,
+    matchStatus: matchStatus,
+  );
 }
 
 class ClubDetailModel {
@@ -91,6 +93,7 @@ class ClubDetailModel {
   factory ClubDetailModel.fromJson(Map<String, dynamic> json) {
     List<dynamic> asList(dynamic v) => v is List ? v : [];
     final allMatches = [
+      ...asList(json['recentMatches']),
       ...asList(json['matches']),
       ...asList(json['schedules']),
       ...asList(json['upcomingMatches']),
@@ -115,16 +118,16 @@ class ClubDetailModel {
   }
 
   ClubDetail toEntity() => ClubDetail(
-        clubId: clubId,
-        clubName: clubName,
-        logo: logo,
-        country: country,
-        founded: founded,
-        venueId: venueId,
-        venueName: venueName,
-        venueAddress: venueAddress,
-        venueCity: venueCity,
-        venueCapacity: venueCapacity,
-        matches: matches.map((m) => m.toEntity()).toList(),
-      );
+    clubId: clubId,
+    clubName: clubName,
+    logo: logo,
+    country: country,
+    founded: founded,
+    venueId: venueId,
+    venueName: venueName,
+    venueAddress: venueAddress,
+    venueCity: venueCity,
+    venueCapacity: venueCapacity,
+    matches: matches.map((m) => m.toEntity()).toList(),
+  );
 }

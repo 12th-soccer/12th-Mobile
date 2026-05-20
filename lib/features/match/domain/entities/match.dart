@@ -25,5 +25,8 @@ class Match {
     this.awayTeamImageUrl,
   });
 
-  bool get isFinished => homeTeamScore != null && awayTeamScore != null;
+  bool get isFinished {
+    if (homeTeamScore == null || awayTeamScore == null) return false;
+    return DateTime.now().difference(matchDate).inMinutes > 130;
+  }
 }

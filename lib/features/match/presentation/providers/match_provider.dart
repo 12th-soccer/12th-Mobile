@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/core/network/api_client.dart';
+import 'package:twelfth_mobile/core/network/api_endpoints.dart';
 import 'package:twelfth_mobile/core/network/dio.dart';
 import 'package:twelfth_mobile/features/match/data/datasources/match_remote_datasource.dart';
 import 'package:twelfth_mobile/features/match/data/repositories/match_repository_impl.dart';
@@ -41,10 +42,10 @@ typedef MatchesByDateArgs = ({String date, String leagueType});
 
 final matchesByDateProvider =
     FutureProvider.family<List<Match>, MatchesByDateArgs>((ref, args) {
-  return ref
-      .read(_getMatchesByDateUseCaseProvider)
-      .call(args.date, args.leagueType);
-});
+      return ref
+          .read(_getMatchesByDateUseCaseProvider)
+          .call(args.date, args.leagueType);
+    });
 
 final matchDetailProvider = FutureProvider.family<Match, int>((ref, matchId) {
   return ref.read(_getMatchDetailUseCaseProvider).call(matchId);
@@ -62,4 +63,31 @@ final matchLineupsProvider = FutureProvider.family<List<MatchLineup>, int>((
   matchId,
 ) {
   return ref.read(_getMatchLineupsUseCaseProvider).call(matchId);
+});
+
+final playerImageProvider = FutureProvider.family<String?, int>((
+  ref,
+  playerId,
+) async {
+  if (playerId == 0) return null;
+  final client = DioClient.instance.apiClient;
+  try {
+    return await client.get(
+      ApiEndpoints.player(
+        playerId.toString(),
+        season: DateTime.now().year.toString(),
+      ),
+      decoder: (data) {
+        if (data == null) return null;
+        final json = data as Map<String, dynamic>;
+        final photo = json['photo'] as String?;
+        final rawName = json['name'] as String? ?? '';
+        final rawImageUrl = photo ?? json['playerImageUrl'] as String?;
+        final isSwapped = photo == null && rawName.startsWith('http');
+        return isSwapped ? rawName : rawImageUrl;
+      },
+    );
+  } catch (_) {
+    return null;
+  }
 });
