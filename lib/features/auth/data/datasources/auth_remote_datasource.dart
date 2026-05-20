@@ -72,6 +72,7 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
           return UserInfo(
             userId: json['userId'] as int,
             email: json['email'] as String,
+            nickname: json['nickname'] as String?,
           );
         },
       );
