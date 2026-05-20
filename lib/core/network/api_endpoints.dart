@@ -55,6 +55,12 @@ class ApiEndpoints {
       '/recruitment?page=$page&size=$size';
   static String recruitmentDetail(String id) => '/recruitment/$id';
 
+  /// spoiler
+  static const spoiler = '/spoiler';
+
+  /// join
+  static String joinRecruitment(String id) => '/join/$id';
+
   /// notifications
   static const notificationSettings = "/notifications/settings";
   static const fcmTokens = "/fcm/tokens";
