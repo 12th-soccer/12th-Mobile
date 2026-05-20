@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
-import 'package:twelfth_mobile/common/components/snack_bar/custom_snack_bar.dart';
+import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/features/no_spoiler/presentation/providers/no_spoiler_provider.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
@@ -24,9 +24,7 @@ class _NoSpoilerSettingsViewState extends ConsumerState<NoSpoilerSettingsView> {
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(CustomSnackBar.error('설정에 실패했습니다. 다시 시도해주세요.'));
+      context.showErrorSnackBar('설정에 실패했습니다. 다시 시도해주세요.');
     }
   }
 
