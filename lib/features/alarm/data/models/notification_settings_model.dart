@@ -6,6 +6,7 @@ class NotificationSettingsModel {
   final bool thirtyMinutesBeforeEnabled;
   final bool fifteenMinutesBeforeEnabled;
   final bool matchStartEnabled;
+  final bool favoriteTeamMatchEnabled;
 
   const NotificationSettingsModel({
     this.notificationEnabled = true,
@@ -13,6 +14,7 @@ class NotificationSettingsModel {
     this.thirtyMinutesBeforeEnabled = true,
     this.fifteenMinutesBeforeEnabled = true,
     this.matchStartEnabled = true,
+    this.favoriteTeamMatchEnabled = true,
   });
 
   factory NotificationSettingsModel.fromJson(Map<String, dynamic> json) =>
@@ -24,6 +26,8 @@ class NotificationSettingsModel {
         fifteenMinutesBeforeEnabled:
             json['fifteenMinutesBeforeEnabled'] as bool? ?? true,
         matchStartEnabled: json['matchStartEnabled'] as bool? ?? true,
+        favoriteTeamMatchEnabled:
+            json['favoriteTeamMatchEnabled'] as bool? ?? true,
       );
 
   factory NotificationSettingsModel.fromEntity(NotificationSettings entity) =>
@@ -33,6 +37,7 @@ class NotificationSettingsModel {
         thirtyMinutesBeforeEnabled: entity.thirtyMinutesBeforeEnabled,
         fifteenMinutesBeforeEnabled: entity.fifteenMinutesBeforeEnabled,
         matchStartEnabled: entity.matchStartEnabled,
+        favoriteTeamMatchEnabled: entity.favoriteTeamMatchEnabled,
       );
 
   Map<String, dynamic> toJson() => {
@@ -41,6 +46,7 @@ class NotificationSettingsModel {
         'thirtyMinutesBeforeEnabled': thirtyMinutesBeforeEnabled,
         'fifteenMinutesBeforeEnabled': fifteenMinutesBeforeEnabled,
         'matchStartEnabled': matchStartEnabled,
+        'favoriteTeamMatchEnabled': favoriteTeamMatchEnabled,
       };
 
   NotificationSettings toEntity() => NotificationSettings(
@@ -49,5 +55,6 @@ class NotificationSettingsModel {
         thirtyMinutesBeforeEnabled: thirtyMinutesBeforeEnabled,
         fifteenMinutesBeforeEnabled: fifteenMinutesBeforeEnabled,
         matchStartEnabled: matchStartEnabled,
+        favoriteTeamMatchEnabled: favoriteTeamMatchEnabled,
       );
 }
