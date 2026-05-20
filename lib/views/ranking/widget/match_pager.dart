@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:twelfth_mobile/features/ranking/domain/entities/club_detail.dart';
 import 'package:twelfth_mobile/views/ranking/widget/history_match_row.dart';
@@ -99,7 +100,7 @@ class MatchPagerState extends State<MatchPager> {
           ),
         ),
         if (_totalPages > 1) ...[
-          const SizedBox(height: 12),
+          AppSpacing.h12,
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(3, (i) {

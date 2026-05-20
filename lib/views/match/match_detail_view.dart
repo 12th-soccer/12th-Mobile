@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -274,7 +275,7 @@ class _MatchHeader extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: AppPadding.cardH,
             child: CenterSection(
               matchState: matchState,
               homeScore: homeScore,
@@ -315,7 +316,7 @@ class _TeamColumn extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           NetworkAvatar(imageUrl: imageUrl, size: 64),
-          const SizedBox(height: 8),
+          AppSpacing.h8,
           Text(
             name,
             style: CustomTextStyle.body2,

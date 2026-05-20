@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
@@ -32,7 +33,7 @@ class ScheduleCalendar extends StatelessWidget {
     final prevMonthDays = DateTime(year, month, 0).day;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: AppPadding.cardH,
       child: Column(
         children: [
           Padding(

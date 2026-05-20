@@ -64,6 +64,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
       );
       if (!mounted) return;
       await ref.read(recruitmentListProvider.notifier).refresh();
+      if (!mounted) return;
       context.pop();
     } catch (_) {
       if (!mounted) return;
@@ -92,13 +93,13 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 8),
+            AppSpacing.h8,
             Container(
               width: 36,
               height: 4,
               decoration: BoxDecoration(
                 color: CustomColor.gray600,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.xs,
               ),
             ),
             Padding(
@@ -107,7 +108,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
                 children: [
                   Text(title, style: CustomTextStyle.heading2),
                   if (subtitle != null) ...[
-                    const SizedBox(width: 8),
+                    AppSpacing.w8,
                     Text(
                       subtitle,
                       style: CustomTextStyle.body3.copyWith(
@@ -147,7 +148,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
                 }).toList(),
               ),
             ),
-            const SizedBox(height: 8),
+            AppSpacing.h8,
           ],
         ),
       ),
@@ -166,13 +167,13 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 8),
+            AppSpacing.h8,
             Container(
               width: 36,
               height: 4,
               decoration: BoxDecoration(
                 color: CustomColor.gray600,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.xs,
               ),
             ),
             Padding(
@@ -208,7 +209,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
                 }).toList(),
               ),
             ),
-            const SizedBox(height: 8),
+            AppSpacing.h8,
           ],
         ),
       ),
@@ -227,13 +228,13 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 8),
+            AppSpacing.h8,
             Container(
               width: 36,
               height: 4,
               decoration: BoxDecoration(
                 color: CustomColor.gray600,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.xs,
               ),
             ),
             Padding(
@@ -269,7 +270,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
                 }).toList(),
               ),
             ),
-            const SizedBox(height: 8),
+            AppSpacing.h8,
           ],
         ),
       ),
@@ -456,7 +457,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
               child: Text(
                 '$_headCount명',
                 textAlign: TextAlign.center,
-                style: CustomTextStyle.body2.copyWith(color: CustomColor.white),
+                style: CustomTextStyle.body2,
               ),
             ),
             _StepperButton(
@@ -521,7 +522,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
       controller: controller,
       maxLines: maxLines,
       maxLength: maxLength,
-      style: CustomTextStyle.body1.copyWith(color: CustomColor.white),
+      style: CustomTextStyle.body1,
       cursorColor: CustomColor.main,
       decoration: InputDecoration(
         hintText: hint,
@@ -563,7 +564,7 @@ class _CategoryChip extends StatelessWidget {
           color: isSelected
               ? CustomColor.main.withValues(alpha: 0.15)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: AppRadius.lg,
           border: Border.all(
             color: isSelected ? CustomColor.main : CustomColor.gray600,
           ),
@@ -606,7 +607,7 @@ class _StepperButton extends StatelessWidget {
         height: 32,
         decoration: BoxDecoration(
           color: CustomColor.gray800,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: AppRadius.sm,
         ),
         child: Icon(
           icon,

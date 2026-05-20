@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
@@ -41,7 +42,7 @@ class CenterSection extends StatelessWidget {
                   ? CustomColor.main
                   : CustomColor.gray500,
             ),
-            const SizedBox(width: 4),
+            AppSpacing.w4,
             Text(
               stadiumName!,
               style: CustomTextStyle.body3.copyWith(
@@ -67,7 +68,7 @@ class CenterSection extends StatelessWidget {
               'Live',
               style: CustomTextStyle.body2.copyWith(color: CustomColor.red),
             ),
-            const SizedBox(height: 4),
+            AppSpacing.h4,
             Text(
               homeScore != null && awayScore != null
                   ? '$homeScore  :  $awayScore'
@@ -101,7 +102,7 @@ class CenterSection extends StatelessWidget {
                   color: CustomColor.gray500,
                 ),
               ),
-            if (dateStr != null) const SizedBox(height: 4),
+            if (dateStr != null) AppSpacing.h4,
             if (timeStr != null)
               Text(timeStr!, style: CustomTextStyle.heading1),
             _stadiumRow(),

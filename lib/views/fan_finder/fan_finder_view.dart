@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -93,7 +94,7 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
                         color: CustomColor.gray500,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    AppSpacing.h12,
                     GestureDetector(
                       onTap: () =>
                           ref.read(recruitmentListProvider.notifier).refresh(),
@@ -218,7 +219,7 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
                   setState(() => _ageFilter = v == _ageFilter ? null : v),
             ),
           ),
-          const SizedBox(width: 8),
+          AppSpacing.w8,
           _FilterChip(
             label: _genderFilter?.displayTag ?? '성별',
             isActive: _genderFilter != null,
@@ -231,7 +232,7 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
                   setState(() => _genderFilter = v == _genderFilter ? null : v),
             ),
           ),
-          const SizedBox(width: 8),
+          AppSpacing.w8,
           _FilterChip(
             label: _k1Filter?.displayTag ?? 'K1',
             isActive: _k1Filter != null,
@@ -251,7 +252,7 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
               );
             },
           ),
-          const SizedBox(width: 8),
+          AppSpacing.w8,
           _FilterChip(
             label: _k2Filter?.displayTag ?? 'K2',
             isActive: _k2Filter != null,
@@ -272,7 +273,7 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
             },
           ),
           if (hasFilter) ...[
-            const SizedBox(width: 8),
+            AppSpacing.w8,
             GestureDetector(
               onTap: () => setState(() {
                 _ageFilter = null;
@@ -287,7 +288,7 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
                 ),
                 decoration: BoxDecoration(
                   border: Border.all(color: CustomColor.gray600),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: AppRadius.lg,
                 ),
                 child: Text(
                   '초기화',
@@ -321,13 +322,13 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 8),
+            AppSpacing.h8,
             Container(
               width: 36,
               height: 4,
               decoration: BoxDecoration(
                 color: CustomColor.gray600,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.xs,
               ),
             ),
             Padding(
@@ -363,7 +364,7 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
                 }).toList(),
               ),
             ),
-            const SizedBox(height: 8),
+            AppSpacing.h8,
           ],
         ),
       ),
@@ -387,13 +388,13 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 8),
+            AppSpacing.h8,
             Container(
               width: 36,
               height: 4,
               decoration: BoxDecoration(
                 color: CustomColor.gray600,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.xs,
               ),
             ),
             Padding(
@@ -429,7 +430,7 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
                 }).toList(),
               ),
             ),
-            const SizedBox(height: 8),
+            AppSpacing.h8,
           ],
         ),
       ),
@@ -467,7 +468,7 @@ class _RecruitmentListItem extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: CustomColor.main.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: AppRadius.lg,
                   ),
                   child: Text(
                     recruitment.teamGroup.displayTag,
@@ -498,7 +499,7 @@ class _RecruitmentListItem extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 4),
+            AppSpacing.h4,
             Text(
               recruitment.content,
               style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
@@ -598,7 +599,7 @@ class _FilterChip extends StatelessWidget {
           color: isActive
               ? CustomColor.main.withValues(alpha: 0.15)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: AppRadius.lg,
           border: Border.all(
             color: isActive ? CustomColor.main : CustomColor.gray600,
           ),
@@ -613,7 +614,7 @@ class _FilterChip extends StatelessWidget {
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
-            const SizedBox(width: 4),
+            AppSpacing.w4,
             Icon(
               Icons.keyboard_arrow_down,
               size: 14,

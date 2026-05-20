@@ -21,9 +21,7 @@ class AlarmRemoteDataSourceImpl implements IAlarmRemoteDataSource {
         decoder: (data) =>
             NotificationSettingsModel.fromJson(data as Map<String, dynamic>),
       );
-    } on ApiException catch (e) {
-      return const NotificationSettingsModel();
-    } catch (e, stack) {
+    } catch (_) {
       return const NotificationSettingsModel();
     }
   }
@@ -31,20 +29,13 @@ class AlarmRemoteDataSourceImpl implements IAlarmRemoteDataSource {
   @override
   Future<NotificationSettingsModel> updateSettings(
     NotificationSettingsModel settings,
-  ) async {
-    try {
-      return await _apiClient.patch(
+  ) =>
+      _apiClient.patch(
         ApiEndpoints.notificationSettings,
         data: settings.toJson(),
         decoder: (data) =>
             NotificationSettingsModel.fromJson(data as Map<String, dynamic>),
       );
-    } on ApiException catch (e) {
-      rethrow;
-    } catch (e, stack) {
-      rethrow;
-    }
-  }
 
   @override
   Future<void> registerFcmToken(String token) async {
@@ -53,6 +44,8 @@ class AlarmRemoteDataSourceImpl implements IAlarmRemoteDataSource {
         ApiEndpoints.fcmTokens,
         data: {'token': token},
       );
-    } catch (e, stack) {}
+    } catch (_) {
+      // FCM 토큰 등록 실패는 무시 (앱 동작에 영향 없음)
+    }
   }
 }

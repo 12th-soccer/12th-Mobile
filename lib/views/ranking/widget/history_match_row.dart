@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
@@ -65,7 +66,7 @@ class HistoryMatchRow extends StatelessWidget {
         child: Row(
           children: [
             NetworkAvatar(imageUrl: myImageUrl, size: 36),
-            const SizedBox(width: 8),
+            AppSpacing.w8,
             Expanded(
               child: Text(
                 clubName,
@@ -106,7 +107,7 @@ class HistoryMatchRow extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const SizedBox(width: 8),
+            AppSpacing.w8,
             NetworkAvatar(imageUrl: opponentImageUrl, size: 36),
           ],
         ),

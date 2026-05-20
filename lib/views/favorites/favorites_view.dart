@@ -24,7 +24,7 @@ class _FavoritesViewState extends ConsumerState<FavoritesView> {
   int _tabIndex = 0;
   final List<String> _tabs = ['구단', '선수'];
 
-  static const _horizontalSpacing = SizedBox(width: 10);
+  static const _horizontalSpacing = AppSpacing.w10;
 
   static const _itemPadding = AppPadding.item16;
   static const _listPadding = AppPadding.listV;
@@ -239,7 +239,7 @@ class _FavoritesViewState extends ConsumerState<FavoritesView> {
             onTap: onRetry,
             child: Text(
               '다시 시도',
-              style: CustomTextStyle.body2.copyWith(color: CustomColor.white),
+              style: CustomTextStyle.body2,
             ),
           ),
         ],

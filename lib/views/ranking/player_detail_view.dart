@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -78,9 +79,9 @@ class PlayerDetailView extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(child: NetworkAvatar(imageUrl: detail.imageUrl, size: 100)),
-            const SizedBox(height: 16),
+            AppSpacing.h16,
             Center(child: Text(detail.name, style: CustomTextStyle.heading1)),
-            const SizedBox(height: 24),
+            AppSpacing.h24,
             _InfoGrid(detail: detail),
             const SizedBox(height: 32),
             _GoalsSection(goalsAsync: goalsAsync),
@@ -143,7 +144,7 @@ class _InfoCell extends StatelessWidget {
           label,
           style: CustomTextStyle.body3.copyWith(color: CustomColor.gray500),
         ),
-        const SizedBox(height: 4),
+        AppSpacing.h4,
         Text(value!, style: CustomTextStyle.body1),
       ],
     );
@@ -161,7 +162,7 @@ class _GoalsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('골 기록', style: CustomTextStyle.heading2),
-        const SizedBox(height: 16),
+        AppSpacing.h16,
         goalsAsync.when(
           loading: () => const Center(
             child: CircularProgressIndicator(color: CustomColor.white),

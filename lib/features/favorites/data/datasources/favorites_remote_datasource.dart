@@ -17,92 +17,34 @@ class FavoritesRemoteDataSourceImpl implements IFavoritesRemoteDataSource {
   const FavoritesRemoteDataSourceImpl(this._apiClient);
 
   @override
-  Future<List<FavoriteClubModel>> getFavoriteClubs() async {
-    try {
-      return await _apiClient.get(
+  Future<List<FavoriteClubModel>> getFavoriteClubs() => _apiClient.get(
         ApiEndpoints.favoriteTeams,
-        decoder: (data) {
-          final list = data as List<dynamic>;
-          return list
-              .map(
-                (e) => FavoriteClubModel.fromJson(e as Map<String, dynamic>),
-              )
-              .toList();
-        },
+        decoder: (data) => (data as List<dynamic>)
+            .map((e) => FavoriteClubModel.fromJson(e as Map<String, dynamic>))
+            .toList(),
       );
-    } on ApiException catch (e) {
-      rethrow;
-    } catch (e, stack) {
-      rethrow;
-    }
-  }
 
   @override
-  Future<void> addFavoriteClub(int clubId) async {
-    try {
-      await _apiClient.postVoid(ApiEndpoints.favoriteTeam(clubId.toString()));
-    } on ApiException catch (e) {
-      rethrow;
-    } catch (e, stack) {
-      rethrow;
-    }
-  }
+  Future<void> addFavoriteClub(int clubId) =>
+      _apiClient.postVoid(ApiEndpoints.favoriteTeam(clubId.toString()));
 
   @override
-  Future<void> removeFavoriteClub(int clubId) async {
-    try {
-      await _apiClient.deleteVoid(
-        ApiEndpoints.favoriteTeam(clubId.toString()),
-      );
-    } on ApiException catch (e) {
-      rethrow;
-    } catch (e, stack) {
-      rethrow;
-    }
-  }
+  Future<void> removeFavoriteClub(int clubId) =>
+      _apiClient.deleteVoid(ApiEndpoints.favoriteTeam(clubId.toString()));
 
   @override
-  Future<List<FavoritePlayerModel>> getFavoritePlayers() async {
-    try {
-      return await _apiClient.get(
+  Future<List<FavoritePlayerModel>> getFavoritePlayers() => _apiClient.get(
         ApiEndpoints.favoritePlayers,
-        decoder: (data) {
-          final list = data as List<dynamic>;
-          return list
-              .map(
-                (e) => FavoritePlayerModel.fromJson(e as Map<String, dynamic>),
-              )
-              .toList();
-        },
+        decoder: (data) => (data as List<dynamic>)
+            .map((e) => FavoritePlayerModel.fromJson(e as Map<String, dynamic>))
+            .toList(),
       );
-    } on ApiException catch (e) {
-      rethrow;
-    } catch (e, stack) {
-      rethrow;
-    }
-  }
 
   @override
-  Future<void> addFavoritePlayer(int playerId) async {
-    try {
-      await _apiClient.postVoid(ApiEndpoints.favoritePlayerRegister(playerId.toString()));
-    } on ApiException catch (e) {
-      rethrow;
-    } catch (e, stack) {
-      rethrow;
-    }
-  }
+  Future<void> addFavoritePlayer(int playerId) =>
+      _apiClient.postVoid(ApiEndpoints.favoritePlayerRegister(playerId.toString()));
 
   @override
-  Future<void> removeFavoritePlayer(int playerId) async {
-    try {
-      await _apiClient.deleteVoid(
-        ApiEndpoints.favoritePlayer(playerId.toString()),
-      );
-    } on ApiException catch (e) {
-      rethrow;
-    } catch (e, stack) {
-      rethrow;
-    }
-  }
+  Future<void> removeFavoritePlayer(int playerId) =>
+      _apiClient.deleteVoid(ApiEndpoints.favoritePlayer(playerId.toString()));
 }

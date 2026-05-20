@@ -100,7 +100,7 @@ class ProfileView extends ConsumerWidget {
         child: Row(
           children: [
             Icon(icon, color: CustomColor.white, size: 22),
-            const SizedBox(width: 12),
+            AppSpacing.w12,
             Text(label, style: CustomTextStyle.body1),
           ],
         ),

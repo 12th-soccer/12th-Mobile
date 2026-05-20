@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+int get kStartSeason => DateTime.now().year - 10;
+
 abstract final class AppSpacing {
   /// vertical SizedBox
   static const h4 = SizedBox(height: 4);
@@ -36,10 +38,12 @@ abstract final class AppPadding {
 }
 
 abstract final class AppRadius {
+  static const double xsValue = 2;
   static const double smValue = 8;
   static const double mdValue = 12;
   static const double lgValue = 20;
 
+  static final xs = BorderRadius.circular(xsValue);
   static final sm = BorderRadius.circular(smValue);
   static final md = BorderRadius.circular(mdValue);
   static final lg = BorderRadius.circular(lgValue);

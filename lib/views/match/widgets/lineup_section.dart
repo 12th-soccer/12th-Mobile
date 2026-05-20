@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
@@ -15,7 +16,7 @@ class LineupSection extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: CustomColor.gray900,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppRadius.md,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,7 +72,7 @@ class LineupSection extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  AppSpacing.h8,
                 ],
               );
             },
@@ -99,7 +100,7 @@ class _LineupCard extends StatelessWidget {
             fontWeight: FontWeight.w900,
           ),
         ),
-        const SizedBox(height: 4),
+        AppSpacing.h4,
         Text(
           lineup.teamName,
           style: CustomTextStyle.body3.copyWith(
@@ -109,7 +110,7 @@ class _LineupCard extends StatelessWidget {
           textAlign: TextAlign.center,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 4),
+        AppSpacing.h4,
         Text(
           lineup.coachName.isEmpty ? '' : '감독  ${lineup.coachName}',
           style: CustomTextStyle.body3.copyWith(color: CustomColor.gray500),

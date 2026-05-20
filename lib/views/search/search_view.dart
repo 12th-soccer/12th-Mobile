@@ -115,7 +115,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         itemCount: _seasons.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, __) => AppSpacing.w8,
         itemBuilder: (_, i) {
           final season = _seasons[i];
           final isSelected = state.selectedSeason == season;
@@ -132,7 +132,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
               padding: const EdgeInsets.symmetric(horizontal: 14),
               decoration: BoxDecoration(
                 color: isSelected ? CustomColor.main : Colors.transparent,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: AppRadius.lg,
                 border: Border.all(
                   color: isSelected ? CustomColor.main : CustomColor.gray600,
                 ),
@@ -351,7 +351,7 @@ class _FilterDropdown extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(label, style: CustomTextStyle.body2),
-                const SizedBox(width: 4),
+                AppSpacing.w4,
                 const Icon(
                   Symbols.keyboard_arrow_down,
                   color: CustomColor.white,

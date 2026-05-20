@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
@@ -5,8 +6,8 @@ import 'package:twelfth_mobile/constants/text_style.dart';
 class OnboardingUI {
   static const SizedBox gapH32 = SizedBox(height: 32);
   static const SizedBox gapH10 = SizedBox(height: 10);
-  static const SizedBox gapH8 = SizedBox(height: 8);
-  static const SizedBox gapW10 = SizedBox(width: 10);
+  static const SizedBox gapH8 = AppSpacing.h8;
+  static const SizedBox gapW10 = AppSpacing.w10;
 
   static const EdgeInsets horizontalPadding = EdgeInsets.symmetric(
     horizontal: 24,
@@ -31,6 +32,6 @@ class OnboardingUI {
 
   static BoxDecoration itemBoxDecoration = BoxDecoration(
     color: CustomColor.gray900,
-    borderRadius: BorderRadius.circular(8),
+    borderRadius: AppRadius.sm,
   );
 }

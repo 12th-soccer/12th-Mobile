@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
@@ -74,7 +75,7 @@ class _LiveCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         decoration: BoxDecoration(
           color: CustomColor.main,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadius.md,
         ),
         child: Row(
           children: [
@@ -103,7 +104,7 @@ class _LiveCard extends StatelessWidget {
                       color: CustomColor.gray600,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  AppSpacing.h4,
                   Text(
                     scoreStr,
                     style: CustomTextStyle.heading2.copyWith(
@@ -142,7 +143,7 @@ class _LiveTeamBlock extends StatelessWidget {
           size: 52,
           placeholderColor: CustomColor.gray500,
         ),
-        const SizedBox(height: 8),
+        AppSpacing.h8,
         Text(
           name,
           style: CustomTextStyle.body2.copyWith(color: CustomColor.black),
@@ -189,7 +190,7 @@ class _NormalRow extends StatelessWidget {
               child: Row(
                 children: [
                   NetworkAvatar(imageUrl: match.homeTeamImageUrl, size: 32),
-                  const SizedBox(width: 8),
+                  AppSpacing.w8,
                   Flexible(
                     child: Text(
                       match.homeTeamName,
@@ -216,7 +217,7 @@ class _NormalRow extends StatelessWidget {
                       textAlign: TextAlign.right,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  AppSpacing.w8,
                   NetworkAvatar(imageUrl: match.awayTeamImageUrl, size: 32),
                 ],
               ),

@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
@@ -72,11 +73,11 @@ class _NoSpoilerSettingsViewState extends ConsumerState<NoSpoilerSettingsView> {
           ),
           body: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: AppPadding.cardH,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 8),
+                  AppSpacing.h8,
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -87,7 +88,7 @@ class _NoSpoilerSettingsViewState extends ConsumerState<NoSpoilerSettingsView> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  AppSpacing.h16,
                   Text(
                     '설정 시 경기 결과가 바로 보이지 않습니다. 해당 경기를 클릭해야 해당 경기의 스코어가 보여집니다. 한번 본 경기 결과는 계속해서 보여지며, 이외의 경기에는 영향을 주지 않습니다.',
                     style: CustomTextStyle.body2.copyWith(

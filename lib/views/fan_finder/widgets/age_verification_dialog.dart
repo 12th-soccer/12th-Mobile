@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
@@ -29,12 +30,12 @@ class AgeVerificationDialog extends StatelessWidget {
               '나이 인증 필요',
               style: CustomTextStyle.heading2,
             ),
-            const SizedBox(height: 12),
+            AppSpacing.h12,
             Text(
               '해당 서비스를 사용하기 위해서는 나이 인증이 필요합니다.\n안전을 위해 만 19세 이상만 사용이 가능합니다.',
               style: CustomTextStyle.body1
             ),
-            const SizedBox(height: 24),
+            AppSpacing.h24,
             Row(
               children: [
                 Expanded(
@@ -44,7 +45,7 @@ class AgeVerificationDialog extends StatelessWidget {
                       side: const BorderSide(color: CustomColor.gray600),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: AppRadius.sm,
                       ),
                     ),
                     child: Text(
@@ -55,7 +56,7 @@ class AgeVerificationDialog extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                AppSpacing.w12,
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(true),
@@ -63,7 +64,7 @@ class AgeVerificationDialog extends StatelessWidget {
                       backgroundColor: CustomColor.main,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: AppRadius.sm,
                       ),
                     ),
                     child: Text(

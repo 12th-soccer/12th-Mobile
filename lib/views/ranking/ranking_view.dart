@@ -24,11 +24,11 @@ class _RankingViewState extends ConsumerState<RankingView> {
   int _tabIndex = 0;
   late int _selectedYear;
   static const _tabs = ['K1', 'K2'];
-  static const _spacing = SizedBox(width: 10);
+  static const _spacing = AppSpacing.w10;
 
   static List<int> get _years {
     final current = DateTime.now().year;
-    return List.generate(current - 2020 + 1, (i) => current - i);
+    return List.generate(current - kStartSeason + 1, (i) => current - i);
   }
 
   Color? _rankBarColor(int rank) {
@@ -116,7 +116,7 @@ class _RankingViewState extends ConsumerState<RankingView> {
                 onSelected: (y) => setState(() => _selectedYear = y),
                 color: CustomColor.gray900,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppRadius.md,
                   side: const BorderSide(color: CustomColor.gray600),
                 ),
                 offset: const Offset(0, 40),
@@ -149,7 +149,7 @@ class _RankingViewState extends ConsumerState<RankingView> {
                   ),
                   decoration: BoxDecoration(
                     color: CustomColor.main,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: AppRadius.lg,
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -161,7 +161,7 @@ class _RankingViewState extends ConsumerState<RankingView> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      AppSpacing.w4,
                       const Icon(
                         Symbols.expand_more,
                         color: CustomColor.black,
@@ -288,7 +288,7 @@ class _RankingViewState extends ConsumerState<RankingView> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    AppSpacing.w4,
                     GestureDetector(
                       onTap: () async {
                         try {

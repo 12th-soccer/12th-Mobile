@@ -26,7 +26,7 @@ class FanPostCard extends StatelessWidget {
           children: [
             Text(
               post.title,
-              style: CustomTextStyle.heading2.copyWith(color: CustomColor.white),
+              style: CustomTextStyle.heading2,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

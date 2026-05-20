@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
@@ -106,7 +107,7 @@ class _HalfTimeDivider extends StatelessWidget {
             child: Divider(color: CustomColor.gray900, thickness: 1),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: AppPadding.cardH,
             child: Text(
               '하프타임',
               style: CustomTextStyle.body3.copyWith(color: CustomColor.gray500),

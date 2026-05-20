@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
@@ -86,9 +87,7 @@ class CustomTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaultTextStyle = CustomTextStyle.body2
-        .copyWith(color: CustomColor.white)
-        .merge(style);
+    final defaultTextStyle = CustomTextStyle.body2.merge(style);
 
     InputDecoration inputDecoration = InputDecoration(
       icon: decoration?.icon,
@@ -144,7 +143,7 @@ class CustomTextFormField extends StatelessWidget {
           color: CustomColor.gray900,
           width: 1,
         ),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppRadius.sm,
       ),
 
       focusedBorder: decoration?.focusedBorder ?? OutlineInputBorder(
@@ -152,7 +151,7 @@ class CustomTextFormField extends StatelessWidget {
           color: CustomColor.white,
           width: 1,
         ),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppRadius.sm,
       ),
 
       errorBorder: OutlineInputBorder(
@@ -160,7 +159,7 @@ class CustomTextFormField extends StatelessWidget {
           color: CustomColor.red,
           width: 1,
         ),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppRadius.sm,
       ),
 
       focusedErrorBorder: OutlineInputBorder(
@@ -168,7 +167,7 @@ class CustomTextFormField extends StatelessWidget {
           color: CustomColor.red,
           width: 1,
         ),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppRadius.sm,
       ),
     );
 

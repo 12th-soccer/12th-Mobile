@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
@@ -46,24 +47,24 @@ class EventRow extends ConsumerWidget {
         ? Row(
             children: [
               photo,
-              const SizedBox(width: 10),
+              AppSpacing.w10,
               Expanded(child: name),
-              const SizedBox(width: 12),
+              AppSpacing.w12,
               time,
-              const SizedBox(width: 10),
+              AppSpacing.w10,
               icon,
             ],
           )
         : Row(
             children: [
               icon,
-              const SizedBox(width: 10),
+              AppSpacing.w10,
               time,
-              const SizedBox(width: 12),
+              AppSpacing.w12,
               Expanded(
                 child: Align(alignment: Alignment.centerRight, child: name),
               ),
-              const SizedBox(width: 10),
+              AppSpacing.w10,
               photo,
             ],
           );
@@ -95,7 +96,7 @@ class _EventIcon extends StatelessWidget {
           height: 18,
           decoration: BoxDecoration(
             color: CustomColor.yellow,
-            borderRadius: BorderRadius.circular(2),
+            borderRadius: AppRadius.xs,
           ),
         );
       case MatchEventType.redCard:
@@ -104,7 +105,7 @@ class _EventIcon extends StatelessWidget {
           height: 18,
           decoration: BoxDecoration(
             color: CustomColor.red,
-            borderRadius: BorderRadius.circular(2),
+            borderRadius: AppRadius.xs,
           ),
         );
       case MatchEventType.subOut:

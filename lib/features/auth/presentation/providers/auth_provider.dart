@@ -57,7 +57,7 @@ class AuthNotifier extends Notifier<AuthState> {
         errorMessage: _parseEmailError(e),
       );
       return false;
-    } catch (e, stack) {
+    } catch (e) {
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: '오류가 발생했습니다. 다시 시도해 주세요',
@@ -75,7 +75,7 @@ class AuthNotifier extends Notifier<AuthState> {
         status: AuthStatus.success,
       );
       return true;
-    } catch (e, stack) {
+    } catch (e) {
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: '오류가 발생했습니다. 다시 시도해 주세요',
@@ -113,7 +113,7 @@ class AuthNotifier extends Notifier<AuthState> {
         errorMessage: _parseError(e),
       );
       return false;
-    } catch (e, stack) {
+    } catch (e) {
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: '오류가 발생했습니다. 다시 시도해 주세요',
@@ -137,7 +137,7 @@ class AuthNotifier extends Notifier<AuthState> {
         errorMessage: _parseError(e),
       );
       return false;
-    } catch (e, stack) {
+    } catch (e) {
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: '오류가 발생했습니다. 다시 시도해 주세요',
@@ -150,8 +150,8 @@ class AuthNotifier extends Notifier<AuthState> {
     state = state.copyWith(status: AuthStatus.loading);
     try {
       await ref.read(_logoutUseCaseProvider).call();
-    } on ApiException catch (e) {
-    } catch (e, stack) {
+    } catch (_) {
+      // 로그아웃 실패해도 로컬 상태는 초기화
     } finally {
       ref.invalidate(userInfoProvider);
       state = const AuthState();
