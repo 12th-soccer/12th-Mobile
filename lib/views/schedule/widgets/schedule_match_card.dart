@@ -92,7 +92,7 @@ class _LiveCard extends StatelessWidget {
                   Text(
                     'Live',
                     style: CustomTextStyle.body3.copyWith(
-                      color: CustomColor.red,
+                      color: CustomColor.green,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
