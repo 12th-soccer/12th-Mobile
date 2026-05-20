@@ -147,13 +147,17 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
           );
         }
 
-        bool isFavoriteMatch(m) =>
+        final now = DateTime.now();
+        bool isLive(m) =>
+            !m.matchDate.isAfter(now) && !m.isFinished;
+        bool isFavorite(m) =>
             favoriteClubNames.contains(m.homeTeamName) ||
             favoriteClubNames.contains(m.awayTeamName);
 
         final sorted = [
-          ...filtered.where(isFavoriteMatch),
-          ...filtered.where((m) => !isFavoriteMatch(m)),
+          ...filtered.where(isLive),
+          ...filtered.where((m) => !isLive(m) && isFavorite(m)),
+          ...filtered.where((m) => !isLive(m) && !isFavorite(m)),
         ];
 
         return RefreshIndicator(
