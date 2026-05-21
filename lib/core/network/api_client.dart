@@ -82,6 +82,13 @@ abstract interface class ApiClient {
     Map<String, Object?>? queryParameters,
     Map<String, dynamic>? headers,
   });
+
+  Future<void> patchVoid(
+    String path, {
+    Object? data,
+    Map<String, Object?>? queryParameters,
+    Map<String, dynamic>? headers,
+  });
 }
 
 class DioApiClient implements ApiClient {
@@ -166,6 +173,22 @@ class DioApiClient implements ApiClient {
   }) {
     return _requestVoid(
       'DELETE',
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      headers: headers,
+    );
+  }
+
+  @override
+  Future<void> patchVoid(
+    String path, {
+    Object? data,
+    Map<String, Object?>? queryParameters,
+    Map<String, dynamic>? headers,
+  }) {
+    return _requestVoid(
+      'PATCH',
       path,
       data: data,
       queryParameters: queryParameters,

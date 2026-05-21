@@ -11,6 +11,7 @@ class ApiEndpoints {
   static const email = "/user/email";
   static const logOut = "/user/logout";
   static const userInfo = "/user/info";
+  static const updateUsername = "/user/name";
 
   /// ranking
   static String ranking(String season, String league) => "/ranking?season=$season&league=$league";
@@ -60,6 +61,17 @@ class ApiEndpoints {
 
   /// join
   static String joinRecruitment(String id) => '/join/$id';
+
+  /// notice
+  static String noticeCreate(String recruitmentId) => '/notice/$recruitmentId';
+  static String noticeDetail(String noticeId) => '/notice/$noticeId';
+
+  /// comment
+  static String commentList(String noticeId) => '/comment/$noticeId';
+  static String commentCreate(String noticeId) => '/comment/$noticeId';
+
+  /// account
+  static const deleteAccount = '/user/me';
 
   /// notifications
   static const notificationSettings = "/notifications/settings";
