@@ -55,7 +55,21 @@ class ProfileView extends ConsumerWidget {
               '정보를 불러올 수 없습니다',
               style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
             ),
-            data: (data) => Text(data.email, style: CustomTextStyle.heading2),
+            data: (data) => Column(
+              children: [
+                Text(
+                  data.username?.isNotEmpty == true ? data.username! : '닉네임',
+                  style: CustomTextStyle.heading2.copyWith(
+                    color: data.hasUsername ? CustomColor.white : CustomColor.gray500,
+                  ),
+                ),
+                AppSpacing.h4,
+                Text(
+                  data.email,
+                  style: CustomTextStyle.body3,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -65,6 +79,11 @@ class ProfileView extends ConsumerWidget {
   Widget _buildMenuList(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
+        _buildMenuItem(
+          icon: Symbols.badge,
+          label: '닉네임 수정',
+          onTap: () => context.push(AppRoutes.editUsername),
+        ),
         _buildMenuItem(
           icon: Symbols.schedule,
           label: '알림 설정',
@@ -83,7 +102,47 @@ class ProfileView extends ConsumerWidget {
             if (context.mounted) context.go(AppRoutes.login);
           },
         ),
+        _buildMenuItem(
+          icon: Symbols.person_remove,
+          label: '회원 탈퇴',
+          color: CustomColor.red,
+          onTap: () => _showDeleteAccountDialog(context, ref),
+        ),
       ],
+    );
+  }
+
+  void _showDeleteAccountDialog(BuildContext context, WidgetRef ref) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: CustomColor.gray900,
+        title: Text('회원 탈퇴', style: CustomTextStyle.heading2),
+        content: Text(
+          '탈퇴하면 계정 및 관련 데이터가 삭제됩니다.\n정말 탈퇴하시겠습니까?',
+          style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              '취소',
+              style: CustomTextStyle.body1.copyWith(color: CustomColor.gray500),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              await ref.read(authNotifierProvider.notifier).deleteAccount();
+              if (context.mounted) context.go(AppRoutes.login);
+            },
+            child: Text(
+              '탈퇴',
+              style: CustomTextStyle.body1.copyWith(color: CustomColor.red),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -91,6 +150,7 @@ class ProfileView extends ConsumerWidget {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
+    Color color = CustomColor.white,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -99,9 +159,12 @@ class ProfileView extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Row(
           children: [
-            Icon(icon, color: CustomColor.white, size: 22),
+            Icon(icon, color: color, size: 22),
             AppSpacing.w12,
-            Text(label, style: CustomTextStyle.body1),
+            Text(
+              label,
+              style: CustomTextStyle.body1.copyWith(color: color),
+            ),
           ],
         ),
       ),

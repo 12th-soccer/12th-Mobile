@@ -16,12 +16,16 @@ class NoSpoilerSettingsView extends ConsumerStatefulWidget {
 }
 
 class _NoSpoilerSettingsViewState extends ConsumerState<NoSpoilerSettingsView> {
-  bool? _noSpoilerEnabled;
+  bool? _original;
+  bool? _current;
+  bool _initialized = false;
+
+  bool get _hasChanges => _initialized && _current != _original;
 
   Future<void> _save() async {
-    if (_noSpoilerEnabled == null) return;
+    if (_current == null) return;
     try {
-      await ref.read(noSpoilerProvider.notifier).save(_noSpoilerEnabled!);
+      await ref.read(noSpoilerProvider.notifier).save(_current!);
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
       if (!mounted) return;
@@ -34,38 +38,41 @@ class _NoSpoilerSettingsViewState extends ConsumerState<NoSpoilerSettingsView> {
     final settingsAsync = ref.watch(noSpoilerProvider);
 
     return settingsAsync.when(
-      loading: () =>
-          Scaffold(
-            backgroundColor: CustomColor.background,
-            appBar: const TwelfthAppBar(),
-            body: const Center(
-              child: CircularProgressIndicator(color: CustomColor.white),
-            ),
+      loading: () => Scaffold(
+        backgroundColor: CustomColor.background,
+        appBar: const TwelfthAppBar(title: '노 스포일러'),
+        body: const Center(
+          child: CircularProgressIndicator(color: CustomColor.white),
+        ),
+      ),
+      error: (e, _) => Scaffold(
+        backgroundColor: CustomColor.background,
+        appBar: const TwelfthAppBar(title: '노 스포일러'),
+        body: Center(
+          child: Text(
+            '설정을 불러오지 못했습니다',
+            style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
           ),
-      error: (e, _) =>
-          Scaffold(
-            backgroundColor: CustomColor.background,
-            appBar: const TwelfthAppBar(),
-            body: Center(
-              child: Text(
-                '설정을 불러오지 못했습니다',
-                style: CustomTextStyle.body2.copyWith(
-                    color: CustomColor.gray500),
-              ),
-            ),
-          ),
+        ),
+      ),
       data: (enabled) {
-        _noSpoilerEnabled ??= enabled;
+        if (!_initialized) {
+          _initialized = true;
+          _original = enabled;
+          _current = enabled;
+        }
+
         return Scaffold(
           backgroundColor: CustomColor.background,
           appBar: TwelfthAppBar(
+            title: '노 스포일러',
             actions: [
               TextButton(
-                onPressed: _save,
+                onPressed: _hasChanges ? _save : null,
                 child: Text(
                   '저장',
                   style: CustomTextStyle.body1.copyWith(
-                    color: CustomColor.blue,
+                    color: _hasChanges ? CustomColor.blue : CustomColor.gray600,
                   ),
                 ),
               ),
@@ -83,8 +90,8 @@ class _NoSpoilerSettingsViewState extends ConsumerState<NoSpoilerSettingsView> {
                     children: [
                       Text('노 스포일러', style: CustomTextStyle.body1),
                       _GradientSwitch(
-                        value: _noSpoilerEnabled!,
-                        onChanged: (v) => setState(() => _noSpoilerEnabled = v),
+                        value: _current!,
+                        onChanged: (v) => setState(() => _current = v),
                       ),
                     ],
                   ),
@@ -113,38 +120,29 @@ class _GradientSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      toggled: value,
-      button: true,
-      label: '노 스포일러',
-      child: FocusableActionDetector(
-        mouseCursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => onChanged(!value),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: 51,
-            height: 31,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              gradient: value
-                  ? TwelfthGradient.horizontal(CustomColor.silverGradient)
-                  : null,
-              color: value ? null : CustomColor.gray900,
-            ),
-            child: AnimatedAlign(
-              duration: const Duration(milliseconds: 200),
-              alignment: value ? Alignment.centerRight : Alignment.centerLeft,
-              child: Container(
-                margin: const EdgeInsets.all(3),
-                width: 25,
-                height: 25,
-                decoration: const BoxDecoration(
-                  color: CustomColor.white,
-                  shape: BoxShape.circle,
-                ),
-              ),
+    return GestureDetector(
+      onTap: () => onChanged(!value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 51,
+        height: 31,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          gradient: value
+              ? TwelfthGradient.horizontal(CustomColor.silverGradient)
+              : null,
+          color: value ? null : CustomColor.gray900,
+        ),
+        child: AnimatedAlign(
+          duration: const Duration(milliseconds: 200),
+          alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+          child: Container(
+            margin: const EdgeInsets.all(3),
+            width: 25,
+            height: 25,
+            decoration: const BoxDecoration(
+              color: CustomColor.white,
+              shape: BoxShape.circle,
             ),
           ),
         ),

@@ -18,33 +18,28 @@ class NotificationSettingsView extends ConsumerWidget {
     return settingsAsync.when(
       loading: () => Scaffold(
         backgroundColor: CustomColor.background,
-        appBar: const TwelfthAppBar(title: '알림 설정'),
+        appBar: const TwelfthAppBar(),
         body: const Center(
           child: CircularProgressIndicator(color: CustomColor.white),
         ),
       ),
       error: (e, _) => Scaffold(
         backgroundColor: CustomColor.background,
-        appBar: const TwelfthAppBar(title: '알림 설정'),
+        appBar: const TwelfthAppBar(),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 '설정을 불러오지 못했습니다',
-                style: CustomTextStyle.body2.copyWith(
-                  color: CustomColor.gray500,
-                ),
+                style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
               ),
               AppSpacing.h16,
               GestureDetector(
-                onTap: () =>
-                    ref.invalidate(notificationSettingsNotifierProvider),
+                onTap: () => ref.invalidate(notificationSettingsNotifierProvider),
                 child: Text(
                   '다시 시도',
-                  style: CustomTextStyle.body2.copyWith(
-                    color: CustomColor.white,
-                  ),
+                  style: CustomTextStyle.body2.copyWith(color: CustomColor.white),
                 ),
               ),
             ],
@@ -58,7 +53,6 @@ class NotificationSettingsView extends ConsumerWidget {
 
 class _SettingsForm extends ConsumerStatefulWidget {
   final NotificationSettings settings;
-
   const _SettingsForm({required this.settings});
 
   @override
@@ -71,7 +65,13 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
   late bool _oneHourBefore;
   late bool _thirtyMinsBefore;
   late bool _fifteenMinsBefore;
-  late bool _favoriteTeamMatch;
+
+  bool get _hasChanges =>
+      _notificationEnabled != widget.settings.notificationEnabled ||
+      _matchStartEnabled != widget.settings.matchStartEnabled ||
+      _oneHourBefore != widget.settings.oneHourBeforeEnabled ||
+      _thirtyMinsBefore != widget.settings.thirtyMinutesBeforeEnabled ||
+      _fifteenMinsBefore != widget.settings.fifteenMinutesBeforeEnabled;
 
   @override
   void initState() {
@@ -81,7 +81,6 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     _oneHourBefore = widget.settings.oneHourBeforeEnabled;
     _thirtyMinsBefore = widget.settings.thirtyMinutesBeforeEnabled;
     _fifteenMinsBefore = widget.settings.fifteenMinutesBeforeEnabled;
-    _favoriteTeamMatch = widget.settings.favoriteTeamMatchEnabled;
   }
 
   Future<void> _save() async {
@@ -91,7 +90,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
       oneHourBeforeEnabled: _oneHourBefore,
       thirtyMinutesBeforeEnabled: _thirtyMinsBefore,
       fifteenMinutesBeforeEnabled: _fifteenMinsBefore,
-      favoriteTeamMatchEnabled: _favoriteTeamMatch,
+      favoriteTeamMatchEnabled: widget.settings.favoriteTeamMatchEnabled,
     );
 
     final success = await ref
@@ -111,14 +110,13 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     return Scaffold(
       backgroundColor: CustomColor.background,
       appBar: TwelfthAppBar(
-        title: '알림 설정',
         actions: [
           TextButton(
-            onPressed: _save,
+            onPressed: _hasChanges ? _save : null,
             child: Text(
               '저장',
               style: CustomTextStyle.body1.copyWith(
-                color: CustomColor.blue,
+                color: _hasChanges ? CustomColor.blue : CustomColor.gray600,
               ),
             ),
           ),
@@ -132,21 +130,20 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             children: [
               AppSpacing.h8,
               _buildRow(
-                label: '알림',
+                label: '관심 구단 경기 알림',
+                sublabel: '관심 구단으로 등록한 팀의 경기 알림을 받습니다.',
                 value: _notificationEnabled,
                 onChanged: (v) => setState(() => _notificationEnabled = v),
               ),
               if (_notificationEnabled) ...[
-                AppSpacing.h8,
-                const Divider(color: CustomColor.gray900, height: 1),
-                AppSpacing.h8,
+                AppSpacing.h4,
+                const Divider(color: CustomColor.gray800, height: 1),
+                AppSpacing.h4,
                 _buildRow(
                   label: '경기 시작',
                   value: _matchStartEnabled,
                   onChanged: (v) => setState(() => _matchStartEnabled = v),
-                  sublabel: '기본 알림으로 끄기 가능합니다.',
                 ),
-                AppSpacing.h4,
                 _buildRow(
                   label: '1시간 전',
                   value: _oneHourBefore,
@@ -161,14 +158,6 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
                   label: '15분 전',
                   value: _fifteenMinsBefore,
                   onChanged: (v) => setState(() => _fifteenMinsBefore = v),
-                ),
-                const Divider(color: CustomColor.gray900, height: 1),
-                AppSpacing.h4,
-                _buildRow(
-                  label: '관심 구단 경기',
-                  value: _favoriteTeamMatch,
-                  onChanged: (v) => setState(() => _favoriteTeamMatch = v),
-                  sublabel: '관심 등록한 구단의 경기 알림',
                 ),
               ],
             ],
@@ -189,19 +178,24 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: CustomTextStyle.body1),
-              if (sublabel != null)
-                Text(
-                  sublabel,
-                  style: CustomTextStyle.body3.copyWith(
-                    color: CustomColor.gray500,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: CustomTextStyle.body1),
+                if (sublabel != null) ...[
+                  AppSpacing.h4,
+                  Text(
+                    sublabel,
+                    style: CustomTextStyle.body3.copyWith(
+                      color: CustomColor.gray500,
+                    ),
                   ),
-                ),
-            ],
+                ],
+              ],
+            ),
           ),
+          AppSpacing.w12,
           _GradientSwitch(value: value, onChanged: onChanged),
         ],
       ),
