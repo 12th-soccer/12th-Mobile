@@ -23,6 +23,7 @@ abstract final class AppRoutes {
   static const player = '/player';
   static const notifications = '/notifications';
   static const noSpoiler = '/no-spoiler';
+  static const editUsername = '/edit-username';
 
   // Fan Finder
   static const fanFinder = '/fan-finder';
