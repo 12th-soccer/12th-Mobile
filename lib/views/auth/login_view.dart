@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
@@ -84,16 +83,23 @@ class _LoginViewState extends ConsumerState<LoginView> {
       body: SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
-          child: Padding(
+          child: SingleChildScrollView(
             padding: AppPadding.screenH,
-            child: Form(
-              key: _formKey,
-              child: Column(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height -
+                    MediaQuery.of(context).padding.top -
+                    MediaQuery.of(context).padding.bottom,
+              ),
+              child: IntrinsicHeight(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Spacer(flex: 2),
-                  Center(child: SvgPicture.asset(TwelfthAssets.logo)),
-                  AppSpacing.h48,
+                  Center(child: Image.asset(TwelfthAssets.logo, width: 160)),
+                  AppSpacing.h32,
                   _buildLabel('이메일'),
                   _smallSpacing,
                   CustomTextFormField(
@@ -180,6 +186,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     child: const Text('구글 계정으로 로그인'),
                   ),
                 ],
+                  ),
+                ),
               ),
             ),
           ),
