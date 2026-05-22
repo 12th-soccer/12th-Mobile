@@ -20,6 +20,9 @@ abstract interface class IAuthRemoteDataSource {
   Future<void> logout();
 
   Future<UserInfo> getUserInfo();
+
+  Future<void> deleteAccount();
+  Future<void> updateUsername(String username);
 }
 
 class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
@@ -51,16 +54,36 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
     required String code,
     required String password,
   }) async {
-    await _apiClient.postVoid(
+    final result = await _apiClient.post<dynamic>(
       ApiEndpoints.signUp,
       data: {'email': email, 'code': code, 'password': password},
+      decoder: (data) => data,
     );
+    // 서버가 false를 반환하면 회원가입 실패
+    if (result == false) {
+      throw const ApiException(
+        type: ApiErrorType.badResponse,
+        statusCode: 400,
+        message: '회원가입에 실패했습니다. 인증번호를 확인해 주세요.',
+      );
+    }
   }
 
   @override
   Future<void> logout() async {
     await _apiClient.deleteVoid(ApiEndpoints.logOut);
   }
+
+  @override
+  Future<void> deleteAccount() =>
+      _apiClient.deleteVoid(ApiEndpoints.deleteAccount);
+
+  @override
+  Future<void> updateUsername(String username) =>
+      _apiClient.patchVoid(
+        ApiEndpoints.updateUsername,
+        data: {'username': username},
+      );
 
   @override
   Future<UserInfo> getUserInfo() async {
@@ -72,7 +95,7 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
           return UserInfo(
             userId: json['userId'] as int,
             email: json['email'] as String,
-            nickname: json['nickname'] as String?,
+            username: json['name'] as String?,
           );
         },
       );

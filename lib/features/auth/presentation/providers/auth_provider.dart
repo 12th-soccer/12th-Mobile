@@ -41,6 +41,10 @@ final _logoutUseCaseProvider = Provider<LogoutUseCase>(
   (ref) => LogoutUseCase(ref.read(authRepositoryProvider)),
 );
 
+final _deleteAccountUseCaseProvider = Provider<DeleteAccountUseCase>(
+  (ref) => DeleteAccountUseCase(ref.read(authRepositoryProvider)),
+);
+
 class AuthNotifier extends Notifier<AuthState> {
   @override
   AuthState build() => const AuthState();
@@ -134,7 +138,7 @@ class AuthNotifier extends Notifier<AuthState> {
     } on ApiException catch (e) {
       state = state.copyWith(
         status: AuthStatus.error,
-        errorMessage: _parseError(e),
+        errorMessage: _parseLoginError(e), // 로그인 전용 에러 메시지
       );
       return false;
     } catch (e) {
@@ -158,13 +162,52 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
+  Future<void> deleteAccount() async {
+    state = state.copyWith(status: AuthStatus.loading);
+    try {
+      await ref.read(_deleteAccountUseCaseProvider).call();
+      ref.invalidate(userInfoProvider);
+      state = const AuthState();
+    } on ApiException catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: _parseError(e),
+      );
+    } catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: '오류가 발생했습니다. 다시 시도해 주세요',
+      );
+    }
+  }
+
+  Future<bool> updateUsername(String username) async {
+    try {
+      await ref.read(authRepositoryProvider).updateUsername(username);
+      ref.invalidate(userInfoProvider);
+      return true;
+    } on ApiException catch (e) {
+      final msg = e.statusCode == 404
+          ? '닉네임 변경에 실패했습니다. 다시 시도해 주세요.'
+          : _parseError(e);
+      state = state.copyWith(status: AuthStatus.error, errorMessage: msg);
+      return false;
+    } catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: '오류가 발생했습니다. 다시 시도해 주세요',
+      );
+      return false;
+    }
+  }
+
   void clearError() {
     state = state.copyWith(status: AuthStatus.initial, errorMessage: null);
   }
 
   String _parseEmailError(ApiException e) {
     if (_isDuplicateEmailError(e)) {
-      return '이미 존재하는 이메일입니다.';
+      return '이미 가입된 이메일입니다. 로그인을 진행해주세요.';
     }
     return _parseError(e);
   }
@@ -198,23 +241,35 @@ class AuthNotifier extends Notifier<AuthState> {
     return '$data';
   }
 
+  /// 로그인 전용 에러 파싱
+  String _parseLoginError(ApiException e) {
+    switch (e.statusCode) {
+      case 401:
+        return '잘못된 입력입니다. 다시 시도해주세요.';
+      case 404:
+        return '존재하지 않는 이메일입니다.';
+      default:
+        return _parseError(e);
+    }
+  }
+
   String _parseError(ApiException e) {
     switch (e.statusCode) {
       case 400:
-        return '입력 정보를 확인해 주세요';
+        return '입력 정보를 확인해 주세요.';
       case 401:
-        return '이메일 또는 비밀번호가 올바르지 않습니다';
+        return '인증이 필요합니다.';
       case 403:
-        return '권한이 없습니다';
+        return '권한이 없습니다.';
       case 404:
-        return '해당 이메일을 가진 유저를 찾을 수 없습니다';
+        return '요청한 정보를 찾을 수 없습니다.';
       case 500:
-        return '서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요';
+        return '서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
       default:
         if (e.isTimeout) {
-          return '네트워크 연결을 확인해 주세요';
+          return '네트워크 연결을 확인해 주세요.';
         }
-        return '오류가 발생했습니다. 다시 시도해 주세요';
+        return '오류가 발생했습니다. 다시 시도해 주세요.';
     }
   }
 }

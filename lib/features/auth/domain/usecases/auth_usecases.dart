@@ -36,3 +36,11 @@ class LogoutUseCase {
 
   Future<void> call() => _repository.logout();
 }
+
+class DeleteAccountUseCase {
+  final IAuthRepository _repository;
+
+  const DeleteAccountUseCase(this._repository);
+
+  Future<void> call() => _repository.deleteAccount();
+}

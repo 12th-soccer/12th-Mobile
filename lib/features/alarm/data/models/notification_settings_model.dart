@@ -40,13 +40,13 @@ class NotificationSettingsModel {
         favoriteTeamMatchEnabled: entity.favoriteTeamMatchEnabled,
       );
 
+  // favoriteTeamMatchEnabled은 PATCH 명세에 없으므로 요청 body에서 제외
   Map<String, dynamic> toJson() => {
         'notificationEnabled': notificationEnabled,
         'oneHourBeforeEnabled': oneHourBeforeEnabled,
         'thirtyMinutesBeforeEnabled': thirtyMinutesBeforeEnabled,
         'fifteenMinutesBeforeEnabled': fifteenMinutesBeforeEnabled,
         'matchStartEnabled': matchStartEnabled,
-        'favoriteTeamMatchEnabled': favoriteTeamMatchEnabled,
       };
 
   NotificationSettings toEntity() => NotificationSettings(

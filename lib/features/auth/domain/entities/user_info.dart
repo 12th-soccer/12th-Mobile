@@ -1,13 +1,13 @@
 class UserInfo {
   final int userId;
   final String email;
-  final String? nickname;
+  final String? username;
 
   const UserInfo({
     required this.userId,
     required this.email,
-    this.nickname,
+    this.username,
   });
 
-  bool get hasNickname => nickname != null && nickname!.isNotEmpty;
+  bool get hasUsername => username != null && username!.isNotEmpty;
 }

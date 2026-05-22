@@ -44,4 +44,14 @@ class AuthRepositoryImpl implements IAuthRepository {
 
   @override
   Future<UserInfo> getUserInfo() => _dataSource.getUserInfo();
+
+  @override
+  Future<void> deleteAccount() async {
+    await _dataSource.deleteAccount();
+    await _tokenStorage.clearTokens();
+  }
+
+  @override
+  Future<void> updateUsername(String username) =>
+      _dataSource.updateUsername(username);
 }
