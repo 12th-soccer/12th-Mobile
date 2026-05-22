@@ -1,4 +1,5 @@
 import 'package:twelfth_mobile/core/constants/spacing.dart';
+import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -13,7 +14,6 @@ import 'package:twelfth_mobile/features/recruitment/domain/entities/recruitment_
 import 'package:twelfth_mobile/features/recruitment/presentation/providers/recruitment_provider.dart';
 import 'package:twelfth_mobile/features/recruitment/presentation/providers/team_list_provider.dart';
 import 'package:twelfth_mobile/views/fan_finder/fan_finder_constants.dart';
-import 'package:twelfth_mobile/views/fan_finder/widgets/age_verification_dialog.dart';
 
 class FanFinderView extends ConsumerStatefulWidget {
   const FanFinderView({super.key});
@@ -26,13 +26,12 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
   final _pageController = PageController(viewportFraction: 0.88);
   AgeGroup? _ageFilter;
   GenderGroup? _genderFilter;
-  TeamGroup? _k1Filter;
-  TeamGroup? _k2Filter;
+  TeamItem? _k1FilterItem;
+  TeamItem? _k2FilterItem;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _showVerification());
   }
 
   @override
@@ -41,22 +40,12 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
     super.dispose();
   }
 
-  Future<void> _showVerification() async {
-    final result = await AgeVerificationDialog.show(context);
-    if (!mounted) return;
-    if (result == true) {
-      // TODO: 포트원 나이 인증 페이지로 이동
-    } else {
-      context.pop();
-    }
-  }
-
-  List<Recruitment> _applyFilters(List<Recruitment> posts) {
+List<Recruitment> _applyFilters(List<Recruitment> posts) {
     return posts.where((p) {
       if (_ageFilter != null && p.ageGroup != _ageFilter) return false;
       if (_genderFilter != null && p.genderGroup != _genderFilter) return false;
-      if (_k1Filter != null && p.teamGroup != _k1Filter) return false;
-      if (_k2Filter != null && p.teamGroup != _k2Filter) return false;
+      if (_k1FilterItem != null && p.teamGroup != _k1FilterItem!.group) return false;
+      if (_k2FilterItem != null && p.teamGroup != _k2FilterItem!.group) return false;
       return true;
     }).toList();
   }
@@ -84,15 +73,18 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
               loading: () => const Center(
                 child: CircularProgressIndicator(color: CustomColor.white),
               ),
-              error: (_, __) => Center(
+              error: (error, __) => Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '모집글을 불러오지 못했습니다',
+                      error is ApiException && error.statusCode == 403
+                          ? '접근 권한이 없습니다.'
+                          : '모집글을 불러오지 못했습니다.',
                       style: CustomTextStyle.body2.copyWith(
                         color: CustomColor.gray500,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                     AppSpacing.h12,
                     GestureDetector(
@@ -169,8 +161,7 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
               final items = pages[pageIndex];
               return ListView.builder(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+                  vertical: 20,
                 ),
                 itemCount: items.length,
                 itemBuilder: (_, i) => _RecruitmentListItem(
@@ -199,8 +190,8 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
     final hasFilter =
         _ageFilter != null ||
         _genderFilter != null ||
-        _k1Filter != null ||
-        _k2Filter != null;
+        _k1FilterItem != null ||
+        _k2FilterItem != null;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -234,41 +225,31 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
           ),
           AppSpacing.w8,
           _FilterChip(
-            label: _k1Filter?.displayTag ?? 'K1',
-            isActive: _k1Filter != null,
+            label: _k1FilterItem?.displayName ?? 'K1',
+            isActive: _k1FilterItem != null,
             onTap: () {
-              final teams =
-                  teamAsync.valueOrNull?.k1Teams ??
-                  TeamGroup.values
-                      .where((t) => t.isK1)
-                      .map((t) => TeamItem(group: t, displayName: t.displayTag))
-                      .toList();
+              final teams = teamAsync.valueOrNull?.k1Teams ?? [];
               _showTeamSheet(
                 title: 'K1 구단',
                 teams: teams,
-                selected: _k1Filter,
-                onSelect: (g) =>
-                    setState(() => _k1Filter = g == _k1Filter ? null : g),
+                selected: _k1FilterItem,
+                onSelect: (t) => setState(() =>
+                    _k1FilterItem = _k1FilterItem?.displayName == t.displayName ? null : t),
               );
             },
           ),
           AppSpacing.w8,
           _FilterChip(
-            label: _k2Filter?.displayTag ?? 'K2',
-            isActive: _k2Filter != null,
+            label: _k2FilterItem?.displayName ?? 'K2',
+            isActive: _k2FilterItem != null,
             onTap: () {
-              final teams =
-                  teamAsync.valueOrNull?.k2Teams ??
-                  TeamGroup.values
-                      .where((t) => !t.isK1)
-                      .map((t) => TeamItem(group: t, displayName: t.displayTag))
-                      .toList();
+              final teams = teamAsync.valueOrNull?.k2Teams ?? [];
               _showTeamSheet(
                 title: 'K2 구단',
                 teams: teams,
-                selected: _k2Filter,
-                onSelect: (g) =>
-                    setState(() => _k2Filter = g == _k2Filter ? null : g),
+                selected: _k2FilterItem,
+                onSelect: (t) => setState(() =>
+                    _k2FilterItem = _k2FilterItem?.displayName == t.displayName ? null : t),
               );
             },
           ),
@@ -278,8 +259,8 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
               onTap: () => setState(() {
                 _ageFilter = null;
                 _genderFilter = null;
-                _k1Filter = null;
-                _k2Filter = null;
+                _k1FilterItem = null;
+                _k2FilterItem = null;
               }),
               child: Container(
                 padding: const EdgeInsets.symmetric(
@@ -374,8 +355,8 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
   void _showTeamSheet({
     required String title,
     required List<TeamItem> teams,
-    required TeamGroup? selected,
-    required void Function(TeamGroup) onSelect,
+    required TeamItem? selected,
+    required void Function(TeamItem) onSelect,
   }) {
     showModalBottomSheet(
       context: context,
@@ -405,25 +386,21 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
               child: ListView(
                 shrinkWrap: true,
                 children: teams.map((t) {
-                  final isSel = selected == t.group;
+                  final isSel = selected?.displayName == t.displayName;
                   return ListTile(
                     dense: true,
                     title: Text(
-                      t.group.displayTag,
+                      t.displayName, // 서버 값 그대로
                       style: CustomTextStyle.body2.copyWith(
                         color: isSel ? CustomColor.main : CustomColor.white,
                         fontWeight: isSel ? FontWeight.w600 : FontWeight.normal,
                       ),
                     ),
                     trailing: isSel
-                        ? const Icon(
-                            Symbols.check,
-                            color: CustomColor.main,
-                            size: 18,
-                          )
+                        ? const Icon(Symbols.check, color: CustomColor.main, size: 18)
                         : null,
                     onTap: () {
-                      onSelect(t.group);
+                      onSelect(t);
                       Navigator.pop(context);
                     },
                   );
@@ -482,9 +459,11 @@ class _RecruitmentListItem extends StatelessWidget {
                 const Icon(Symbols.group, color: CustomColor.gray500, size: 14),
                 const SizedBox(width: 3),
                 Text(
-                  '최대 ${recruitment.headCount}명',
+                  '${recruitment.currentParticipants ?? 0}/${recruitment.headCount}명',
                   style: CustomTextStyle.body3.copyWith(
-                    color: CustomColor.gray500,
+                    color: recruitment.isFull
+                        ? CustomColor.main
+                        : CustomColor.gray500,
                   ),
                 ),
               ],

@@ -29,17 +29,4 @@ abstract final class FanFinderConstants {
   static const tagRowHeight = 36.0;
   static const minParticipants = 4;
   static const maxParticipants = 10;
-
-  /// 필터/태그 옵션
-  static const ageOptions = ['#20대', '#30대', '#40대', '#50대+'];
-  static const genderOptions = ['#여성', '#남성', '#성별무관'];
-  static const k1Teams = [
-    '#FC서울', '#전북현대', '#울산HD', '#수원FC',
-    '#인천유나이티드', '#대전하나시티즌', '#포항스틸러스',
-    '#성남FC', '#광주FC', '#대구FC',
-  ];
-  static const k2Teams = [
-    '#부산아이파크', '#안산그리너스', '#충남아산',
-    '#서울이랜드', '#경남FC', '#김천상무',
-  ];
 }
