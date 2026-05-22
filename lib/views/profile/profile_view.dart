@@ -117,12 +117,15 @@ class ProfileView extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: CustomColor.gray900,
-        title: Text('회원 탈퇴', style: CustomTextStyle.heading2),
+        title: Center(child: Text('회원 탈퇴', style: CustomTextStyle.heading2)),
         content: Text(
-          '탈퇴하면 계정 및 관련 데이터가 삭제됩니다.\n정말 탈퇴하시겠습니까?',
-          style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
+          '계정 및 관련 데이터가 삭제됩니다.\n정말 탈퇴하시겠습니까?',
+          style: CustomTextStyle.body1,
         ),
         actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
@@ -141,6 +144,7 @@ class ProfileView extends ConsumerWidget {
               style: CustomTextStyle.body1.copyWith(color: CustomColor.red),
             ),
           ),
+        ],),
         ],
       ),
     );
