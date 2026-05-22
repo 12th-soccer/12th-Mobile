@@ -58,8 +58,8 @@ class RecruitmentModel {
         currentParticipants: entity.currentParticipants,
         ageGroup: entity.ageGroup.apiValue,
         genderGroup: entity.genderGroup.apiValue,
-        k1Group: entity.teamGroup.isK1 ? entity.teamGroup.apiValue : null,
-        k2Group: entity.teamGroup.isK1 ? null : entity.teamGroup.apiValue,
+        k1Group: entity.isK1 ? entity.teamCode : null,
+        k2Group: entity.isK1 ? null : entity.teamCode,
         expiredAt: entity.expiryDate,
       );
 
@@ -74,25 +74,23 @@ class RecruitmentModel {
     if (k1Group != null) map['k1Group'] = k1Group;
     if (k2Group != null) map['k2Group'] = k2Group;
     if (expiredAt != null) {
-      map['expiredAt'] = expiredAt!.toIso8601String().split('.').first; // "2026-05-25T18:00:00"
+      map['expiredAt'] = expiredAt!.toIso8601String().split('.').first;
     }
     return map;
   }
 
-  Recruitment toEntity() {
-    final teamApiVal = k1Group ?? k2Group;
-    final team = TeamGroup.fromApiValue(teamApiVal) ?? TeamGroup.fcSeoul;
-    return Recruitment(
-      id: id,
-      title: title,
-      content: content,
-      headCount: headCount,
-      currentParticipants: currentParticipants,
-      ageGroup: AgeGroup.fromApiValue(ageGroup) ?? AgeGroup.twenties,
-      genderGroup: GenderGroup.fromApiValue(genderGroup) ?? GenderGroup.any,
-      teamGroup: team,
-      noticeId: noticeId,
-      expiryDate: expiredAt, // 서버: expiredAt → 클라: expiryDate
-    );
-  }
+  Recruitment toEntity() => Recruitment(
+        id: id,
+        title: title,
+        content: content,
+        headCount: headCount,
+        currentParticipants: currentParticipants,
+        ageGroup: AgeGroup.fromApiValue(ageGroup) ?? AgeGroup.twenties,
+        genderGroup: GenderGroup.fromApiValue(genderGroup) ?? GenderGroup.any,
+        teamCode: k1Group ?? k2Group,
+        isK1: k1Group != null,
+        teamDisplayName: null,
+        noticeId: noticeId,
+        expiryDate: expiredAt,
+      );
 }

@@ -8,7 +8,9 @@ class Recruitment {
   final int? currentParticipants;
   final AgeGroup ageGroup;
   final GenderGroup genderGroup;
-  final TeamGroup teamGroup;
+  final String? teamCode;
+  final bool isK1;
+  final String? teamDisplayName;
   final DateTime? expiryDate;
   final String? noticeId;
 
@@ -20,7 +22,9 @@ class Recruitment {
     this.currentParticipants,
     required this.ageGroup,
     required this.genderGroup,
-    required this.teamGroup,
+    this.teamCode,
+    this.isK1 = true,
+    this.teamDisplayName,
     this.expiryDate,
     this.noticeId,
   });
@@ -31,7 +35,8 @@ class Recruitment {
   List<String> get tags => [
         ageGroup.displayTag,
         genderGroup.displayTag,
-        teamGroup.displayTag,
+        if (teamDisplayName != null) '#$teamDisplayName'
+        else if (teamCode != null) '#$teamCode',
       ];
 
   bool get isExpired {

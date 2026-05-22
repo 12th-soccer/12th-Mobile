@@ -145,7 +145,7 @@ class _FanFinderDetailViewState extends ConsumerState<FanFinderDetailView> {
                 borderRadius: AppRadius.lg,
               ),
               child: Text(
-                current.teamGroup.displayTag,
+                current.teamDisplayName ?? current.teamCode ?? '',
                 style: CustomTextStyle.body3.copyWith(
                   color: CustomColor.main,
                   fontWeight: FontWeight.w600,

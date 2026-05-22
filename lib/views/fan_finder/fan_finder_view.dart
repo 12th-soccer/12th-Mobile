@@ -44,8 +44,8 @@ List<Recruitment> _applyFilters(List<Recruitment> posts) {
     return posts.where((p) {
       if (_ageFilter != null && p.ageGroup != _ageFilter) return false;
       if (_genderFilter != null && p.genderGroup != _genderFilter) return false;
-      if (_k1FilterItem != null && p.teamGroup != _k1FilterItem!.group) return false;
-      if (_k2FilterItem != null && p.teamGroup != _k2FilterItem!.group) return false;
+      if (_k1FilterItem != null && p.teamCode != _k1FilterItem!.displayName) return false;
+      if (_k2FilterItem != null && p.teamCode != _k2FilterItem!.displayName) return false;
       return true;
     }).toList();
   }
@@ -448,7 +448,7 @@ class _RecruitmentListItem extends StatelessWidget {
                     borderRadius: AppRadius.lg,
                   ),
                   child: Text(
-                    recruitment.teamGroup.displayTag,
+                    recruitment.teamDisplayName ?? recruitment.teamCode ?? '',
                     style: CustomTextStyle.body3.copyWith(
                       color: CustomColor.main,
                       fontWeight: FontWeight.w600,
