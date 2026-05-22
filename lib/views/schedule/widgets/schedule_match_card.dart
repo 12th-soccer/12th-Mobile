@@ -1,14 +1,18 @@
 import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match.dart';
+import 'package:twelfth_mobile/features/no_spoiler/presentation/providers/no_spoiler_provider.dart';
+import 'package:twelfth_mobile/features/no_spoiler/presentation/providers/revealed_matches_provider.dart';
 import 'package:twelfth_mobile/views/match/match_detail_view.dart';
 
-class ScheduleMatchCard extends StatelessWidget {
+class ScheduleMatchCard extends ConsumerWidget {
   const ScheduleMatchCard({super.key, required this.match});
 
   final Match match;
@@ -25,7 +29,8 @@ class ScheduleMatchCard extends StatelessWidget {
 
   String get _dateStr => '${match.matchDate.month}/${match.matchDate.day}';
 
-  void _onTap(BuildContext context) {
+  void _onTap(BuildContext context, WidgetRef ref) {
+    ref.read(revealedMatchesProvider.notifier).reveal(match.matchId.toString());
     context.push(
       AppRoutes.match,
       extra: MatchExtra(
@@ -42,14 +47,23 @@ class ScheduleMatchCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final noSpoiler = ref.watch(noSpoilerProvider).valueOrNull ?? false;
+    final isRevealed = ref.watch(revealedMatchesProvider
+        .select((s) => s.contains(match.matchId.toString())));
+
+    final hideScore = noSpoiler &&
+        _state == MatchState.finished &&
+        !isRevealed;
+
     return _state == MatchState.live
-        ? _LiveCard(match: match, onTap: () => _onTap(context))
+        ? _LiveCard(match: match, onTap: () => _onTap(context, ref))
         : _NormalRow(
             match: match,
             state: _state,
             timeStr: _timeStr,
-            onTap: () => _onTap(context),
+            hideScore: hideScore,
+            onTap: () => _onTap(context, ref),
           );
   }
 }
@@ -159,26 +173,45 @@ class _NormalRow extends StatelessWidget {
   final Match match;
   final MatchState state;
   final String timeStr;
+  final bool hideScore;
   final VoidCallback onTap;
 
   const _NormalRow({
     required this.match,
     required this.state,
     required this.timeStr,
+    required this.hideScore,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final centerWidget =
-        state == MatchState.finished &&
-            match.homeTeamScore != null &&
-            match.awayTeamScore != null
-        ? Text(
-            '${match.homeTeamScore} : ${match.awayTeamScore}',
-            style: CustomTextStyle.heading3,
-          )
-        : Text(timeStr, style: CustomTextStyle.heading3);
+    Widget centerWidget;
+
+    if (state == MatchState.finished &&
+        match.homeTeamScore != null &&
+        match.awayTeamScore != null) {
+      if (hideScore) {
+        centerWidget = Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Symbols.lock, size: 14, color: CustomColor.gray500),
+            AppSpacing.w4,
+            Text(
+              '결과 보기',
+              style: CustomTextStyle.body3.copyWith(color: CustomColor.gray500),
+            ),
+          ],
+        );
+      } else {
+        centerWidget = Text(
+          '${match.homeTeamScore} : ${match.awayTeamScore}',
+          style: CustomTextStyle.heading3,
+        );
+      }
+    } else {
+      centerWidget = Text(timeStr, style: CustomTextStyle.heading3);
+    }
 
     return GestureDetector(
       onTap: onTap,
