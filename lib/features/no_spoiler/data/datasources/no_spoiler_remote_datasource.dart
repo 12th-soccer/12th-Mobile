@@ -13,24 +13,34 @@ class NoSpoilerRemoteDataSourceImpl implements INoSpoilerRemoteDataSource {
 
   @override
   Future<bool> get() async {
-    return _apiClient.get(
-      ApiEndpoints.spoiler,
-      decoder: (data) {
-        final json = data as Map<String, dynamic>;
-        return json['spoilerEnabled'] as bool? ?? true;
-      },
-    );
+    try {
+      return await _apiClient.get(
+        ApiEndpoints.spoiler,
+        decoder: (data) {
+          final json = data as Map<String, dynamic>;
+          return json['spoilerEnabled'] as bool? ?? false;
+        },
+      );
+    } on ApiException catch (e) {
+      if (e.statusCode == 404) return false;
+      rethrow;
+    }
   }
 
   @override
   Future<bool> save(bool enabled) async {
-    return _apiClient.patch(
-      ApiEndpoints.spoiler,
-      data: {'spoilerEnabled': enabled},
-      decoder: (data) {
-        final json = data as Map<String, dynamic>;
-        return json['spoilerEnabled'] as bool? ?? enabled;
-      },
-    );
+    try {
+      return await _apiClient.patch(
+        ApiEndpoints.spoiler,
+        data: {'spoilerEnabled': enabled},
+        decoder: (data) {
+          final json = data as Map<String, dynamic>;
+          return json['spoilerEnabled'] as bool? ?? enabled;
+        },
+      );
+    } on ApiException catch (e) {
+      if (e.statusCode == 404) return enabled;
+      rethrow;
+    }
   }
 }
