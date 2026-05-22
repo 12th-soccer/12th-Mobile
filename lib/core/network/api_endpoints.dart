@@ -54,7 +54,7 @@ class ApiEndpoints {
   static const recruitmentCreate = '/recruitment';
   static String recruitments({int page = 0, int size = 10}) =>
       '/recruitment?page=$page&size=$size';
-  static String recruitmentDetail(String id) => '/recruitment/$id';
+  static String recruitmentDetail(String recruitmentId) => '/recruitment/$recruitmentId';
 
   /// spoiler
   static const spoiler = '/spoiler';
