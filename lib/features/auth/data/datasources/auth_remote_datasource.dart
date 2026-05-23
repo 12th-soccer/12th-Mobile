@@ -59,7 +59,6 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
       data: {'email': email, 'code': code, 'password': password},
       decoder: (data) => data,
     );
-    // 서버가 false를 반환하면 회원가입 실패
     if (result == false) {
       throw const ApiException(
         type: ApiErrorType.badResponse,
@@ -95,7 +94,7 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
           return UserInfo(
             userId: json['userId'] as int,
             email: json['email'] as String,
-            username: json['name'] as String?,
+            username: json['username'] as String?,
           );
         },
       );

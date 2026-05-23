@@ -53,7 +53,7 @@ class _EditUsernameViewState extends ConsumerState<EditUsernameView> {
     setState(() => _isSaving = false);
 
     if (success) {
-      context.showSuccessSnackBar('닉네임이 변경됐습니다.');
+      FocusScope.of(context).unfocus();
       context.pop();
     } else {
       final error = ref.read(authNotifierProvider).errorMessage;
