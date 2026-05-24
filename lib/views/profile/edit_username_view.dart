@@ -23,7 +23,7 @@ class _EditUsernameViewState extends ConsumerState<EditUsernameView> {
   @override
   void initState() {
     super.initState();
-    final current = ref.read(userInfoProvider).valueOrNull?.username ?? '';
+    final current = ref.read(userInfoProvider).valueOrNull?.validUsername ?? '';
     _controller = TextEditingController(text: current);
     _hasText = current.isNotEmpty;
     _controller.addListener(() {
@@ -54,7 +54,7 @@ class _EditUsernameViewState extends ConsumerState<EditUsernameView> {
 
     if (success) {
       FocusScope.of(context).unfocus();
-      context.pop();
+      context.pop(username);
     } else {
       final error = ref.read(authNotifierProvider).errorMessage;
       context.showErrorSnackBar(error ?? '닉네임 변경에 실패했습니다.');
