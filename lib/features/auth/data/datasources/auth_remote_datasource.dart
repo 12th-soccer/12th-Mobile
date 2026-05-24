@@ -74,8 +74,9 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
   }
 
   @override
-  Future<void> deleteAccount() =>
-      _apiClient.deleteVoid(ApiEndpoints.deleteAccount);
+  Future<void> deleteAccount() async {
+    await _apiClient.deleteVoid(ApiEndpoints.deleteAccount);
+  }
 
   @override
   Future<void> updateUsername(String username) =>
