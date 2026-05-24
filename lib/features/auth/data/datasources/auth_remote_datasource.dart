@@ -90,11 +90,19 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
       return await _apiClient.get(
         ApiEndpoints.userInfo,
         decoder: (data) {
-          final json = data as Map<String, dynamic>;
+          final root = data as Map<String, dynamic>;
+          final nested = root['data'];
+          final json = nested is Map<String, dynamic> ? nested : root;
+          final rawUsername =
+              json['username'] ??
+              json['userName'] ??
+              json['nickname'] ??
+              json['nickName'] ??
+              json['name'];
           return UserInfo(
-            userId: json['userId'] as int,
-            email: json['email'] as String,
-            username: json['username'] as String?,
+            userId: int.tryParse('${json['userId'] ?? json['id'] ?? 0}') ?? 0,
+            email: (json['email'] ?? '').toString(),
+            username: rawUsername?.toString(),
           );
         },
       );

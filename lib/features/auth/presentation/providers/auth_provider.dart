@@ -49,6 +49,15 @@ class AuthNotifier extends Notifier<AuthState> {
   @override
   AuthState build() => const AuthState();
 
+  Future<void> _refreshUserInfoCache() async {
+    try {
+      ref.invalidate(userInfoProvider);
+      await ref.read(userInfoProvider.future);
+    } catch (_) {
+      ref.invalidate(userInfoProvider);
+    }
+  }
+
   Future<bool> sendVerificationEmail(String email) async {
     state = state.copyWith(status: AuthStatus.loading);
     try {
@@ -108,7 +117,7 @@ class AuthNotifier extends Notifier<AuthState> {
       await ref
           .read(_loginUseCaseProvider)
           .call(email: state.signUpEmail, password: password);
-      ref.invalidate(userInfoProvider);
+      await _refreshUserInfoCache();
       state = const AuthState(status: AuthStatus.success);
       return true;
     } on ApiException catch (e) {
@@ -132,7 +141,7 @@ class AuthNotifier extends Notifier<AuthState> {
       await ref
           .read(_loginUseCaseProvider)
           .call(email: email, password: password);
-      ref.invalidate(userInfoProvider);
+      await _refreshUserInfoCache();
       state = state.copyWith(status: AuthStatus.success);
       return true;
     } on ApiException catch (e) {
@@ -184,12 +193,14 @@ class AuthNotifier extends Notifier<AuthState> {
   Future<bool> updateUsername(String username) async {
     try {
       await ref.read(authRepositoryProvider).updateUsername(username);
-      ref.invalidate(userInfoProvider);
+      await _refreshUserInfoCache();
       return true;
     } on ApiException catch (e) {
-      final msg = e.statusCode == 404
-          ? '닉네임 변경에 실패했습니다. 다시 시도해 주세요.'
-          : _parseError(e);
+      final msg = switch (e.statusCode) {
+        404 => '닉네임 변경에 실패했습니다. 다시 시도해 주세요.',
+        409 => '이미 사용 중인 닉네임입니다.',
+        _ => _parseError(e),
+      };
       state = state.copyWith(status: AuthStatus.error, errorMessage: msg);
       return false;
     } catch (e) {
