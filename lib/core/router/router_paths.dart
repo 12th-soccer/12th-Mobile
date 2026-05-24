@@ -24,6 +24,7 @@ abstract final class AppRoutes {
   static const notifications = '/notifications';
   static const noSpoiler = '/no-spoiler';
   static const editUsername = '/edit-username';
+  static const myRecruitments = '/my-recruitments';
 
   // Fan Finder
   static const fanFinder = '/fan-finder';
