@@ -1,32 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/constants/spacing.dart';
-import 'package:twelfth_mobile/constants/text_style.dart';
-import 'package:go_router/go_router.dart';
+import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/features/auth/presentation/providers/auth_provider.dart';
 
-class ProfileView extends ConsumerWidget {
+class ProfileView extends ConsumerStatefulWidget {
   const ProfileView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfileView> createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends ConsumerState<ProfileView> {
+  String? _usernameOverride;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CustomColor.background,
       body: SafeArea(
         child: Column(
           children: [
-            _buildProfileHeader(ref),
-            _buildMenuList(context, ref),
+            _buildProfileHeader(),
+            _buildMenuList(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildProfileHeader(WidgetRef ref) {
+  Widget _buildProfileHeader() {
     final userInfoAsync = ref.watch(userInfoProvider);
 
     return Padding(
@@ -37,8 +45,23 @@ class ProfileView extends ConsumerWidget {
             width: 72,
             height: 72,
             decoration: const BoxDecoration(
-              color: CustomColor.gray500,
               shape: BoxShape.circle,
+            ),
+            child: ClipOval(
+              child: Image.asset(
+                'assets/images/profile.png',
+                width: 72,
+                height: 72,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  width: 72,
+                  height: 72,
+                  decoration: const BoxDecoration(
+                    color: CustomColor.gray500,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
             ),
           ),
           AppSpacing.h12,
@@ -52,22 +75,25 @@ class ProfileView extends ConsumerWidget {
               ),
             ),
             error: (_, __) => Text(
-              '정보를 불러올 수 없습니다',
-              style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
+              _usernameOverride ?? '정보를 불러올 수 없습니다',
+              style: CustomTextStyle.body2.copyWith(
+                color: _usernameOverride != null
+                    ? CustomColor.white
+                    : CustomColor.gray500,
+              ),
             ),
             data: (data) => Column(
               children: [
                 Text(
-                  data.username?.isNotEmpty == true ? data.username! : '닉네임',
+                  _usernameOverride ?? data.validUsername ?? '닉네임',
                   style: CustomTextStyle.heading2.copyWith(
-                    color: data.hasUsername ? CustomColor.white : CustomColor.gray500,
+                    color: (_usernameOverride ?? data.validUsername) != null
+                        ? CustomColor.white
+                        : CustomColor.gray500,
                   ),
                 ),
                 AppSpacing.h4,
-                Text(
-                  data.email,
-                  style: CustomTextStyle.body3,
-                ),
+                Text(data.email, style: CustomTextStyle.body3),
               ],
             ),
           ),
@@ -76,13 +102,24 @@ class ProfileView extends ConsumerWidget {
     );
   }
 
-  Widget _buildMenuList(BuildContext context, WidgetRef ref) {
+  Widget _buildMenuList() {
     return Column(
       children: [
         _buildMenuItem(
           icon: Symbols.badge,
           label: '닉네임 수정',
-          onTap: () => context.push(AppRoutes.editUsername),
+          onTap: () async {
+            final updated = await context.push<String>(AppRoutes.editUsername);
+            if (!mounted || updated == null || updated.trim().isEmpty) return;
+            setState(() => _usernameOverride = updated.trim());
+            ref.invalidate(userInfoProvider);
+            context.showSuccessSnackBar('닉네임이 변경되었습니다.');
+          },
+        ),
+        _buildMenuItem(
+          icon: Symbols.group,
+          label: '모임 모아보기',
+          onTap: () => context.push(AppRoutes.myRecruitments),
         ),
         _buildMenuItem(
           icon: Symbols.schedule,
@@ -99,20 +136,23 @@ class ProfileView extends ConsumerWidget {
           label: '로그아웃',
           onTap: () async {
             await ref.read(authNotifierProvider.notifier).logout();
-            if (context.mounted) context.go(AppRoutes.login);
+            if (mounted) {
+              setState(() => _usernameOverride = null);
+              context.go(AppRoutes.login);
+            }
           },
         ),
         _buildMenuItem(
           icon: Symbols.person_remove,
           label: '회원 탈퇴',
           color: CustomColor.red,
-          onTap: () => _showDeleteAccountDialog(context, ref),
+          onTap: () => _showDeleteAccountDialog(),
         ),
       ],
     );
   }
 
-  void _showDeleteAccountDialog(BuildContext context, WidgetRef ref) {
+  void _showDeleteAccountDialog() {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -126,25 +166,31 @@ class ProfileView extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              '취소',
-              style: CustomTextStyle.body1.copyWith(color: CustomColor.gray500),
-            ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(
+                  '취소',
+                  style: CustomTextStyle.body1.copyWith(
+                    color: CustomColor.gray500,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(ctx).pop();
+                  await ref.read(authNotifierProvider.notifier).deleteAccount();
+                  if (mounted) {
+                    setState(() => _usernameOverride = null);
+                    context.go(AppRoutes.login);
+                  }
+                },
+                child: Text(
+                  '탈퇴',
+                  style: CustomTextStyle.body1.copyWith(color: CustomColor.red),
+                ),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              await ref.read(authNotifierProvider.notifier).deleteAccount();
-              if (context.mounted) context.go(AppRoutes.login);
-            },
-            child: Text(
-              '탈퇴',
-              style: CustomTextStyle.body1.copyWith(color: CustomColor.red),
-            ),
-          ),
-        ],),
         ],
       ),
     );
@@ -165,10 +211,7 @@ class ProfileView extends ConsumerWidget {
           children: [
             Icon(icon, color: color, size: 22),
             AppSpacing.w12,
-            Text(
-              label,
-              style: CustomTextStyle.body1.copyWith(color: color),
-            ),
+            Text(label, style: CustomTextStyle.body1.copyWith(color: color)),
           ],
         ),
       ),
