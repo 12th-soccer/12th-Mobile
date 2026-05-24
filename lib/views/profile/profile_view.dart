@@ -157,9 +157,9 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: CustomColor.gray900,
-        title: Center(child: Text('회원 탈퇴', style: CustomTextStyle.heading2)),
+        title: Center(child: Text('회원 탈퇴', style: CustomTextStyle.heading1)),
         content: Text(
-          '계정 및 관련 데이터가 삭제됩니다.\n정말 탈퇴하시겠습니까?',
+          '계정 및 관련 데이터가 삭제되며, 동일 계정으로 다시는 해당 서비스에 가입할 수 없습니다.\n정말 탈퇴하시겠습니까?',
           style: CustomTextStyle.body1,
         ),
         actions: [
