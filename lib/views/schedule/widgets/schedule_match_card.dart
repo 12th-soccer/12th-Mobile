@@ -24,10 +24,15 @@ class ScheduleMatchCard extends ConsumerWidget {
     return MatchState.live;
   }
 
-  String get _timeStr =>
-      '${match.matchDate.hour.toString().padLeft(2, '0')}:${match.matchDate.minute.toString().padLeft(2, '0')}';
+  String get _timeStr {
+    final koreaTime = match.matchDate.add(const Duration(hours: 9));
+    return '${koreaTime.hour.toString().padLeft(2, '0')}:${koreaTime.minute.toString().padLeft(2, '0')}';
+  }
 
-  String get _dateStr => '${match.matchDate.month}/${match.matchDate.day}';
+  String get _dateStr {
+    final koreaTime = match.matchDate.add(const Duration(hours: 9));
+    return '${koreaTime.month}/${koreaTime.day}';
+  }
 
   void _onTap(BuildContext context, WidgetRef ref) {
     ref.read(revealedMatchesProvider.notifier).reveal(match.matchId.toString());
@@ -76,8 +81,9 @@ class _LiveCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final koreaTime = match.matchDate.add(const Duration(hours: 9));
     final timeStr =
-        '${match.matchDate.hour.toString().padLeft(2, '0')}:${match.matchDate.minute.toString().padLeft(2, '0')}';
+        '${koreaTime.hour.toString().padLeft(2, '0')}:${koreaTime.minute.toString().padLeft(2, '0')}';
     final scoreStr = match.homeTeamScore != null && match.awayTeamScore != null
         ? '${match.homeTeamScore} : ${match.awayTeamScore}'
         : '- : -';
