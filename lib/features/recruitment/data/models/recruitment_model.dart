@@ -14,6 +14,8 @@ class RecruitmentModel {
   final String? noticeId;
   final DateTime? expiredAt;
   final DateTime? createdDate;
+  final int? hostId;
+  final String? hostName;
 
   const RecruitmentModel({
     this.id,
@@ -28,6 +30,8 @@ class RecruitmentModel {
     this.noticeId,
     this.expiredAt,
     this.createdDate,
+    this.hostId,
+    this.hostName,
   });
 
   factory RecruitmentModel.fromJson(Map<String, dynamic> json) =>
@@ -41,13 +45,15 @@ class RecruitmentModel {
         genderGroup: json['genderGroup'] as String? ?? 'ANY',
         k1Group: json['k1Group'] as String?,
         k2Group: json['k2Group'] as String?,
-        noticeId: json['noticeId']?.toString(),
+        noticeId: json['notice_id']?.toString(),
         expiredAt: json['expiredAt'] != null
             ? DateTime.tryParse(json['expiredAt'] as String)
             : null,
         createdDate: json['createdDate'] != null
             ? DateTime.tryParse(json['createdDate'] as String)
             : null,
+        hostId: json['hostId'] as int?,
+        hostName: json['hostName'] as String?,
       );
 
   factory RecruitmentModel.fromEntity(Recruitment entity) => RecruitmentModel(
@@ -61,6 +67,8 @@ class RecruitmentModel {
         k1Group: entity.isK1 ? entity.teamCode : null,
         k2Group: entity.isK1 ? null : entity.teamCode,
         expiredAt: entity.expiryDate,
+        hostId: entity.authorId,
+        hostName: entity.authorName,
       );
 
   Map<String, dynamic> toJson() {
@@ -92,5 +100,7 @@ class RecruitmentModel {
         teamDisplayName: null,
         noticeId: noticeId,
         expiryDate: expiredAt,
+        authorId: hostId,
+        authorName: hostName,
       );
 }

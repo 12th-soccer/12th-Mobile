@@ -32,4 +32,8 @@ class RecruitmentRepositoryImpl implements IRecruitmentRepository {
   @override
   Future<void> joinRecruitment(String id) =>
       _dataSource.joinRecruitment(id);
+
+  @override
+  Future<void> createNoticeRoom(String recruitmentId, String description) =>
+      _dataSource.createNoticeRoom(recruitmentId, description);
 }

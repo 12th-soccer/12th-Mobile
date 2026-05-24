@@ -7,6 +7,7 @@ abstract interface class IRecruitmentRemoteDataSource {
   Future<RecruitmentModel> getRecruitmentDetail(String id);
   Future<void> createRecruitment(RecruitmentModel model);
   Future<void> joinRecruitment(String id);
+  Future<void> createNoticeRoom(String recruitmentId, String description);
 }
 
 class RecruitmentRemoteDataSourceImpl implements IRecruitmentRemoteDataSource {
@@ -19,7 +20,7 @@ class RecruitmentRemoteDataSourceImpl implements IRecruitmentRemoteDataSource {
     int size = 10,
   }) async {
     return await _apiClient.get(
-      ApiEndpoints.recruitments(page: page, size: size),
+      ApiEndpoints.recruitments(page: page, size: size, sort: 'createdAt,desc'),
       decoder: (data) {
         final json = data as Map<String, dynamic>;
         final list = json['content'] as List<dynamic>? ?? [];
@@ -41,14 +42,24 @@ class RecruitmentRemoteDataSourceImpl implements IRecruitmentRemoteDataSource {
 
   @override
   Future<void> createRecruitment(RecruitmentModel model) async {
+    final jsonData = model.toJson();
+
     await _apiClient.postVoid(
       ApiEndpoints.recruitmentCreate,
-      data: model.toJson(),
+      data: jsonData,
     );
   }
 
   @override
   Future<void> joinRecruitment(String id) async {
     await _apiClient.postVoid(ApiEndpoints.joinRecruitment(id));
+  }
+
+  @override
+  Future<void> createNoticeRoom(String recruitmentId, String description) async {
+    await _apiClient.postVoid(
+      ApiEndpoints.noticeCreate(recruitmentId),
+      data: {'description': description},
+    );
   }
 }

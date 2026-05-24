@@ -5,4 +5,5 @@ abstract interface class IRecruitmentRepository {
   Future<Recruitment> getRecruitmentDetail(String id);
   Future<void> createRecruitment(Recruitment recruitment);
   Future<void> joinRecruitment(String id);
+  Future<void> createNoticeRoom(String recruitmentId, String description);
 }

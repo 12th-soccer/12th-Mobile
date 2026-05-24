@@ -65,12 +65,18 @@ final recruitmentDetailProvider =
   return ref.read(recruitmentRepositoryProvider).getRecruitmentDetail(id);
 });
 
-Future<void> createRecruitment(WidgetRef ref, Recruitment recruitment) {
-  return ref
+Future<void> createRecruitment(WidgetRef ref, Recruitment recruitment) async {
+  await ref
       .read(recruitmentRepositoryProvider)
       .createRecruitment(recruitment);
+
+  await ref.read(recruitmentListProvider.notifier).refresh();
 }
 
 Future<void> joinRecruitment(WidgetRef ref, String id) {
   return ref.read(recruitmentRepositoryProvider).joinRecruitment(id);
+}
+
+Future<void> createNoticeRoom(WidgetRef ref, String recruitmentId, String description) {
+  return ref.read(recruitmentRepositoryProvider).createNoticeRoom(recruitmentId, description);
 }

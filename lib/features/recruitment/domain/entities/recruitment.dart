@@ -13,6 +13,8 @@ class Recruitment {
   final String? teamDisplayName;
   final DateTime? expiryDate;
   final String? noticeId;
+  final int? authorId;
+  final String? authorName;
 
   const Recruitment({
     this.id,
@@ -27,6 +29,8 @@ class Recruitment {
     this.teamDisplayName,
     this.expiryDate,
     this.noticeId,
+    this.authorId,
+    this.authorName,
   });
 
   bool get isFull =>
