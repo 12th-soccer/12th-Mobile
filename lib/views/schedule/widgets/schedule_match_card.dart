@@ -204,9 +204,21 @@ class _NormalRow extends StatelessWidget {
           ],
         );
       } else {
-        centerWidget = Text(
-          '${match.homeTeamScore} : ${match.awayTeamScore}',
-          style: CustomTextStyle.heading3,
+        centerWidget = Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '${match.homeTeamScore} : ${match.awayTeamScore}',
+              style: CustomTextStyle.heading3,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              timeStr,
+              style: CustomTextStyle.body3.copyWith(
+                color: CustomColor.gray500,
+              ),
+            ),
+          ],
         );
       }
     } else {
