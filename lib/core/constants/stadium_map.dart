@@ -20,14 +20,12 @@ abstract final class StadiumMap {
     '충남 아산 프로축구단': '이순신종합운동장',
     '안산 그리너스': '안산와~스타디움',
     '김포FC': '김포솔터축구장',
-    '화성FC': '화성종합경기타운주경기장',
     '충북청주FC': '청주종합운동장',
     '전남 드래곤즈': '광양전용구장',
     '광주FC': '광주축구전용경기장',
-    '용인FC': '용인미르스타디움',
-    '김해FC2008': '김해스포츠센터',
-    '파주프런티어FC': '파주스타디움',
     '천안시티FC': '천안종합운동장',
+    '용인FC': '용인미르스타디움',
+    'Yongin City': '용인미르스타디움',
   };
 
   static String? lookup(String teamName) {
@@ -38,6 +36,7 @@ abstract final class StadiumMap {
     }
     return null;
   }
+
   static Uri naverMapUri(String stadiumName) {
     return Uri.parse(
       'nmap://search?query=${Uri.encodeComponent(stadiumName)}&appname=com.example.twelfth_mobile',

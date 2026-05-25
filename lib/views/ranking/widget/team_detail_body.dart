@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:twelfth_mobile/core/constants/stadium_map.dart';
@@ -69,12 +70,12 @@ class TeamDetailBody extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
             child: Column(
               children: [
-                NetworkAvatar(imageUrl: detail.imageUrl, size: 100),
-                const SizedBox(height: 16),
+                NetworkAvatar(imageUrl: detail.logo, size: 100),
+                AppSpacing.h16,
                 Text(detail.clubName, style: CustomTextStyle.heading1),
-                const SizedBox(height: 8),
+                AppSpacing.h8,
                 GestureDetector(
-                  onTap: () => _openStadium(detail.stadiumName),
+                  onTap: () => _openStadium(detail.venueName),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -84,9 +85,9 @@ class TeamDetailBody extends StatelessWidget {
                         color: CustomColor.main,
                         fill: 1,
                       ),
-                      const SizedBox(width: 4),
+                      AppSpacing.w4,
                       Text(
-                        detail.stadiumName,
+                        detail.venueName,
                         style: CustomTextStyle.body3.copyWith(
                           color: CustomColor.main,
                         ),
@@ -124,7 +125,7 @@ class TeamDetailBody extends StatelessWidget {
           ),
 
           _SectionHeader(title: '일정'),
-          const SizedBox(height: 4),
+          AppSpacing.h4,
           if (upcoming.isNotEmpty)
             MatchPager(
               matches: upcoming,
@@ -134,10 +135,10 @@ class TeamDetailBody extends StatelessWidget {
             )
           else
             _EmptySection(message: '해당 구단의 경기 일정이 없습니다.'),
-          const SizedBox(height: 24),
+          AppSpacing.h24,
 
           _SectionHeader(title: '경기 내역'),
-          const SizedBox(height: 4),
+          AppSpacing.h4,
           if (past.isNotEmpty)
             MatchPager(
               matches: past,
@@ -147,9 +148,9 @@ class TeamDetailBody extends StatelessWidget {
             )
           else
             _EmptySection(message: '해당 구단의 경기 내역이 없습니다.'),
-          const SizedBox(height: 24),
+          AppSpacing.h24,
 
-          const SizedBox(height: 16),
+          AppSpacing.h16,
         ],
       ),
     );

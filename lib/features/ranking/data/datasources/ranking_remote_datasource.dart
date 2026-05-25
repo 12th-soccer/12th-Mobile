@@ -7,20 +7,26 @@ import 'package:twelfth_mobile/features/ranking/domain/entities/player_detail.da
 import 'package:twelfth_mobile/features/ranking/domain/entities/player_goal.dart';
 
 abstract interface class IRankingRemoteDataSource {
-  Future<List<ClubRankingModel>> getRanking(String leagueType);
+  Future<List<ClubRankingModel>> getRanking(String leagueType, String season);
   Future<ClubDetailModel> getClubDetail(int clubId);
   Future<PlayerDetail> getPlayerDetail(int playerId);
-  Future<List<PlayerGoal>> getPlayerGoals(int playerId);
+  Future<PlayerGoal?> getPlayerGoals(int playerId);
 }
 
 class RankingRemoteDataSourceImpl implements IRankingRemoteDataSource {
   final ApiClient _apiClient;
   const RankingRemoteDataSourceImpl(this._apiClient);
 
+  static String _toLeagueParam(String leagueType) {
+    if (leagueType == 'K1') return 'kleague1';
+    if (leagueType == 'K2') return 'kleague2';
+    return leagueType;
+  }
+
   @override
-  Future<List<ClubRankingModel>> getRanking(String leagueType) async {
+  Future<List<ClubRankingModel>> getRanking(String leagueType, String season) async {
     try {
-      final url = ApiEndpoints.ranking(leagueType);
+      final url = ApiEndpoints.ranking(season, _toLeagueParam(leagueType));
       return await _apiClient.get(
         url,
         decoder: (data) {
@@ -43,7 +49,7 @@ class RankingRemoteDataSourceImpl implements IRankingRemoteDataSource {
   Future<ClubDetailModel> getClubDetail(int clubId) async {
     try {
       return await _apiClient.get(
-        ApiEndpoints.club(clubId.toString()),
+        ApiEndpoints.team(clubId.toString()),
         decoder: (data) =>
             ClubDetailModel.fromJson(data as Map<String, dynamic>),
       );
@@ -58,12 +64,13 @@ class RankingRemoteDataSourceImpl implements IRankingRemoteDataSource {
   Future<PlayerDetail> getPlayerDetail(int playerId) async {
     try {
       return await _apiClient.get(
-        ApiEndpoints.player(playerId.toString()),
+        ApiEndpoints.player(playerId.toString(), season: _currentSeason),
         decoder: (data) {
           final json = data as Map<String, dynamic>;
           final rawName = json['name'] as String? ?? '';
-          final rawImageUrl = json['playerImageUrl'] as String?;
-          final isSwapped = rawName.startsWith('http');
+          final photo = json['photo'] as String?;
+          final rawImageUrl = photo ?? json['playerImageUrl'] as String?;
+          final isSwapped = photo == null && rawName.startsWith('http');
           return PlayerDetail(
             playerId: json['playerId'] as int,
             name: isSwapped ? (rawImageUrl ?? '') : rawName,
@@ -71,7 +78,7 @@ class RankingRemoteDataSourceImpl implements IRankingRemoteDataSource {
             age: json['age'] as int?,
             position: json['position'] as String?,
             number: json['number'] as int?,
-            clubName: json['clubName'] as String?,
+            clubName: (json['teamName'] ?? json['clubName']) as String?,
           );
         },
       );
@@ -82,31 +89,30 @@ class RankingRemoteDataSourceImpl implements IRankingRemoteDataSource {
     }
   }
 
+  static String get _currentSeason => DateTime.now().year.toString();
+
   @override
-  Future<List<PlayerGoal>> getPlayerGoals(int playerId) async {
-    try {
-      return await _apiClient.get(
-        ApiEndpoints.goal(playerId.toString()),
-        decoder: (data) {
-          if (data == null) return <PlayerGoal>[];
-          final list = data as List<dynamic>;
-          return list
-              .map(
-                (e) =>
-                    PlayerGoalModel.fromJson(e as Map<String, dynamic>)
-                        .toEntity(),
-              )
-              .toList();
-        },
-      );
-    } on ApiException catch (e) {
-      final status = e.statusCode;
-      if (status == 400 || status == 404 || (status != null && status >= 500)) {
-        return [];
+  Future<PlayerGoal?> getPlayerGoals(int playerId) async {
+    final season = _currentSeason;
+    for (final league in const ['kleague1', 'kleague2']) {
+      try {
+        final result = await _apiClient.get(
+          ApiEndpoints.goals(playerId.toString(), season, league),
+          decoder: (data) {
+            if (data == null) return null;
+            return PlayerGoalModel.fromJson(data as Map<String, dynamic>)
+                .toEntity();
+          },
+        );
+        if (result != null) return result;
+      } on ApiException catch (e) {
+        final status = e.statusCode;
+        if (status == 400 || status == 401 || status == 404) continue;
+        rethrow;
+      } catch (_) {
+        rethrow;
       }
-      rethrow;
-    } catch (_) {
-      rethrow;
     }
+    return null;
   }
 }

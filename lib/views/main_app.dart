@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/bottom_nav/twelfth_bottom_nav_bar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/core/services/fcm_service.dart';
 
 class TwelfthMainApp extends ConsumerStatefulWidget {
@@ -33,6 +35,13 @@ class _TwelfthMainAppState extends ConsumerState<TwelfthMainApp> {
         onTap: (index) {
           widget.navigationShell.goBranch(index, initialLocation: true);
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push(AppRoutes.fanFinder),
+        backgroundColor: CustomColor.main,
+        shape: const CircleBorder(),
+        tooltip: '팬 찾기',
+        child: const Icon(Symbols.group, color: CustomColor.black, size: 26),
       ),
     );
   }

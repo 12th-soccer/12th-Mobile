@@ -1,5 +1,5 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
 import 'package:twelfth_mobile/constants/twelfth_assets.dart';
@@ -42,7 +42,7 @@ class _TwelfthSplashViewState extends State<TwelfthSplashView> {
     if (!_checked || _hasToken) {
       return Scaffold(
         backgroundColor: CustomColor.background,
-        body: Center(child: SvgPicture.asset(TwelfthAssets.logo)),
+        body: Center(child: Image.asset(TwelfthAssets.logo, width: 160)),
       );
     }
 
@@ -50,11 +50,11 @@ class _TwelfthSplashViewState extends State<TwelfthSplashView> {
       backgroundColor: CustomColor.background,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: AppPadding.pageH,
           child: Column(
             children: [
               const Spacer(),
-              SvgPicture.asset(TwelfthAssets.logo),
+              Image.asset(TwelfthAssets.logo, width: 160),
               const Spacer(),
               TwelfthElevatedButton(
                 onPressed: () => context.go(AppRoutes.login),

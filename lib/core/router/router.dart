@@ -22,7 +22,15 @@ import 'package:twelfth_mobile/core/router/player_route_args.dart';
 import 'package:twelfth_mobile/core/router/team_route_args.dart';
 import 'package:twelfth_mobile/views/ranking/team_detail_view.dart';
 import 'package:twelfth_mobile/views/schedule/schedule_view.dart';
+import 'package:twelfth_mobile/views/fan_finder/chat/chat_view.dart';
+import 'package:twelfth_mobile/views/fan_finder/fan_finder_detail_view.dart';
+import 'package:twelfth_mobile/views/fan_finder/fan_finder_view.dart';
+import 'package:twelfth_mobile/views/fan_finder/fan_finder_write_view.dart';
+import 'package:twelfth_mobile/features/recruitment/domain/entities/recruitment.dart';
+import 'package:twelfth_mobile/views/profile/edit_username_view.dart';
+import 'package:twelfth_mobile/views/profile/my_recruitments_view.dart';
 import 'package:twelfth_mobile/views/splash_view.dart';
+import 'package:twelfth_mobile/views/phone_verification/phone_verification_view.dart';
 
 final appRouter = GoRouter(
   initialLocation: AppRoutes.splash,
@@ -155,6 +163,40 @@ final appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.noSpoiler,
       builder: (context, state) => const NoSpoilerSettingsView(),
+    ),
+    GoRoute(
+      path: AppRoutes.editUsername,
+      builder: (context, state) => const EditUsernameView(),
+    ),
+    GoRoute(
+      path: AppRoutes.myRecruitments,
+      builder: (context, state) => const MyRecruitmentsView(),
+    ),
+    GoRoute(
+      path: AppRoutes.phoneVerification,
+      builder: (context, state) => const PhoneVerificationView(),
+    ),
+    GoRoute(
+      path: AppRoutes.fanFinder,
+      builder: (context, state) => const FanFinderView(),
+    ),
+    GoRoute(
+      path: AppRoutes.fanFinderWrite,
+      builder: (context, state) => const FanFinderWriteView(),
+    ),
+    GoRoute(
+      path: AppRoutes.fanFinderDetail,
+      builder: (context, state) {
+        final recruitment = state.extra as Recruitment;
+        return FanFinderDetailView(recruitment: recruitment);
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.fanFinderChat,
+      builder: (context, state) {
+        final recruitment = state.extra as Recruitment;
+        return ChatView(recruitment: recruitment);
+      },
     ),
   ],
 );

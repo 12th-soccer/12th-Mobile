@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
 import 'package:twelfth_mobile/common/components/title/twelfth_accent_title.dart';
-import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/features/auth/presentation/providers/auth_provider.dart';
@@ -56,7 +56,7 @@ class _SignUpEmailViewState extends ConsumerState<SignUpEmailView> {
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: AppPadding.screenH,
             child: Form(
               key: _formKey,
               child: Column(
@@ -110,6 +110,7 @@ class _SignUpEmailViewState extends ConsumerState<SignUpEmailView> {
                       );
                     },
                   ),
+                  AppSpacing.h48,
                 ],
               ),
             ),

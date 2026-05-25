@@ -5,6 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/core/router/player_route_args.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/core/router/team_route_args.dart';
@@ -23,10 +24,10 @@ class _FavoritesViewState extends ConsumerState<FavoritesView> {
   int _tabIndex = 0;
   final List<String> _tabs = ['구단', '선수'];
 
-  static const _horizontalSpacing = SizedBox(width: 10);
+  static const _horizontalSpacing = AppSpacing.w10;
 
-  static const _itemPadding = EdgeInsets.all(16);
-  static const _listPadding = EdgeInsets.symmetric(vertical: 8);
+  static const _itemPadding = AppPadding.item16;
+  static const _listPadding = AppPadding.listV;
 
   TextStyle get _emptyTextStyle => CustomTextStyle.body1;
 
@@ -233,12 +234,12 @@ class _FavoritesViewState extends ConsumerState<FavoritesView> {
             message,
             style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
           ),
-          const SizedBox(height: 16),
+          AppSpacing.h16,
           GestureDetector(
             onTap: onRetry,
             child: Text(
               '다시 시도',
-              style: CustomTextStyle.body2.copyWith(color: CustomColor.white),
+              style: CustomTextStyle.body2,
             ),
           ),
         ],

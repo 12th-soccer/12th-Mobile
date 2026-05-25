@@ -1,5 +1,4 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/core/services/local_notification_service.dart';
 import 'package:twelfth_mobile/features/alarm/presentation/providers/alarm_provider.dart';
@@ -37,6 +36,6 @@ abstract final class FcmService {
   }
 
   static Future<void> _registerToken(WidgetRef ref, String token) async {
-    await ref.read(alarmRemoteDataSourceProvider).registerFcmToken(token);
+    await registerFcmToken(ref, token);
   }
 }

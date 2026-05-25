@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
@@ -11,6 +12,7 @@ class ScheduleCalendar extends StatelessWidget {
     required this.onPrevMonth,
     required this.onNextMonth,
     required this.onDateSelected,
+    required this.onHeaderTap,
   });
 
   final DateTime focusedMonth;
@@ -18,6 +20,7 @@ class ScheduleCalendar extends StatelessWidget {
   final VoidCallback onPrevMonth;
   final VoidCallback onNextMonth;
   final ValueChanged<DateTime> onDateSelected;
+  final VoidCallback? onHeaderTap;
 
   static const _weekLabels = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -30,7 +33,7 @@ class ScheduleCalendar extends StatelessWidget {
     final prevMonthDays = DateTime(year, month, 0).day;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: AppPadding.cardH,
       child: Column(
         children: [
           Padding(
@@ -50,7 +53,10 @@ class ScheduleCalendar extends StatelessWidget {
                     ),
                   ),
                 ),
-                Text('$month월', style: CustomTextStyle.heading2),
+                GestureDetector(
+                  onTap: onHeaderTap,
+                  child: Text('$year년 $month월', style: CustomTextStyle.heading2),
+                ),
                 GestureDetector(
                   onTap: onNextMonth,
                   behavior: HitTestBehavior.opaque,

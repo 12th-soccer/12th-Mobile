@@ -20,6 +20,9 @@ abstract interface class IAuthRemoteDataSource {
   Future<void> logout();
 
   Future<UserInfo> getUserInfo();
+
+  Future<void> deleteAccount();
+  Future<void> updateUsername(String username);
 }
 
 class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
@@ -51,10 +54,18 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
     required String code,
     required String password,
   }) async {
-    await _apiClient.postVoid(
+    final result = await _apiClient.post<dynamic>(
       ApiEndpoints.signUp,
       data: {'email': email, 'code': code, 'password': password},
+      decoder: (data) => data,
     );
+    if (result == false) {
+      throw const ApiException(
+        type: ApiErrorType.badResponse,
+        statusCode: 400,
+        message: '회원가입에 실패했습니다. 인증번호를 확인해 주세요.',
+      );
+    }
   }
 
   @override
@@ -63,15 +74,36 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
   }
 
   @override
+  Future<void> deleteAccount() async {
+    await _apiClient.deleteVoid(ApiEndpoints.deleteAccount);
+  }
+
+  @override
+  Future<void> updateUsername(String username) =>
+      _apiClient.patchVoid(
+        ApiEndpoints.updateUsername,
+        data: {'username': username},
+      );
+
+  @override
   Future<UserInfo> getUserInfo() async {
     try {
       return await _apiClient.get(
         ApiEndpoints.userInfo,
         decoder: (data) {
-          final json = data as Map<String, dynamic>;
+          final root = data as Map<String, dynamic>;
+          final nested = root['data'];
+          final json = nested is Map<String, dynamic> ? nested : root;
+          final rawUsername =
+              json['username'] ??
+              json['userName'] ??
+              json['nickname'] ??
+              json['nickName'] ??
+              json['name'];
           return UserInfo(
-            userId: json['userId'] as int,
-            email: json['email'] as String,
+            userId: int.tryParse('${json['userId'] ?? json['id'] ?? 0}') ?? 0,
+            email: (json['email'] ?? '').toString(),
+            username: rawUsername?.toString(),
           );
         },
       );

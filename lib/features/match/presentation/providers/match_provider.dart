@@ -1,10 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/core/network/api_client.dart';
+import 'package:twelfth_mobile/core/network/api_endpoints.dart';
 import 'package:twelfth_mobile/core/network/dio.dart';
+import 'package:twelfth_mobile/core/providers/player_cache_provider.dart';
 import 'package:twelfth_mobile/features/match/data/datasources/match_remote_datasource.dart';
 import 'package:twelfth_mobile/features/match/data/repositories/match_repository_impl.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match_event.dart';
+import 'package:twelfth_mobile/features/match/domain/entities/match_lineup.dart';
 import 'package:twelfth_mobile/features/match/domain/repositories/i_match_repository.dart';
 import 'package:twelfth_mobile/features/match/domain/usecases/match_usecases.dart';
 
@@ -32,15 +35,75 @@ final _getMatchEventsUseCaseProvider = Provider<GetMatchEventsUseCase>(
   (ref) => GetMatchEventsUseCase(ref.read(matchRepositoryProvider)),
 );
 
-final matchesByDateProvider = FutureProvider.family<List<Match>, String>((
-  ref,
-  date,
-) {
-  return ref.read(_getMatchesByDateUseCaseProvider).call(date);
-});
+final _getMatchLineupsUseCaseProvider = Provider<GetMatchLineupsUseCase>(
+  (ref) => GetMatchLineupsUseCase(ref.read(matchRepositoryProvider)),
+);
+
+typedef MatchesByDateArgs = ({String date, String leagueType});
+
+final matchesByDateProvider =
+    FutureProvider.family<List<Match>, MatchesByDateArgs>((ref, args) {
+      return ref
+          .read(_getMatchesByDateUseCaseProvider)
+          .call(args.date, args.leagueType);
+    });
 
 final matchDetailProvider = FutureProvider.family<Match, int>((ref, matchId) {
   return ref.read(_getMatchDetailUseCaseProvider).call(matchId);
+});
+
+final enhancedMatchDetailProvider = FutureProvider.family<Match, int>((
+  ref,
+  matchId,
+) async {
+  try {
+    final detailMatch = await ref
+        .read(_getMatchDetailUseCaseProvider)
+        .call(matchId);
+
+    final matchDate = detailMatch.matchDate;
+    final dateKey =
+        '${matchDate.year}-${matchDate.month.toString().padLeft(2, '0')}-${matchDate.day.toString().padLeft(2, '0')}';
+
+    try {
+      final k1Matches = await ref
+          .read(_getMatchesByDateUseCaseProvider)
+          .call(dateKey, 'K1');
+      final k2Matches = await ref
+          .read(_getMatchesByDateUseCaseProvider)
+          .call(dateKey, 'K2');
+
+      final allMatches = [...k1Matches, ...k2Matches];
+
+      final dateMatch = allMatches.firstWhere(
+        (m) =>
+            m.matchId == matchId ||
+            (m.homeTeamName == detailMatch.homeTeamName &&
+                m.awayTeamName == detailMatch.awayTeamName),
+        orElse: () => detailMatch,
+      );
+
+      final hasDetailScore =
+          detailMatch.homeTeamScore != null &&
+          detailMatch.awayTeamScore != null;
+      final hasDateScore =
+          dateMatch.homeTeamScore != null && dateMatch.awayTeamScore != null;
+
+      if (hasDateScore && !hasDetailScore) {
+        return dateMatch;
+      }
+
+      if (hasDateScore && hasDetailScore) {
+        return dateMatch;
+      }
+
+      return detailMatch;
+    } catch (e) {
+      return detailMatch;
+    }
+  } catch (e) {
+    rethrow;
+  }
 });
 
 final matchEventsProvider = FutureProvider.family<List<MatchEvent>, int>((
@@ -49,3 +112,12 @@ final matchEventsProvider = FutureProvider.family<List<MatchEvent>, int>((
 ) {
   return ref.read(_getMatchEventsUseCaseProvider).call(matchId);
 });
+
+final matchLineupsProvider = FutureProvider.family<List<MatchLineup>, int>((
+  ref,
+  matchId,
+) {
+  return ref.read(_getMatchLineupsUseCaseProvider).call(matchId);
+});
+
+final playerImageProvider = enhancedPlayerImageProvider;

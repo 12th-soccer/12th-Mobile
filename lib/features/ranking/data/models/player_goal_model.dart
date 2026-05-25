@@ -1,38 +1,33 @@
 import 'package:twelfth_mobile/features/ranking/domain/entities/player_goal.dart';
 
 class PlayerGoalModel {
-  final int id;
   final int playerId;
   final String playerName;
-  final DateTime matchDate;
-  final int goalTime;
-  final String? goalType;
+  final int season;
+  final String league;
+  final int goalCount;
 
   const PlayerGoalModel({
-    required this.id,
     required this.playerId,
     required this.playerName,
-    required this.matchDate,
-    required this.goalTime,
-    this.goalType,
+    required this.season,
+    required this.league,
+    required this.goalCount,
   });
 
-  factory PlayerGoalModel.fromJson(Map<String, dynamic> json) =>
-      PlayerGoalModel(
-        id: json['id'] as int,
+  factory PlayerGoalModel.fromJson(Map<String, dynamic> json) => PlayerGoalModel(
         playerId: json['playerId'] as int,
         playerName: json['playerName'] as String,
-        matchDate: DateTime.parse(json['matchDate'] as String),
-        goalTime: json['goalTime'] as int,
-        goalType: json['goalType'] as String?,
+        season: json['season'] as int,
+        league: json['league'] as String,
+        goalCount: json['goalCount'] as int,
       );
 
   PlayerGoal toEntity() => PlayerGoal(
-        id: id,
         playerId: playerId,
         playerName: playerName,
-        matchDate: matchDate,
-        goalTime: goalTime,
-        goalType: goalType,
+        season: season,
+        league: league,
+        goalCount: goalCount,
       );
 }

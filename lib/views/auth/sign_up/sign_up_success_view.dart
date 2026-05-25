@@ -3,7 +3,7 @@ import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
-import 'package:twelfth_mobile/core/router/router.dart';
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 
 class SignUpSuccessView extends StatelessWidget {
@@ -15,7 +15,7 @@ class SignUpSuccessView extends StatelessWidget {
       backgroundColor: CustomColor.background,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: AppPadding.screenH,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,7 +25,7 @@ class SignUpSuccessView extends StatelessWidget {
                 '회원가입 성공',
                 style: CustomTextStyle.heading1,
               ),
-              const SizedBox(height: 10),
+              AppSpacing.h10,
               Text(
                 '12th에 오신 것을 환영합니다.\n시작 전 간단한 설문을 진행할게요.',
                 style: CustomTextStyle.body2.copyWith(
@@ -43,6 +43,7 @@ class SignUpSuccessView extends StatelessWidget {
                 },
                 child: const Text('다음'),
               ),
+              AppSpacing.h48,
             ],
           ),
         ),

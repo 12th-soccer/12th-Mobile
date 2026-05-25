@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -69,7 +70,7 @@ class PlayerDetailView extends ConsumerWidget {
 
   Widget _buildBody(
     PlayerDetail detail,
-    AsyncValue<List<PlayerGoal>> goalsAsync,
+    AsyncValue<PlayerGoal?> goalsAsync,
   ) {
     return SingleChildScrollView(
       child: Padding(
@@ -78,11 +79,11 @@ class PlayerDetailView extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(child: NetworkAvatar(imageUrl: detail.imageUrl, size: 100)),
-            const SizedBox(height: 16),
+            AppSpacing.h16,
             Center(child: Text(detail.name, style: CustomTextStyle.heading1)),
-            const SizedBox(height: 24),
+            AppSpacing.h24,
             _InfoGrid(detail: detail),
-            const SizedBox(height: 32),
+            AppSpacing.h48,
             _GoalsSection(goalsAsync: goalsAsync),
           ],
         ),
@@ -143,7 +144,7 @@ class _InfoCell extends StatelessWidget {
           label,
           style: CustomTextStyle.body3.copyWith(color: CustomColor.gray500),
         ),
-        const SizedBox(height: 4),
+        AppSpacing.h4,
         Text(value!, style: CustomTextStyle.body1),
       ],
     );
@@ -151,7 +152,7 @@ class _InfoCell extends StatelessWidget {
 }
 
 class _GoalsSection extends StatelessWidget {
-  final AsyncValue<List<PlayerGoal>> goalsAsync;
+  final AsyncValue<PlayerGoal?> goalsAsync;
 
   const _GoalsSection({required this.goalsAsync});
 
@@ -161,7 +162,7 @@ class _GoalsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('골 기록', style: CustomTextStyle.heading2),
-        const SizedBox(height: 16),
+        AppSpacing.h16,
         goalsAsync.when(
           loading: () => const Center(
             child: CircularProgressIndicator(color: CustomColor.white),
@@ -170,35 +171,25 @@ class _GoalsSection extends StatelessWidget {
             '골 기록이 없습니다',
             style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
           ),
-          data: (goals) {
-            if (goals.isEmpty) {
+          data: (goal) {
+            if (goal == null || goal.goalCount == 0) {
               return Text(
                 '골 기록이 없습니다',
-                style: CustomTextStyle.body2.copyWith(
-                  color: CustomColor.gray500,
-                ),
+                style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
               );
             }
-            return ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: goals.length,
-              itemBuilder: (context, index) {
-                final goal = goals[index];
-                final dateStr =
-                    '${goal.matchDate.year}. ${goal.matchDate.month.toString().padLeft(2, '0')}. ${goal.matchDate.day.toString().padLeft(2, '0')}';
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(dateStr, style: CustomTextStyle.body2),
-                      ),
-                      Text("골 ${goal.goalTime}'", style: CustomTextStyle.body2),
-                    ],
-                  ),
-                );
-              },
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${goal.season}시즌',
+                  style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
+                ),
+                Text(
+                  '${goal.goalCount}골',
+                  style: CustomTextStyle.body1,
+                ),
+              ],
             );
           },
         ),

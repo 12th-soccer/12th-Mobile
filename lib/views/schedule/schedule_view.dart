@@ -2,11 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
-import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/features/favorites/presentation/providers/favorites_provider.dart';
 import 'package:twelfth_mobile/features/match/presentation/providers/match_provider.dart';
 import 'package:twelfth_mobile/views/schedule/widgets/league_tabs.dart';
@@ -65,8 +63,12 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
     );
   }
 
+  String get _leagueType => _leagueTabIndex == 0 ? 'K1' : 'K2';
+
   Future<void> _onRefresh() async {
-    ref.invalidate(matchesByDateProvider(_dateKey));
+    ref.invalidate(
+      matchesByDateProvider((date: _dateKey, leagueType: _leagueType)),
+    );
     _resetToToday();
   }
 
@@ -77,7 +79,6 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
       body: SafeArea(
         child: Column(
           children: [
-            _buildSearchBar(context),
             const SizedBox(height: 20),
             ScheduleCalendar(
               focusedMonth: _focusedMonth,
@@ -95,6 +96,7 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
                 ),
               ),
               onDateSelected: (date) => setState(() => _selectedDate = date),
+              onHeaderTap: _resetToToday,
             ),
             LeagueTabs(
               selectedIndex: _leagueTabIndex,
@@ -107,43 +109,10 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
     );
   }
 
-  Widget _buildSearchBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: GestureDetector(
-        onTap: () => context.push(AppRoutes.search),
-        child: Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: CustomColor.gray800,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: CustomColor.gray800),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Row(
-            children: [
-              const Icon(
-                Symbols.search,
-                color: CustomColor.gray600,
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '선수이름, 구단이름으로 검색',
-                style: CustomTextStyle.body2.copyWith(
-                  color: CustomColor.gray600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildMatchList() {
-    final matchesAsync = ref.watch(matchesByDateProvider(_dateKey));
-    final leagueFilter = _leagueTabIndex == 0 ? 'K1' : 'K2';
+    final matchesAsync = ref.watch(
+      matchesByDateProvider((date: _dateKey, leagueType: _leagueType)),
+    );
     final favoriteClubNames = ref
             .watch(favoritesNotifierProvider)
             .valueOrNull
@@ -164,9 +133,7 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
         ),
       ),
       data: (matches) {
-        final filtered = matches
-            .where((m) => m.leagueType == null || m.leagueType == leagueFilter)
-            .toList();
+        final filtered = matches;
 
         if (filtered.isEmpty) {
           return _buildRefreshList(
@@ -180,14 +147,17 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
           );
         }
 
-        // 관심 구단 경기 상단 고정
-        bool _isFavoriteMatch(m) =>
+        final now = DateTime.now();
+        bool isLive(m) =>
+            !m.matchDate.isAfter(now) && !m.isFinished;
+        bool isFavorite(m) =>
             favoriteClubNames.contains(m.homeTeamName) ||
             favoriteClubNames.contains(m.awayTeamName);
 
         final sorted = [
-          ...filtered.where(_isFavoriteMatch),
-          ...filtered.where((m) => !_isFavoriteMatch(m)),
+          ...filtered.where(isLive),
+          ...filtered.where((m) => !isLive(m) && isFavorite(m)),
+          ...filtered.where((m) => !isLive(m) && !isFavorite(m)),
         ];
 
         return RefreshIndicator(
@@ -196,7 +166,7 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
           backgroundColor: CustomColor.gray900,
           child: ListView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: AppPadding.listV,
             itemCount: sorted.length,
             itemBuilder: (context, index) =>
                 ScheduleMatchCard(match: sorted[index]),

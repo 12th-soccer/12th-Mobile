@@ -9,6 +9,7 @@ import 'package:twelfth_mobile/common/components/title/twelfth_accent_title.dart
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/features/auth/presentation/providers/auth_provider.dart';
@@ -94,7 +95,7 @@ class _SignUpVerifyViewState extends ConsumerState<SignUpVerifyView> {
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: AppPadding.screenH,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -132,14 +133,14 @@ class _SignUpVerifyViewState extends ConsumerState<SignUpVerifyView> {
                           onChanged: (_) => setState(() {}),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      AppSpacing.w8,
                       GestureDetector(
                         onTap: _resendCode,
                         child: Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
                             color: CustomColor.gray900,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: AppRadius.sm,
                           ),
                           child: Center(
                             child: Text('재전송', style: CustomTextStyle.body2),
@@ -169,6 +170,7 @@ class _SignUpVerifyViewState extends ConsumerState<SignUpVerifyView> {
                         )
                       : const Text('다음'),
                 ),
+                AppSpacing.h48,
               ],
             ),
           ),

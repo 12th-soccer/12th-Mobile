@@ -1,5 +1,6 @@
 import 'package:twelfth_mobile/features/match/domain/entities/match.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match_event.dart';
+import 'package:twelfth_mobile/features/match/domain/entities/match_lineup.dart';
 import 'package:twelfth_mobile/features/match/domain/repositories/i_match_repository.dart';
 
 class GetMatchesByDateUseCase {
@@ -7,7 +8,8 @@ class GetMatchesByDateUseCase {
 
   const GetMatchesByDateUseCase(this._repository);
 
-  Future<List<Match>> call(String date) => _repository.getMatchesByDate(date);
+  Future<List<Match>> call(String date, String leagueType) =>
+      _repository.getMatchesByDate(date, leagueType);
 }
 
 class GetMatchDetailUseCase {
@@ -25,4 +27,13 @@ class GetMatchEventsUseCase {
 
   Future<List<MatchEvent>> call(int matchId) =>
       _repository.getMatchEvents(matchId);
+}
+
+class GetMatchLineupsUseCase {
+  final IMatchRepository _repository;
+
+  const GetMatchLineupsUseCase(this._repository);
+
+  Future<List<MatchLineup>> call(int matchId) =>
+      _repository.getMatchLineups(matchId);
 }

@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
@@ -9,6 +10,9 @@ class EventsSection extends StatelessWidget {
   final AsyncValue<List<MatchEvent>> eventsAsync;
   final int? homeTeamId;
   final int? awayTeamId;
+  final String? homeTeamName;
+  final String? homeTeamImageUrl;
+  final String? awayTeamImageUrl;
   final void Function(MatchEvent event)? onPlayerTap;
 
   const EventsSection({
@@ -16,16 +20,19 @@ class EventsSection extends StatelessWidget {
     required this.eventsAsync,
     this.homeTeamId,
     this.awayTeamId,
+    this.homeTeamName,
+    this.homeTeamImageUrl,
+    this.awayTeamImageUrl,
     this.onPlayerTap,
   });
 
   bool _resolveIsHome(MatchEvent event) {
-    if (event.clubId == 0) return true;
-    if (homeTeamId != null) {
-      return event.clubId == homeTeamId;
+    if (homeTeamName != null && event.teamName.isNotEmpty) {
+      return event.teamName == homeTeamName;
     }
-    if (awayTeamId != null) {
-      return event.clubId != awayTeamId;
+    if (event.clubId != 0) {
+      if (homeTeamId != null) return event.clubId == homeTeamId;
+      if (awayTeamId != null) return event.clubId != awayTeamId;
     }
     return true;
   }
@@ -68,10 +75,12 @@ class EventsSection extends StatelessWidget {
             widgets.add(const _HalfTimeDivider());
             halfTimeInserted = true;
           }
+          final isHome = _resolveIsHome(event);
           widgets.add(
             EventRow(
               event: event,
-              isHome: _resolveIsHome(event),
+              isHome: isHome,
+              teamImageUrl: isHome ? homeTeamImageUrl : awayTeamImageUrl,
               onTap: event.playerName.trim().isNotEmpty
                   ? () => onPlayerTap?.call(event)
                   : null,
@@ -98,7 +107,7 @@ class _HalfTimeDivider extends StatelessWidget {
             child: Divider(color: CustomColor.gray900, thickness: 1),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: AppPadding.cardH,
             child: Text(
               '하프타임',
               style: CustomTextStyle.body3.copyWith(color: CustomColor.gray500),

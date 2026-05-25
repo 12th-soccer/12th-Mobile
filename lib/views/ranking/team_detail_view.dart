@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -68,7 +69,7 @@ class TeamDetailView extends ConsumerWidget {
                   color: CustomColor.gray500,
                 ),
               ),
-              const SizedBox(height: 16),
+              AppSpacing.h16,
               GestureDetector(
                 onTap: () => ref.invalidate(clubDetailProvider(clubId)),
                 child: Text(

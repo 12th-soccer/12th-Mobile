@@ -4,6 +4,7 @@ class NotificationSettings {
   final bool thirtyMinutesBeforeEnabled;
   final bool fifteenMinutesBeforeEnabled;
   final bool matchStartEnabled;
+  final bool favoriteTeamMatchEnabled;
 
   const NotificationSettings({
     this.notificationEnabled = true,
@@ -11,26 +12,8 @@ class NotificationSettings {
     this.thirtyMinutesBeforeEnabled = true,
     this.fifteenMinutesBeforeEnabled = true,
     this.matchStartEnabled = true,
+    this.favoriteTeamMatchEnabled = true,
   });
-
-  factory NotificationSettings.fromJson(Map<String, dynamic> json) =>
-      NotificationSettings(
-        notificationEnabled: json['notificationEnabled'] as bool? ?? true,
-        oneHourBeforeEnabled: json['oneHourBeforeEnabled'] as bool? ?? true,
-        thirtyMinutesBeforeEnabled:
-            json['thirtyMinutesBeforeEnabled'] as bool? ?? true,
-        fifteenMinutesBeforeEnabled:
-            json['fifteenMinutesBeforeEnabled'] as bool? ?? true,
-        matchStartEnabled: json['matchStartEnabled'] as bool? ?? true,
-      );
-
-  Map<String, dynamic> toJson() => {
-        'notificationEnabled': notificationEnabled,
-        'oneHourBeforeEnabled': oneHourBeforeEnabled,
-        'thirtyMinutesBeforeEnabled': thirtyMinutesBeforeEnabled,
-        'fifteenMinutesBeforeEnabled': fifteenMinutesBeforeEnabled,
-        'matchStartEnabled': matchStartEnabled,
-      };
 
   NotificationSettings copyWith({
     bool? notificationEnabled,
@@ -38,6 +21,7 @@ class NotificationSettings {
     bool? thirtyMinutesBeforeEnabled,
     bool? fifteenMinutesBeforeEnabled,
     bool? matchStartEnabled,
+    bool? favoriteTeamMatchEnabled,
   }) =>
       NotificationSettings(
         notificationEnabled: notificationEnabled ?? this.notificationEnabled,
@@ -47,5 +31,7 @@ class NotificationSettings {
         fifteenMinutesBeforeEnabled:
             fifteenMinutesBeforeEnabled ?? this.fifteenMinutesBeforeEnabled,
         matchStartEnabled: matchStartEnabled ?? this.matchStartEnabled,
+        favoriteTeamMatchEnabled:
+            favoriteTeamMatchEnabled ?? this.favoriteTeamMatchEnabled,
       );
 }

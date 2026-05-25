@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:twelfth_mobile/core/network/token_storage.dart';
 import 'package:twelfth_mobile/features/auth/data/models/login_response_model.dart';
@@ -7,20 +9,37 @@ import 'package:twelfth_mobile/features/auth/data/models/login_response_model.da
 class GoogleOAuthLauncher {
   static const String callbackScheme = 'twelfth';
   static final Uri _authorizationUri = Uri.parse(
-    'http://12th.cloud/oauth2/authorization/google',
+    'http://12th.cloud:8080/oauth2/authorization/google',
   );
 
   static Future<bool> open() async {
-    final result = await FlutterWebAuth2.authenticate(
-      url: _authorizationUri.toString(),
-      callbackUrlScheme: callbackScheme,
-    );
-    final response = _parseLoginResponse(Uri.parse(result));
-    await TokenStorage.instance.saveTokens(
-      accessToken: response.accessToken,
-      refreshToken: response.refreshToken,
-    );
-    return true;
+    try {
+      final result = await FlutterWebAuth2.authenticate(
+        url: _authorizationUri.toString(),
+        callbackUrlScheme: callbackScheme,
+        options: const FlutterWebAuth2Options(
+          timeout: 120,
+        ),
+      );
+      debugPrint('[GoogleOAuth] callback URL: $result');
+
+      final response = _parseLoginResponse(Uri.parse(result));
+      debugPrint(
+        '[GoogleOAuth] accessToken: ${response.accessToken.substring(0, response.accessToken.length.clamp(0, 20))}...',
+      );
+
+      await TokenStorage.instance.saveTokens(
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      );
+      return true;
+    } on PlatformException catch (e) {
+      debugPrint('[GoogleOAuth] canceled or platform error: ${e.code} - ${e.message}');
+      return false;
+    } catch (e) {
+      debugPrint('[GoogleOAuth] unexpected error: $e');
+      rethrow;
+    }
   }
 
   static LoginResponseModel _parseLoginResponse(Uri uri) {
@@ -47,15 +66,19 @@ class GoogleOAuthLauncher {
       }
     }
 
+    debugPrint('[GoogleOAuth] 파싱 실패. URI: $uri');
     throw const FormatException('OAuth 콜백에 accessToken이 없습니다.');
   }
 
   static Map<String, dynamic>? _mapFromParameters(Map<String, String> params) {
-    if (params.containsKey('accessToken') ||
-        params.containsKey('AccessToken')) {
+    final accessToken =
+        params['accessToken'] ?? params['AccessToken'] ?? params['access_token'];
+    if (accessToken != null && accessToken.isNotEmpty) {
       return <String, dynamic>{
-        'accessToken': params['accessToken'] ?? params['AccessToken'],
-        'refreshToken': params['refreshToken'] ?? params['RefreshToken'],
+        'accessToken': accessToken,
+        'refreshToken': params['refreshToken'] ??
+            params['RefreshToken'] ??
+            params['refresh_token'],
         'email': params['email'],
       };
     }

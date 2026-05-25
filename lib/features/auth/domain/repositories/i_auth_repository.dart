@@ -16,4 +16,7 @@ abstract interface class IAuthRepository {
   Future<bool> isLoggedIn();
 
   Future<UserInfo> getUserInfo();
+
+  Future<void> deleteAccount();
+  Future<void> updateUsername(String username);
 }

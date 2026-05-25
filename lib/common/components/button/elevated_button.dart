@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
@@ -56,7 +57,7 @@ class TwelfthElevatedButton extends StatelessWidget {
       children: [
         if (imgPath != null) ...[
           SvgPicture.asset(imgPath!, width: 20, height: 20),
-          const SizedBox(width: 8),
+          AppSpacing.w8,
         ],
         DefaultTextStyle(
           style: CustomTextStyle.heading2.copyWith(color: effectiveTextColor),

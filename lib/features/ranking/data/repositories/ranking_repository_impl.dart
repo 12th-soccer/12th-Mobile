@@ -10,9 +10,8 @@ class RankingRepositoryImpl implements IRankingRepository {
   const RankingRepositoryImpl(this._dataSource);
 
   @override
-  Future<List<ClubRanking>> getRanking(String leagueType) async {
-    final models = await _dataSource.getRanking(leagueType);
-    // 승점 내림차순 → 승수 내림차순 정렬 후 순위 부여
+  Future<List<ClubRanking>> getRanking(String leagueType, String season) async {
+    final models = await _dataSource.getRanking(leagueType, season);
     final sorted = [...models]
       ..sort((a, b) {
         final pointDiff = b.point.compareTo(a.point);
@@ -37,6 +36,6 @@ class RankingRepositoryImpl implements IRankingRepository {
       _dataSource.getPlayerDetail(playerId);
 
   @override
-  Future<List<PlayerGoal>> getPlayerGoals(int playerId) =>
+  Future<PlayerGoal?> getPlayerGoals(int playerId) =>
       _dataSource.getPlayerGoals(playerId);
 }

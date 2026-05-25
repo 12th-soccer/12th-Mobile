@@ -1,3 +1,4 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
@@ -50,7 +51,7 @@ class TwelfthBottomNavBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, color: color, size: 22, fill: isSelected ? 1.0 : 0.0),
-            const SizedBox(height: 4),
+            AppSpacing.h4,
             Text(label, style: CustomTextStyle.body2.copyWith(color: color)),
           ],
         ),

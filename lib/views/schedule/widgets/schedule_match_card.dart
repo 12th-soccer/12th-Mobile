@@ -1,13 +1,18 @@
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match.dart';
+import 'package:twelfth_mobile/features/no_spoiler/presentation/providers/no_spoiler_provider.dart';
+import 'package:twelfth_mobile/features/no_spoiler/presentation/providers/revealed_matches_provider.dart';
 import 'package:twelfth_mobile/views/match/match_detail_view.dart';
 
-class ScheduleMatchCard extends StatelessWidget {
+class ScheduleMatchCard extends ConsumerWidget {
   const ScheduleMatchCard({super.key, required this.match});
 
   final Match match;
@@ -19,12 +24,18 @@ class ScheduleMatchCard extends StatelessWidget {
     return MatchState.live;
   }
 
-  String get _timeStr =>
-      '${match.matchDate.hour.toString().padLeft(2, '0')}:${match.matchDate.minute.toString().padLeft(2, '0')}';
+  String get _timeStr {
+    final koreaTime = match.matchDate.add(const Duration(hours: 9));
+    return '${koreaTime.hour.toString().padLeft(2, '0')}:${koreaTime.minute.toString().padLeft(2, '0')}';
+  }
 
-  String get _dateStr => '${match.matchDate.month}/${match.matchDate.day}';
+  String get _dateStr {
+    final koreaTime = match.matchDate.add(const Duration(hours: 9));
+    return '${koreaTime.month}/${koreaTime.day}';
+  }
 
-  void _onTap(BuildContext context) {
+  void _onTap(BuildContext context, WidgetRef ref) {
+    ref.read(revealedMatchesProvider.notifier).reveal(match.matchId.toString());
     context.push(
       AppRoutes.match,
       extra: MatchExtra(
@@ -41,14 +52,23 @@ class ScheduleMatchCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final noSpoiler = ref.watch(noSpoilerProvider).valueOrNull ?? false;
+    final isRevealed = ref.watch(revealedMatchesProvider
+        .select((s) => s.contains(match.matchId.toString())));
+
+    final hideScore = noSpoiler &&
+        _state == MatchState.finished &&
+        !isRevealed;
+
     return _state == MatchState.live
-        ? _LiveCard(match: match, onTap: () => _onTap(context))
+        ? _LiveCard(match: match, onTap: () => _onTap(context, ref))
         : _NormalRow(
             match: match,
             state: _state,
             timeStr: _timeStr,
-            onTap: () => _onTap(context),
+            hideScore: hideScore,
+            onTap: () => _onTap(context, ref),
           );
   }
 }
@@ -61,8 +81,9 @@ class _LiveCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final koreaTime = match.matchDate.add(const Duration(hours: 9));
     final timeStr =
-        '${match.matchDate.hour.toString().padLeft(2, '0')}:${match.matchDate.minute.toString().padLeft(2, '0')}';
+        '${koreaTime.hour.toString().padLeft(2, '0')}:${koreaTime.minute.toString().padLeft(2, '0')}';
     final scoreStr = match.homeTeamScore != null && match.awayTeamScore != null
         ? '${match.homeTeamScore} : ${match.awayTeamScore}'
         : '- : -';
@@ -74,7 +95,7 @@ class _LiveCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         decoration: BoxDecoration(
           color: CustomColor.main,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadius.md,
         ),
         child: Row(
           children: [
@@ -92,7 +113,7 @@ class _LiveCard extends StatelessWidget {
                   Text(
                     'Live',
                     style: CustomTextStyle.body3.copyWith(
-                      color: CustomColor.red,
+                      color: CustomColor.green,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -103,7 +124,7 @@ class _LiveCard extends StatelessWidget {
                       color: CustomColor.gray600,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  AppSpacing.h4,
                   Text(
                     scoreStr,
                     style: CustomTextStyle.heading2.copyWith(
@@ -142,7 +163,7 @@ class _LiveTeamBlock extends StatelessWidget {
           size: 52,
           placeholderColor: CustomColor.gray500,
         ),
-        const SizedBox(height: 8),
+        AppSpacing.h8,
         Text(
           name,
           style: CustomTextStyle.body2.copyWith(color: CustomColor.black),
@@ -158,26 +179,57 @@ class _NormalRow extends StatelessWidget {
   final Match match;
   final MatchState state;
   final String timeStr;
+  final bool hideScore;
   final VoidCallback onTap;
 
   const _NormalRow({
     required this.match,
     required this.state,
     required this.timeStr,
+    required this.hideScore,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final centerWidget =
-        state == MatchState.finished &&
-            match.homeTeamScore != null &&
-            match.awayTeamScore != null
-        ? Text(
-            '${match.homeTeamScore} : ${match.awayTeamScore}',
-            style: CustomTextStyle.heading3,
-          )
-        : Text(timeStr, style: CustomTextStyle.heading3);
+    Widget centerWidget;
+
+    if (state == MatchState.finished &&
+        match.homeTeamScore != null &&
+        match.awayTeamScore != null) {
+      if (hideScore) {
+        centerWidget = Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Symbols.lock, size: 14, color: CustomColor.gray500),
+            AppSpacing.w4,
+            Text(
+              '결과 보기',
+              style: CustomTextStyle.body3.copyWith(color: CustomColor.gray500),
+            ),
+          ],
+        );
+      } else {
+        centerWidget = Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '${match.homeTeamScore} : ${match.awayTeamScore}',
+              style: CustomTextStyle.heading3,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              timeStr,
+              style: CustomTextStyle.body3.copyWith(
+                color: CustomColor.gray500,
+              ),
+            ),
+          ],
+        );
+      }
+    } else {
+      centerWidget = Text(timeStr, style: CustomTextStyle.heading3);
+    }
 
     return GestureDetector(
       onTap: onTap,
@@ -189,7 +241,7 @@ class _NormalRow extends StatelessWidget {
               child: Row(
                 children: [
                   NetworkAvatar(imageUrl: match.homeTeamImageUrl, size: 32),
-                  const SizedBox(width: 8),
+                  AppSpacing.w8,
                   Flexible(
                     child: Text(
                       match.homeTeamName,
@@ -216,7 +268,7 @@ class _NormalRow extends StatelessWidget {
                       textAlign: TextAlign.right,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  AppSpacing.w8,
                   NetworkAvatar(imageUrl: match.awayTeamImageUrl, size: 32),
                 ],
               ),

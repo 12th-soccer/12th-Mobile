@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/router/player_route_args.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
@@ -71,12 +72,18 @@ class _SearchViewState extends ConsumerState<SearchView> {
     }
   }
 
+  static List<String> get _seasons {
+    final current = DateTime.now().year;
+    return List.generate(5, (i) => (current - i).toString());
+  }
+
   @override
   Widget build(BuildContext context) {
     final searchState = ref.watch(searchNotifierProvider);
     final showResults =
         searchState.status != SearchStatus.initial ||
         _searchController.text.isNotEmpty;
+    final isPlayerFilter = searchState.filter == SearchFilter.player;
 
     return GestureDetector(
       onTap: () => _focusNode.unfocus(),
@@ -88,6 +95,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
             children: [
               _buildTopBar(searchState),
               const Divider(color: CustomColor.main, height: 1),
+              if (isPlayerFilter) _buildSeasonSelector(searchState),
               Expanded(
                 child: showResults
                     ? _buildResultsSection(searchState)
@@ -96,6 +104,51 @@ class _SearchViewState extends ConsumerState<SearchView> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSeasonSelector(SearchState state) {
+    return SizedBox(
+      height: 44,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        itemCount: _seasons.length,
+        separatorBuilder: (_, __) => AppSpacing.w8,
+        itemBuilder: (_, i) {
+          final season = _seasons[i];
+          final isSelected = state.selectedSeason == season;
+          return GestureDetector(
+            onTap: () {
+              ref.read(searchNotifierProvider.notifier).setSeason(season);
+              final q = _searchController.text.trim();
+              if (q.isNotEmpty) {
+                ref.read(searchNotifierProvider.notifier).search(q);
+              }
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                color: isSelected ? CustomColor.main : Colors.transparent,
+                borderRadius: AppRadius.lg,
+                border: Border.all(
+                  color: isSelected ? CustomColor.main : CustomColor.gray600,
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  season,
+                  style: CustomTextStyle.body3.copyWith(
+                    color: isSelected ? CustomColor.black : CustomColor.gray500,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -175,6 +228,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
 
   Widget _buildClubResults(List<ClubSearchResult> clubs) {
     return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 48),
       itemCount: clubs.length,
       itemBuilder: (context, index) {
         final club = clubs[index];
@@ -204,6 +258,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
 
   Widget _buildPlayerResults(List<PlayerSearchResult> players) {
     return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 48),
       itemCount: players.length,
       itemBuilder: (context, index) {
         final player = players[index];
@@ -269,7 +324,7 @@ class _FilterDropdown extends StatelessWidget {
         color: Colors.transparent,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: AppRadius.sm,
           side: const BorderSide(color: CustomColor.main),
         ),
         offset: const Offset(0, 36),
@@ -289,16 +344,16 @@ class _FilterDropdown extends StatelessWidget {
         child: SizedBox(
           width: 72,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), // 고유값
             decoration: BoxDecoration(
               border: Border.all(color: CustomColor.main),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppRadius.sm,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(label, style: CustomTextStyle.body2),
-                const SizedBox(width: 4),
+                AppSpacing.w4,
                 const Icon(
                   Symbols.keyboard_arrow_down,
                   color: CustomColor.white,
