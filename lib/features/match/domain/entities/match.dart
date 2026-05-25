@@ -27,6 +27,8 @@ class Match {
 
   bool get isFinished {
     if (homeTeamScore == null || awayTeamScore == null) return false;
-    return DateTime.now().difference(matchDate).inMinutes > 130;
+    final koreanMatchTime = matchDate.add(Duration(hours: 9));
+    final nowKorean = DateTime.now().add(Duration(hours: 9));
+    return nowKorean.difference(koreanMatchTime).inMinutes > 130;
   }
 }

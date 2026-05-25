@@ -10,5 +10,5 @@ abstract interface class IRankingRepository {
 
   Future<PlayerDetail> getPlayerDetail(int playerId);
 
-  Future<PlayerGoal?> getPlayerGoals(int playerId);
+  Future<List<PlayerGoal>> getPlayerGoals(int playerId);
 }

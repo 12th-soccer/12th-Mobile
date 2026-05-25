@@ -54,7 +54,7 @@ final playerDetailProvider = FutureProvider.family<PlayerDetail, int>((
   return ref.read(rankingRepositoryProvider).getPlayerDetail(playerId);
 });
 
-final playerGoalsProvider = FutureProvider.family<PlayerGoal?, int>((
+final playerGoalsProvider = FutureProvider.family<List<PlayerGoal>, int>((
   ref,
   playerId,
 ) {

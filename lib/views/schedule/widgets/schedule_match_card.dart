@@ -18,8 +18,10 @@ class ScheduleMatchCard extends ConsumerWidget {
   final Match match;
 
   MatchState get _state {
-    final now = DateTime.now();
-    if (match.matchDate.isAfter(now)) return MatchState.upcoming;
+    final koreanTime = match.matchDate.add(Duration(hours: 9));
+    final nowKorean = DateTime.now().add(Duration(hours: 9));
+
+    if (koreanTime.isAfter(nowKorean)) return MatchState.upcoming;
     if (match.isFinished) return MatchState.finished;
     return MatchState.live;
   }

@@ -21,13 +21,13 @@ class ScheduleMatchRow extends StatelessWidget {
   bool get _isHome => ClubIdMap.sameTeam(match.homeTeamName, clubName);
 
   String get _dateStr {
-    final d = match.matchDate;
-    return '${d.month}/${d.day}';
+    final koreanTime = match.matchDate.add(Duration(hours: 9));
+    return '${koreanTime.month}/${koreanTime.day}';
   }
 
   String get _timeStr {
-    final d = match.matchDate;
-    return '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+    final koreanTime = match.matchDate.add(Duration(hours: 9));
+    return '${koreanTime.hour.toString().padLeft(2, '0')}:${koreanTime.minute.toString().padLeft(2, '0')}';
   }
 
   @override

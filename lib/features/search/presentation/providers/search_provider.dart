@@ -53,6 +53,7 @@ class SearchNotifier extends Notifier<SearchState> {
     );
   }
 
+
   Future<void> search(String keyword) async {
     final requestId = ++_requestId;
     final q = keyword.trim();

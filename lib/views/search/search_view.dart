@@ -74,7 +74,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
 
   static List<String> get _seasons {
     final current = DateTime.now().year;
-    return List.generate(5, (i) => (current - i).toString());
+    return List.generate(current - kStartSeason + 1, (i) => (current - i).toString());
   }
 
   @override
@@ -95,7 +95,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
             children: [
               _buildTopBar(searchState),
               const Divider(color: CustomColor.main, height: 1),
-              if (isPlayerFilter) _buildSeasonSelector(searchState),
+              if (isPlayerFilter) _buildSeasonDropdown(searchState),
               Expanded(
                 child: showResults
                     ? _buildResultsSection(searchState)
@@ -108,47 +108,79 @@ class _SearchViewState extends ConsumerState<SearchView> {
     );
   }
 
-  Widget _buildSeasonSelector(SearchState state) {
-    return SizedBox(
-      height: 44,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        itemCount: _seasons.length,
-        separatorBuilder: (_, __) => AppSpacing.w8,
-        itemBuilder: (_, i) {
-          final season = _seasons[i];
-          final isSelected = state.selectedSeason == season;
-          return GestureDetector(
-            onTap: () {
+  Widget _buildSeasonDropdown(SearchState state) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          AppSpacing.w8,
+          PopupMenuButton<String>(
+            onSelected: (season) {
               ref.read(searchNotifierProvider.notifier).setSeason(season);
               final q = _searchController.text.trim();
               if (q.isNotEmpty) {
                 ref.read(searchNotifierProvider.notifier).search(q);
               }
             },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              decoration: BoxDecoration(
-                color: isSelected ? CustomColor.main : Colors.transparent,
-                borderRadius: AppRadius.lg,
-                border: Border.all(
-                  color: isSelected ? CustomColor.main : CustomColor.gray600,
-                ),
-              ),
-              child: Center(
-                child: Text(
-                  season,
-                  style: CustomTextStyle.body3.copyWith(
-                    color: isSelected ? CustomColor.black : CustomColor.gray500,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            color: CustomColor.gray900,
+            shape: RoundedRectangleBorder(
+              borderRadius: AppRadius.md,
+              side: const BorderSide(color: CustomColor.gray600),
+            ),
+            offset: const Offset(0, 40),
+            itemBuilder: (_) => _seasons
+                .map(
+                  (season) => PopupMenuItem<String>(
+                    value: season,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 2,
+                    ),
+                    child: Text(
+                      '${season}년',
+                      style: CustomTextStyle.body2.copyWith(
+                        color: season == state.selectedSeason
+                            ? CustomColor.main
+                            : CustomColor.white,
+                        fontWeight: season == state.selectedSeason
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                      ),
+                    ),
                   ),
-                ),
+                )
+                .toList(),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 7,
+              ),
+              decoration: BoxDecoration(
+                color: CustomColor.main,
+                borderRadius: AppRadius.lg,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '${state.selectedSeason}년',
+                    style: CustomTextStyle.body3.copyWith(
+                      color: CustomColor.black,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  AppSpacing.w4,
+                  const Icon(
+                    Symbols.expand_more,
+                    color: CustomColor.black,
+                    size: 16,
+                  ),
+                ],
               ),
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
