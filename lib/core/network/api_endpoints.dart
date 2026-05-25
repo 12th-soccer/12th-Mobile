@@ -61,6 +61,7 @@ class ApiEndpoints {
 
   /// join
   static String joinRecruitment(String id) => '/join/$id';
+  static const myJoinedRecruitments = '/join';
 
   /// notice
   static String noticeCreate(String recruitmentId) => '/notice/$recruitmentId';
@@ -72,6 +73,9 @@ class ApiEndpoints {
 
   /// account
   static const deleteAccount = '/user/me';
+
+  /// phone verification
+  static const phoneVerify = '/user/phone/verify';
 
   /// notifications
   static const notificationSettings = "/notifications/settings";

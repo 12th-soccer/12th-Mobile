@@ -27,7 +27,16 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
         child: Column(
           children: [
             _buildProfileHeader(),
-            _buildMenuList(),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _buildMenuList(),
+                    AppSpacing.h48,
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),

@@ -9,6 +9,7 @@ import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/features/auth/presentation/providers/auth_provider.dart';
+import 'package:twelfth_mobile/features/notice/presentation/providers/notice_provider.dart';
 import 'package:twelfth_mobile/features/recruitment/domain/entities/recruitment.dart';
 import 'package:twelfth_mobile/features/recruitment/presentation/providers/recruitment_provider.dart';
 import 'package:twelfth_mobile/views/fan_finder/fan_finder_constants.dart';
@@ -25,18 +26,28 @@ class FanFinderDetailView extends ConsumerStatefulWidget {
 
 class _FanFinderDetailViewState extends ConsumerState<FanFinderDetailView> {
   bool _isJoining = false;
-  bool _didAutoNavigate = false;
 
-  @override
-  void initState() {
-    super.initState();
-    if (widget.recruitment.noticeId != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || _didAutoNavigate) return;
-        _didAutoNavigate = true;
-        context.push(AppRoutes.fanFinderChat, extra: widget.recruitment);
-      });
+  bool _isAuthor(Recruitment recruitment) {
+    final userInfo = ref.read(userInfoProvider).valueOrNull;
+    print('=== 작성자 판별 ===');
+    print('현재 사용자 ID: ${userInfo?.userId}');
+    print('작성자 ID: ${recruitment.authorId}');
+    print('작성자 이름: ${recruitment.authorName}');
+
+    if (userInfo == null || recruitment.authorId == null) {
+      print('판별 실패: userInfo 또는 authorId가 null');
+      return false;
     }
+
+    final isAuthor = userInfo.userId == recruitment.authorId;
+    print('작성자 여부: $isAuthor');
+    return isAuthor;
+  }
+
+  bool _isAuthorByError(ApiException e) {
+    final msg = e.responseData?.toString().toLowerCase() ?? '';
+    return msg.contains('작성자') || msg.contains('author') ||
+           msg.contains('본인이 생성한') || msg.contains('자신이 만든');
   }
 
   bool _isAlreadyJoined(ApiException e) {
@@ -60,7 +71,63 @@ class _FanFinderDetailViewState extends ConsumerState<FanFinderDetailView> {
   String _formatDate(DateTime d) =>
       '${d.year}.${d.month.toString().padLeft(2, '0')}.${d.day.toString().padLeft(2, '0')}';
 
-  Future<void> _handleJoin() async {
+  Future<bool> _recoverJoinSuccess(Recruitment current) async {
+    final id = current.id;
+    if (id == null) return false;
+
+    try {
+      ref.invalidate(recruitmentDetailProvider(id));
+      final updated = await ref.read(recruitmentDetailProvider(id).future);
+      ref.read(recruitmentListProvider.notifier).refresh();
+
+      final before = current.currentParticipants ?? 0;
+      final after = updated.currentParticipants ?? before;
+      final joined = after > before;
+
+      if (!mounted || !joined) return joined;
+
+      if (updated.noticeId != null) {
+        context.push(AppRoutes.fanFinderChat, extra: updated);
+      } else {
+        context.showSuccessSnackBar('참가 신청이 완료됐습니다.');
+      }
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> _ensureNoticeAccess(Recruitment recruitment) async {
+    final noticeId = recruitment.noticeId;
+    if (noticeId == null) return false;
+
+    setState(() => _isJoining = true);
+    try {
+      ref.invalidate(noticeProvider(noticeId));
+      await ref.read(noticeProvider(noticeId).future);
+      if (!mounted) return true;
+      context.push(AppRoutes.fanFinderChat, extra: recruitment);
+      return true;
+    } on ApiException catch (e) {
+      if (!mounted) return false;
+      final msg = switch (e.statusCode) {
+        400 => '해당 모집방에 참여한 사람만 공지방에 입장할 수 있습니다.',
+        403 => '해당 모집방에 참여한 사람만 공지방에 입장할 수 있습니다.',
+        404 => '공지방을 찾을 수 없습니다.',
+        _ => '공지방 입장에 실패했습니다.',
+      };
+      context.showErrorSnackBar(msg);
+      return false;
+    } catch (_) {
+      if (!mounted) return false;
+      context.showErrorSnackBar('공지방 입장에 실패했습니다.');
+      return false;
+    } finally {
+      if (mounted) setState(() => _isJoining = false);
+    }
+  }
+
+  Future<void> _createNoticeRoom(Recruitment current) async {
     final userInfo = ref.read(userInfoProvider).valueOrNull;
     if (userInfo == null || !userInfo.hasUsername) {
       if (!mounted) return;
@@ -68,22 +135,111 @@ class _FanFinderDetailViewState extends ConsumerState<FanFinderDetailView> {
       return;
     }
 
-    final id = widget.recruitment.id;
+    final id = current.id;
+    if (id == null) return;
+
+    if (!current.isFull) {
+      context.showErrorSnackBar('설정된 인원이 모두 모여야 공지방을 생성할 수 있습니다.');
+      return;
+    }
+
+    final description = await _showDescriptionDialog();
+    if (description == null || description.trim().isEmpty) return;
+
+    setState(() => _isJoining = true);
+    try {
+      await createNoticeRoom(ref, id, description);
+
+      if (!mounted) return;
+
+      ref.invalidate(recruitmentDetailProvider(id));
+      ref.read(recruitmentListProvider.notifier).refresh();
+
+      final updatedRecruitment = await ref.read(recruitmentDetailProvider(id).future);
+
+      print('=== 공지방 생성 후 데이터 확인 ===');
+      print('noticeId: ${updatedRecruitment.noticeId}');
+      print('recruitment ID: ${updatedRecruitment.id}');
+
+      if (!mounted) return;
+      context.showSuccessSnackBar('공지방이 생성됐습니다.');
+
+      if (updatedRecruitment.noticeId == null) {
+        print('❌ 서버 문제: 공지방 생성 후에도 noticeId가 null입니다.');
+        context.showErrorSnackBar('공지방이 생성되었지만 입장에 실패했습니다. 잠시 후 다시 시도해주세요.');
+        return;
+      }
+
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (!mounted) return;
+      await _ensureNoticeAccess(updatedRecruitment);
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      final msg = switch (e.statusCode) {
+        400 => '공지방은 최소 4명이 모여야 작성할 수 있습니다.',
+        403 => '공지방은 모집글 작성자만 작성할 수 있습니다.',
+        404 => '모집글을 찾을 수 없습니다.',
+        _ => '공지방 생성에 실패했습니다.',
+      };
+      context.showErrorSnackBar(msg);
+    } catch (_) {
+      if (!mounted) return;
+      context.showErrorSnackBar('공지방 생성에 실패했습니다.');
+    } finally {
+      if (mounted) setState(() => _isJoining = false);
+    }
+  }
+
+  Future<void> _handleJoin(Recruitment current) async {
+    final userInfo = ref.read(userInfoProvider).valueOrNull;
+    if (userInfo == null || !userInfo.hasUsername) {
+      if (!mounted) return;
+      context.showErrorSnackBar('닉네임을 설정해야 해당 기능의 사용이 가능합니다.');
+      return;
+    }
+
+    if (current.noticeId != null) {
+      await _ensureNoticeAccess(current);
+      return;
+    }
+
+    final id = current.id;
     if (id == null) return;
 
     setState(() => _isJoining = true);
     try {
       await joinRecruitment(ref, id);
       if (!mounted) return;
-      ref.invalidate(recruitmentDetailProvider(id));
+      try {
+        ref.invalidate(recruitmentDetailProvider(id));
+        await ref.read(recruitmentDetailProvider(id).future);
+      } catch (_) {
+      }
       ref.read(recruitmentListProvider.notifier).refresh();
+      if (!mounted) return;
       context.showSuccessSnackBar('참가 신청이 완료됐습니다.');
     } on ApiException catch (e) {
       if (!mounted) return;
-      if ((e.statusCode == 400 && _isAlreadyJoined(e)) || e.statusCode == 403) {
+      if (e.statusCode == 400 && _isAlreadyJoined(e)) {
         final detail = ref.read(recruitmentDetailProvider(id)).valueOrNull;
-        final target = detail ?? widget.recruitment;
-        context.push(AppRoutes.fanFinderChat, extra: target);
+        final target = detail ?? current;
+        if (target.noticeId != null) {
+          context.push(AppRoutes.fanFinderChat, extra: target);
+        } else {
+          context.showSuccessSnackBar('이미 참가한 모집글입니다.');
+        }
+        return;
+      }
+      if (e.statusCode == 403) {
+        if (_isAuthorByError(e)) {
+          context.showErrorSnackBar('본인이 생성한 글에는 가입을 할 수 없습니다.');
+          return;
+        }
+
+        final recovered = await _recoverJoinSuccess(current);
+        if (!mounted) return;
+        if (recovered) return;
+        context.showErrorSnackBar('해당 모집방에 참여한 사람만 공지방에 입장할 수 있습니다.');
         return;
       }
       final msg = switch (e.statusCode) {
@@ -100,10 +256,6 @@ class _FanFinderDetailViewState extends ConsumerState<FanFinderDetailView> {
     }
   }
 
-  void _enterNoticeRoom(Recruitment current) {
-    context.push(AppRoutes.fanFinderChat, extra: current);
-  }
-
   @override
   Widget build(BuildContext context) {
     final recruitment = widget.recruitment;
@@ -112,15 +264,10 @@ class _FanFinderDetailViewState extends ConsumerState<FanFinderDetailView> {
         : null;
     final current = detailAsync?.valueOrNull ?? recruitment;
 
-    if (current.noticeId != null && !_didAutoNavigate) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || _didAutoNavigate) return;
-        _didAutoNavigate = true;
-        context.push(AppRoutes.fanFinderChat, extra: current);
-      });
-    }
-
     final hasNotice = current.noticeId != null;
+    final isAuthor = _isAuthor(current);
+    final canShowJoinButton = !isAuthor && !current.isExpired;
+    final canShowCreateNoticeButton = isAuthor && !hasNotice && current.isFull;
 
     return Scaffold(
       backgroundColor: CustomColor.background,
@@ -209,7 +356,7 @@ class _FanFinderDetailViewState extends ConsumerState<FanFinderDetailView> {
             ],
             const Spacer(),
             Padding(
-              padding: const EdgeInsets.only(bottom: 32),
+              padding: const EdgeInsets.only(bottom: 48),
               child: Column(
                 children: [
                   if (hasNotice) ...[
@@ -221,45 +368,242 @@ class _FanFinderDetailViewState extends ConsumerState<FanFinderDetailView> {
                     ),
                     FanFinderConstants.spaceS,
                   ],
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isJoining
-                          ? null
-                          : hasNotice
-                          ? () => _enterNoticeRoom(current)
-                          : _handleJoin,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: CustomColor.main,
-                        disabledBackgroundColor: CustomColor.main.withValues(
-                          alpha: 0.5,
+                  if (canShowJoinButton) ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _isJoining ? null : () => _handleJoin(current),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: CustomColor.main,
+                          disabledBackgroundColor: CustomColor.main.withValues(
+                            alpha: 0.5,
+                          ),
+                          padding: FanFinderConstants.buttonVerticalPadding,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: FanFinderConstants.buttonRadius,
+                          ),
                         ),
-                        padding: FanFinderConstants.buttonVerticalPadding,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: FanFinderConstants.buttonRadius,
-                        ),
+                        child: _isJoining
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: CustomColor.black,
+                                ),
+                              )
+                            : Text(
+                                '가입하기',
+                                style: CustomTextStyle.heading2.copyWith(
+                                  color: CustomColor.black,
+                                ),
+                              ),
                       ),
-                      child: _isJoining
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: CustomColor.black,
-                              ),
-                            )
-                          : Text(
-                              hasNotice ? '공지방 입장' : '가입하기',
-                              style: CustomTextStyle.heading2.copyWith(
-                                color: CustomColor.black,
-                              ),
-                            ),
                     ),
-                  ),
+                  ]
+                  else if (canShowCreateNoticeButton) ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _isJoining ? null : () => _createNoticeRoom(current),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: CustomColor.main,
+                          disabledBackgroundColor: CustomColor.main.withValues(
+                            alpha: 0.5,
+                          ),
+                          padding: FanFinderConstants.buttonVerticalPadding,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: FanFinderConstants.buttonRadius,
+                          ),
+                        ),
+                        child: _isJoining
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: CustomColor.black,
+                                ),
+                              )
+                            : Text(
+                                '공지방 생성하기',
+                                style: CustomTextStyle.heading2.copyWith(
+                                  color: CustomColor.black,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ]
+                  else if (hasNotice) ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _isJoining ? null : () => _ensureNoticeAccess(current),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: CustomColor.main,
+                          disabledBackgroundColor: CustomColor.main.withValues(
+                            alpha: 0.5,
+                          ),
+                          padding: FanFinderConstants.buttonVerticalPadding,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: FanFinderConstants.buttonRadius,
+                          ),
+                        ),
+                        child: _isJoining
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: CustomColor.black,
+                                ),
+                              )
+                            : Text(
+                                '공지방 입장',
+                                style: CustomTextStyle.heading2.copyWith(
+                                  color: CustomColor.black,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ]
+                  else if (isAuthor && !current.isFull) ...[
+                    Container(
+                      width: double.infinity,
+                      padding: FanFinderConstants.buttonVerticalPadding,
+                      decoration: BoxDecoration(
+                        color: CustomColor.gray600,
+                        borderRadius: FanFinderConstants.buttonRadius,
+                      ),
+                      child: Text(
+                        '인원이 모두 모이면 공지방을 생성할 수 있습니다',
+                        style: CustomTextStyle.heading2.copyWith(
+                          color: CustomColor.gray500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Future<String?> _showDescriptionDialog() async {
+    final controller = TextEditingController();
+
+    return showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: CustomColor.gray900,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: CustomColor.gray600,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                AppSpacing.h16,
+                Text(
+                  '공지방 생성',
+                  style: CustomTextStyle.heading1,
+                ),
+                AppSpacing.h8,
+                Text(
+                  '공지방에서 사용할 설명을 입력해주세요.',
+                  style: CustomTextStyle.body1.copyWith(color: CustomColor.gray500),
+                ),
+                AppSpacing.h16,
+                TextField(
+                  controller: controller,
+                  maxLines: 4,
+                  maxLength: 100,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: '예: 오늘 7시까지 모여주세요.',
+                    hintStyle: CustomTextStyle.body2.copyWith(color: CustomColor.gray600),
+                    border: OutlineInputBorder(
+                      borderRadius: AppRadius.md,
+                      borderSide: BorderSide(color: CustomColor.gray600),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: AppRadius.md,
+                      borderSide: BorderSide(color: CustomColor.gray600),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: AppRadius.md,
+                      borderSide: BorderSide(color: CustomColor.main),
+                    ),
+                    fillColor: CustomColor.gray800,
+                    filled: true,
+                  ),
+                  style: CustomTextStyle.body2.copyWith(color: CustomColor.white),
+                ),
+                AppSpacing.h20,
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: AppRadius.md,
+                            side: BorderSide(color: CustomColor.gray600),
+                          ),
+                        ),
+                        child: Text(
+                          '취소',
+                          style: CustomTextStyle.body1,
+                        ),
+                      ),
+                    ),
+                    AppSpacing.w12,
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          final text = controller.text.trim();
+                          if (text.isNotEmpty) {
+                            Navigator.of(context).pop(text);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: CustomColor.main,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: AppRadius.md),
+                        ),
+                        child: Text(
+                          '생성',
+                          style: CustomTextStyle.body1.copyWith(color: CustomColor.black),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

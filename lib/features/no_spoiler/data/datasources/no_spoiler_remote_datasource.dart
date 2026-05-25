@@ -21,9 +21,8 @@ class NoSpoilerRemoteDataSourceImpl implements INoSpoilerRemoteDataSource {
           return json['spoilerEnabled'] as bool? ?? false;
         },
       );
-    } on ApiException catch (e) {
-      if (e.statusCode == 404) return false;
-      rethrow;
+    } catch (e) {
+      return false;
     }
   }
 

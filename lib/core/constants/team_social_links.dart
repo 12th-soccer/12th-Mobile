@@ -127,11 +127,15 @@ abstract final class TeamSocials {
 
   static TeamSocialLinks? of(String teamName) {
     final canonical = canonicalName(teamName);
+    print('[TeamSocials] Looking up team: "$teamName" → canonical: "$canonical"');
 
     if (canonical != null && _data.containsKey(canonical)) {
-      return _data[canonical];
+      final links = _data[canonical]!;
+      print('[TeamSocials] Found social links for $canonical: Instagram: ${links.instagram}, YouTube: ${links.youtube}');
+      return links;
     }
 
+    print('[TeamSocials] No social links found for "$teamName"');
     return null;
   }
 
@@ -142,6 +146,40 @@ abstract final class TeamSocials {
 
     if (_data.containsKey(trimmed)) {
       return trimmed;
+    }
+
+    final aliases = <String, String>{
+      'Yongin City': 'YONGIN_FC',
+      '용인 시티': 'YONGIN_FC',
+      'FC Seoul': 'FC_SEOUL',
+      'Ulsan HD FC': 'ULSAN_HD',
+      'Jeonbuk Motors': 'JEONBUK_HYUNDAU',
+      'Daejeon Citizen': 'DAEJEON_HANA_CITIZEN',
+      'Bucheon FC 1995': 'BUCHEON_FC_1995',
+      'Gwangju FC': 'GWANGJU_FC',
+      'Pohang Steelers': 'POHANG_STEELERS',
+      'FC Anyang': 'FC_ANYANG',
+      'Gimcheon Sangmu': 'GIMCHEON_SANGMU',
+      'Incheon United': 'INCHEON_UNITED',
+      'Gangwon FC': 'GANGWON_FC',
+      'Jeju United FC': 'JEJU_SK',
+      'Suwon Samsung Bluewings': 'SUWON_SAMSUNG_BLUEWINGS',
+      'Busan I Park': 'BUSAN_IPARK',
+      'Suwon City FC': 'SUWON_FC',
+      'Daegu FC': 'DAEGU_FC',
+      'Seoul E-Land FC': 'SEOUL_E_LAND',
+      'Gimpo Citizen': 'GIMPO_FC',
+      'Asan Mugunghwa': 'CHUNGNAM_ASAN_FC',
+      'Seongnam FC': 'SEONGNAM_FC',
+      'Cheonan City': 'CHEONAN_CITY_FC',
+      'Ansan Greeners': 'ANSAN_GREENERS',
+      'Gyeongnam FC': 'GYEONGNAM_FC',
+      'Cheongju': 'CHEONGJU_FC',
+      'Jeonnam Dragons': 'JEONNAM_DRAGONS',
+    };
+
+    if (aliases.containsKey(trimmed)) {
+      return aliases[trimmed];
     }
 
     final normalizedInput = _normalizeForLookup(trimmed);

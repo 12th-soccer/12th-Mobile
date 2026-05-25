@@ -83,7 +83,7 @@ class PlayerDetailView extends ConsumerWidget {
             Center(child: Text(detail.name, style: CustomTextStyle.heading1)),
             AppSpacing.h24,
             _InfoGrid(detail: detail),
-            const SizedBox(height: 32),
+            AppSpacing.h48,
             _GoalsSection(goalsAsync: goalsAsync),
           ],
         ),

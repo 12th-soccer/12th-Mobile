@@ -30,7 +30,7 @@ abstract final class AppPadding {
   static const cardH = EdgeInsets.symmetric(horizontal: 16);
 
   /// list / item padding
-  static const listV = EdgeInsets.symmetric(vertical: 8);
+  static const listV = EdgeInsets.fromLTRB(0, 8, 0, 48);
   static const itemV12 = EdgeInsets.symmetric(vertical: 12);
   static const itemV14 = EdgeInsets.symmetric(vertical: 14);
   static const item16 = EdgeInsets.all(16);

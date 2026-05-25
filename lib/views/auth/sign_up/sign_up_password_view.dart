@@ -168,6 +168,7 @@ class _SignUpPasswordViewState extends ConsumerState<SignUpPasswordView> {
                       );
                     },
                   ),
+                  AppSpacing.h48,
                 ],
               ),
             ),

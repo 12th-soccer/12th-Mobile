@@ -29,7 +29,7 @@ class EventRow extends ConsumerWidget {
         ? ref.watch(playerImageProvider(event.playerId!))
         : null;
 
-    final resolvedImageUrl = playerImageAsync?.valueOrNull ?? teamImageUrl;
+    final resolvedImageUrl = playerImageAsync?.valueOrNull;
 
     final photo = NetworkAvatar(imageUrl: resolvedImageUrl, size: 36);
     final name = Text(

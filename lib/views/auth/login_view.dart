@@ -191,6 +191,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     onPressed: _onGoogleLogin,
                     child: const Text('구글 계정으로 로그인'),
                   ),
+                  AppSpacing.h48,
                 ],
                   ),
                 ),

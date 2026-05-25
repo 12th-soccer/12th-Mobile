@@ -14,6 +14,7 @@ import 'package:twelfth_mobile/features/recruitment/domain/entities/recruitment_
 import 'package:twelfth_mobile/features/recruitment/presentation/providers/recruitment_provider.dart';
 import 'package:twelfth_mobile/features/recruitment/presentation/providers/team_list_provider.dart';
 import 'package:twelfth_mobile/views/fan_finder/fan_finder_constants.dart';
+import 'package:twelfth_mobile/features/phone_verification/presentation/providers/phone_verification_status_provider.dart';
 
 class FanFinderView extends ConsumerStatefulWidget {
   const FanFinderView({super.key});
@@ -28,6 +29,7 @@ class _FanFinderViewState extends ConsumerState<FanFinderView> {
   GenderGroup? _genderFilter;
   TeamItem? _k1FilterItem;
   TeamItem? _k2FilterItem;
+  bool _phoneVerificationChecked = false;
 
   @override
   void initState() {
@@ -44,15 +46,45 @@ List<Recruitment> _applyFilters(List<Recruitment> posts) {
     return posts.where((p) {
       if (_ageFilter != null && p.ageGroup != _ageFilter) return false;
       if (_genderFilter != null && p.genderGroup != _genderFilter) return false;
-      if (_k1FilterItem != null && p.teamCode != _k1FilterItem!.displayName) return false;
-      if (_k2FilterItem != null && p.teamCode != _k2FilterItem!.displayName) return false;
+
+      if (_k1FilterItem != null) {
+        final postTeam = p.teamDisplayName ?? p.teamCode ?? '';
+        if (postTeam != _k1FilterItem!.displayName) return false;
+      }
+      if (_k2FilterItem != null) {
+        final postTeam = p.teamDisplayName ?? p.teamCode ?? '';
+        if (postTeam != _k2FilterItem!.displayName) return false;
+      }
+
       return true;
     }).toList();
+  }
+
+  Future<void> _checkPhoneVerification() async {
+    final isVerified = ref.read(phoneVerificationStatusProvider);
+    if (!isVerified) {
+      final result = await context.push<bool>(AppRoutes.phoneVerification);
+      if (result == true) {
+        ref.read(phoneVerificationStatusProvider.notifier).setVerified(true);
+      } else {
+        if (mounted) {
+          context.pop();
+        }
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final listAsync = ref.watch(recruitmentListProvider);
+    final isPhoneVerified = ref.watch(phoneVerificationStatusProvider);
+
+    if (!isPhoneVerified && !_phoneVerificationChecked) {
+      _phoneVerificationChecked = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _checkPhoneVerification();
+      });
+    }
 
     return Scaffold(
       backgroundColor: CustomColor.background,
@@ -133,7 +165,7 @@ List<Recruitment> _applyFilters(List<Recruitment> posts) {
     );
   }
 
-  static const int _pageSize = 10;
+  static const int _pageSize = 8;
 
   List<List<Recruitment>> _chunk(List<Recruitment> list) {
     final pages = <List<Recruitment>>[];
@@ -159,15 +191,17 @@ List<Recruitment> _applyFilters(List<Recruitment> posts) {
             },
             itemBuilder: (context, pageIndex) {
               final items = pages[pageIndex];
-              return ListView.builder(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 20,
-                ),
-                itemCount: items.length,
-                itemBuilder: (_, i) => _RecruitmentListItem(
-                  recruitment: items[i],
-                  onTap: () =>
-                      context.push(AppRoutes.fanFinderDetail, extra: items[i]),
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                child: ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 48),
+                  itemCount: items.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (_, i) => _RecruitmentListItem(
+                    recruitment: items[i],
+                    onTap: () =>
+                        context.push(AppRoutes.fanFinderDetail, extra: items[i]),
+                  ),
                 ),
               );
             },
@@ -175,7 +209,7 @@ List<Recruitment> _applyFilters(List<Recruitment> posts) {
         ),
         if (pages.length > 1)
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(vertical: 16),
             child: _PageIndicator(
               controller: _pageController,
               count: pages.length,
@@ -505,7 +539,7 @@ class _PageIndicator extends StatefulWidget {
 class _PageIndicatorState extends State<_PageIndicator> {
   int _current = 0;
 
-  static const int _maxDots = 5;
+  static const int _maxDots = 3;
 
   @override
   void initState() {
@@ -526,11 +560,14 @@ class _PageIndicatorState extends State<_PageIndicator> {
 
   int get _activeDotIndex {
     final total = widget.count;
+
     if (total <= _maxDots) return _current;
+
     if (_current == 0) return 0;
-    if (_current == total - 1) return 4;
-    final progress = (_current - 1) / (total - 2);
-    return 1 + (progress * 2).round();
+
+    if (_current == total - 1) return 2;
+
+    return 1;
   }
 
   int get _dotCount => min(widget.count, _maxDots);
@@ -544,12 +581,12 @@ class _PageIndicatorState extends State<_PageIndicator> {
         final isActive = i == activeDot;
         return AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          width: isActive ? 16 : 6,
-          height: 6,
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          width: isActive ? 20 : 8,
+          height: 8,
           decoration: BoxDecoration(
             color: isActive ? CustomColor.main : CustomColor.gray600,
-            borderRadius: BorderRadius.circular(3),
+            borderRadius: BorderRadius.circular(4),
           ),
         );
       }),

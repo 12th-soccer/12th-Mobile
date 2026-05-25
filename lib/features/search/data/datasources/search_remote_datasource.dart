@@ -19,8 +19,10 @@ class SearchRemoteDataSourceImpl implements ISearchRemoteDataSource {
 
   @override
   Future<List<ClubSearchResultModel>> searchClubs(String keyword) async {
+    List<ClubSearchResultModel> apiResults = [];
+
     try {
-      return await _apiClient.get(
+      apiResults = await _apiClient.get(
         ApiEndpoints.searchTeam(keyword),
         decoder: (data) {
           if (data == null) return <ClubSearchResultModel>[];
@@ -39,9 +41,12 @@ class SearchRemoteDataSourceImpl implements ISearchRemoteDataSource {
         },
       );
     } on ApiException catch (e) {
-      if (e.statusCode == 400 || e.statusCode == 404) return [];
-      rethrow;
+      if (e.statusCode != 400 && e.statusCode != 404) rethrow;
     }
+
+    final localTeams = _searchLocalTeams(keyword);
+
+    return [...apiResults, ...localTeams];
   }
 
   @override
@@ -107,6 +112,11 @@ class SearchRemoteDataSourceImpl implements ISearchRemoteDataSource {
     }
 
     return allPlayers.where((p) => p.name.toLowerCase().contains(q)).toList();
+  }
+
+  List<ClubSearchResultModel> _searchLocalTeams(String keyword) {
+    final localTeams = <ClubSearchResultModel>[];
+    return localTeams;
   }
 
   List<dynamic> _toList(dynamic data) {

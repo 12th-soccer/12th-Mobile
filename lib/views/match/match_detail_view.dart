@@ -128,7 +128,7 @@ class MatchDetailView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final detailAsync = ref.watch(matchDetailProvider(extra.matchId));
+    final detailAsync = ref.watch(enhancedMatchDetailProvider(extra.matchId));
     final eventsAsync = ref.watch(matchEventsProvider(extra.matchId));
     final lineupsAsync = ref.watch(matchLineupsProvider(extra.matchId));
 
@@ -211,9 +211,9 @@ class MatchDetailView extends ConsumerWidget {
                 awayTeamImageUrl: detailAsync.valueOrNull?.awayTeamImageUrl,
                 onPlayerTap: (event) => _openPlayerDetail(context, ref, event),
               ),
-              const SizedBox(height: 20),
+              AppSpacing.h20,
               LineupSection(lineupsAsync: lineupsAsync),
-              const SizedBox(height: 32),
+              AppSpacing.h48,
             ],
           ],
         ),

@@ -164,7 +164,6 @@ class AuthNotifier extends Notifier<AuthState> {
     try {
       await ref.read(_logoutUseCaseProvider).call();
     } catch (_) {
-      // 로그아웃 실패해도 로컬 상태는 초기화
     } finally {
       ref.invalidate(userInfoProvider);
       state = const AuthState();

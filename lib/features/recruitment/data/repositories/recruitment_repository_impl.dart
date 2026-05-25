@@ -1,6 +1,7 @@
 import 'package:twelfth_mobile/features/recruitment/data/datasources/recruitment_remote_datasource.dart';
 import 'package:twelfth_mobile/features/recruitment/data/models/recruitment_model.dart';
 import 'package:twelfth_mobile/features/recruitment/domain/entities/recruitment.dart';
+import 'package:twelfth_mobile/features/recruitment/domain/entities/joined_recruitment.dart';
 import 'package:twelfth_mobile/features/recruitment/domain/repositories/i_recruitment_repository.dart';
 
 class RecruitmentRepositoryImpl implements IRecruitmentRepository {
@@ -36,4 +37,10 @@ class RecruitmentRepositoryImpl implements IRecruitmentRepository {
   @override
   Future<void> createNoticeRoom(String recruitmentId, String description) =>
       _dataSource.createNoticeRoom(recruitmentId, description);
+
+  @override
+  Future<List<JoinedRecruitment>> getMyJoinedRecruitments() async {
+    final models = await _dataSource.getMyJoinedRecruitments();
+    return models;
+  }
 }

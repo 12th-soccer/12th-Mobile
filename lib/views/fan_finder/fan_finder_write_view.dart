@@ -7,6 +7,9 @@ import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
+import 'package:twelfth_mobile/core/network/api_client.dart';
+import 'package:twelfth_mobile/core/network/token_storage.dart';
+import 'package:twelfth_mobile/features/auth/presentation/providers/auth_provider.dart';
 import 'package:twelfth_mobile/features/recruitment/domain/entities/recruitment.dart';
 import 'package:twelfth_mobile/features/recruitment/domain/entities/recruitment_enums.dart';
 import 'package:twelfth_mobile/features/recruitment/presentation/providers/recruitment_provider.dart';
@@ -27,7 +30,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
   int _headCount = FanFinderConstants.minParticipants;
   AgeGroup? _ageGroup;
   GenderGroup? _genderGroup;
-  TeamGroup? _teamGroup;
+  TeamItem? _selectedTeam;
   DateTime? _expiryDate;
   bool _isSubmitting = false;
 
@@ -38,40 +41,120 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
     super.dispose();
   }
 
-  bool get _canSubmit =>
-      _titleController.text.trim().isNotEmpty &&
-      _contentController.text.trim().isNotEmpty &&
-      _ageGroup != null &&
-      _genderGroup != null &&
-      _teamGroup != null &&
-      !_isSubmitting;
-
   Future<void> _submit() async {
-    if (!_canSubmit) return;
+    if (!_validateSubmission()) return;
+
+    final userInfo = ref.read(userInfoProvider).valueOrNull;
+    print('=== 사용자 정보 확인 ===');
+    print('UserInfo: $userInfo');
+    print('UserId: ${userInfo?.userId}');
+    print('Email: ${userInfo?.email}');
+    print('Username: ${userInfo?.username}');
+    print('HasUsername: ${userInfo?.hasUsername}');
+
+    final token = await TokenStorage.instance.getAccessToken();
+    print('=== 토큰 상태 확인 ===');
+    print('Has Token: ${token != null}');
+    if (token != null) {
+      print('Token Length: ${token.length}');
+      print('Token Prefix: ${token.length > 10 ? token.substring(0, 10) : token}...');
+    }
+
+    if (userInfo == null) {
+      context.showErrorSnackBar('로그인이 필요합니다.');
+      return;
+    }
+    if (!userInfo.hasUsername) {
+      context.showErrorSnackBar('닉네임을 설정해야 모집글 작성이 가능합니다.');
+      return;
+    }
+
     setState(() => _isSubmitting = true);
     try {
-      await createRecruitment(
-        ref,
-        Recruitment(
-          title: _titleController.text.trim(),
-          content: _contentController.text.trim(),
-          headCount: _headCount,
-          ageGroup: _ageGroup!,
-          genderGroup: _genderGroup!,
-          teamGroup: _teamGroup!,
-          expiryDate: _expiryDate,
-        ),
+      final recruitment = Recruitment(
+        title: _titleController.text.trim(),
+        content: _contentController.text.trim(),
+        headCount: _headCount,
+        ageGroup: _ageGroup!,
+        genderGroup: _genderGroup!,
+        teamCode: _selectedTeam!.code,
+        isK1: _selectedTeam!.isK1,
+        teamDisplayName: _selectedTeam!.displayName,
+        expiryDate: _expiryDate,
       );
+
+      print('=== Recruitment 생성 요청 ===');
+      print('Title: ${recruitment.title}');
+      print('Content: ${recruitment.content}');
+      print('HeadCount: ${recruitment.headCount}');
+      print('AgeGroup: ${recruitment.ageGroup}');
+      print('GenderGroup: ${recruitment.genderGroup}');
+      print('TeamCode: ${recruitment.teamCode}');
+      print('IsK1: ${recruitment.isK1}');
+      print('TeamDisplayName: ${recruitment.teamDisplayName}');
+      print('ExpiryDate: ${recruitment.expiryDate}');
+
+      await createRecruitment(ref, recruitment);
       if (!mounted) return;
       await ref.read(recruitmentListProvider.notifier).refresh();
       if (!mounted) return;
       context.pop();
-    } catch (_) {
+    } on ApiException catch (e) {
       if (!mounted) return;
-      context.showErrorSnackBar('모집글 등록에 실패했습니다. 다시 시도해 주세요.');
+
+      print('=== API 에러 정보 ===');
+      print('Status Code: ${e.statusCode}');
+      print('Response Data: ${e.responseData}');
+      print('URI: ${e.uri}');
+
+      final msg = switch (e.statusCode) {
+        401 => '로그인이 필요합니다.',
+        403 => '모집글 작성 권한이 없습니다. 닉네임 설정을 확인해주세요.\n상세: ${e.responseData}',
+        400 => '입력된 정보를 확인해주세요.\n상세: ${e.responseData}',
+        _ => '모집글 등록에 실패했습니다. (${e.statusCode})\n상세: ${e.responseData}',
+      };
+      context.showErrorSnackBar(msg);
+    } catch (e) {
+      if (!mounted) return;
+      print('=== 일반 에러 ===');
+      print('Error: $e');
+      context.showErrorSnackBar('모집글 등록에 실패했습니다. 다시 시도해 주세요. (에러: $e)');
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
+  }
+
+  bool _validateSubmission() {
+    if (_titleController.text.trim().isEmpty) {
+      context.showErrorSnackBar('제목을 입력해 주세요.');
+      return false;
+    }
+    if (_contentController.text.trim().isEmpty) {
+      context.showErrorSnackBar('내용을 입력해 주세요.');
+      return false;
+    }
+    if (_ageGroup == null) {
+      context.showErrorSnackBar('연령대를 선택해 주세요.');
+      return false;
+    }
+    if (_genderGroup == null) {
+      context.showErrorSnackBar('성별을 선택해 주세요.');
+      return false;
+    }
+    if (_selectedTeam == null) {
+      context.showErrorSnackBar('K1 또는 K2 구단을 선택해 주세요.');
+      return false;
+    }
+
+    print('=== 선택된 팀 정보 ===');
+    print('Team DisplayName: ${_selectedTeam!.displayName}');
+    print('Team Code: ${_selectedTeam!.code}');
+    print('Team IsK1: ${_selectedTeam!.isK1}');
+    if (_expiryDate == null) {
+      context.showErrorSnackBar('만료일을 선택해 주세요.');
+      return false;
+    }
+    return true;
   }
 
   void _showPickerSheet<T>({
@@ -155,7 +238,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
     );
   }
 
-  void _showK1Sheet(List<TeamItem> teams) {
+  void _showTeamSheet(String title, List<TeamItem> teams) {
     showModalBottomSheet(
       context: context,
       backgroundColor: CustomColor.gray900,
@@ -163,119 +246,63 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (_) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AppSpacing.h8,
-            Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
-                color: CustomColor.gray600,
-                borderRadius: AppRadius.xs,
+      builder: (_) => FractionallySizedBox(
+        heightFactor: 0.5,
+        child: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              AppSpacing.h8,
+              Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: CustomColor.gray600,
+                  borderRadius: AppRadius.xs,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
-              child: Text('K1 구단', style: CustomTextStyle.heading2),
-            ),
-            Flexible(
-              child: ListView(
-                shrinkWrap: true,
-                children: teams.map((t) {
-                  final isSel = _teamGroup == t.group;
-                  return ListTile(
-                    dense: true,
-                    title: Text(
-                      t.group.displayTag,
-                      style: CustomTextStyle.body2.copyWith(
-                        color: isSel ? CustomColor.main : CustomColor.white,
-                        fontWeight: isSel ? FontWeight.w600 : FontWeight.normal,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+                child: Text(title, style: CustomTextStyle.heading2),
+              ),
+              Expanded(
+                child: ListView(
+                  children: teams.map((t) {
+                    final isSel = _selectedTeam?.displayName == t.displayName;
+                    return ListTile(
+                      dense: true,
+                      title: Text(
+                        t.displayName,
+                        style: CustomTextStyle.body2.copyWith(
+                          color: isSel ? CustomColor.main : CustomColor.white,
+                          fontWeight: isSel ? FontWeight.w600 : FontWeight.normal,
+                        ),
                       ),
-                    ),
-                    trailing: isSel
-                        ? const Icon(
-                            Symbols.check,
-                            color: CustomColor.main,
-                            size: 18,
-                          )
-                        : null,
-                    onTap: () {
-                      setState(() => _teamGroup = t.group);
-                      Navigator.pop(context);
-                    },
-                  );
-                }).toList(),
+                      trailing: isSel
+                          ? const Icon(
+                              Symbols.check,
+                              color: CustomColor.main,
+                              size: 18,
+                            )
+                          : null,
+                      onTap: () {
+                        setState(() => _selectedTeam = t);
+                        Navigator.pop(context);
+                      },
+                    );
+                  }).toList(),
+                ),
               ),
-            ),
-            AppSpacing.h8,
-          ],
+              AppSpacing.h8,
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void _showK2Sheet(List<TeamItem> teams) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: CustomColor.gray900,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (_) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AppSpacing.h8,
-            Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
-                color: CustomColor.gray600,
-                borderRadius: AppRadius.xs,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
-              child: Text('K2 구단', style: CustomTextStyle.heading2),
-            ),
-            Flexible(
-              child: ListView(
-                shrinkWrap: true,
-                children: teams.map((t) {
-                  final isSel = _teamGroup == t.group;
-                  return ListTile(
-                    dense: true,
-                    title: Text(
-                      t.group.displayTag,
-                      style: CustomTextStyle.body2.copyWith(
-                        color: isSel ? CustomColor.main : CustomColor.white,
-                        fontWeight: isSel ? FontWeight.w600 : FontWeight.normal,
-                      ),
-                    ),
-                    trailing: isSel
-                        ? const Icon(
-                            Symbols.check,
-                            color: CustomColor.main,
-                            size: 18,
-                          )
-                        : null,
-                    onTap: () {
-                      setState(() => _teamGroup = t.group);
-                      Navigator.pop(context);
-                    },
-                  );
-                }).toList(),
-              ),
-            ),
-            AppSpacing.h8,
-          ],
-        ),
-      ),
-    );
-  }
+  void _showK1Sheet(List<TeamItem> teams) => _showTeamSheet('K1 구단', teams);
+  void _showK2Sheet(List<TeamItem> teams) => _showTeamSheet('K2 구단', teams);
 
   Future<void> _pickDate() async {
     final picked = await DatePickerBottomSheet.show(
@@ -344,58 +371,22 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
                     onSelect: (v) => setState(() => _genderGroup = v),
                   ),
                 ),
-                teamAsync.when(
-                  loading: () => _CategoryChip(
-                    label: 'K1 구단',
-                    isSelected: _teamGroup?.isK1 == true,
-                    onTap: () {},
-                  ),
-                  error: (_, __) => _CategoryChip(
-                    label: 'K1 구단',
-                    isSelected: _teamGroup?.isK1 == true,
-                    onTap: () => _showK1Sheet(
-                      TeamGroup.values
-                          .where((t) => t.isK1)
-                          .map(
-                            (t) =>
-                                TeamItem(group: t, displayName: t.displayTag),
-                          )
-                          .toList(),
-                    ),
-                  ),
-                  data: (state) => _CategoryChip(
-                    label: (_teamGroup?.isK1 == true)
-                        ? _teamGroup!.displayTag
-                        : 'K1 구단',
-                    isSelected: _teamGroup?.isK1 == true,
-                    onTap: () => _showK1Sheet(state.k1Teams),
+                _CategoryChip(
+                  label: (_selectedTeam?.isK1 == true)
+                      ? _selectedTeam!.displayName
+                      : 'K1 구단',
+                  isSelected: _selectedTeam?.isK1 == true,
+                  onTap: () => _showK1Sheet(
+                    teamAsync.valueOrNull?.k1Teams ?? [],
                   ),
                 ),
-                teamAsync.when(
-                  loading: () => _CategoryChip(
-                    label: 'K2 구단',
-                    isSelected: _teamGroup?.isK1 == false,
-                    onTap: () {},
-                  ),
-                  error: (_, __) => _CategoryChip(
-                    label: 'K2 구단',
-                    isSelected: _teamGroup?.isK1 == false,
-                    onTap: () => _showK2Sheet(
-                      TeamGroup.values
-                          .where((t) => !t.isK1)
-                          .map(
-                            (t) =>
-                                TeamItem(group: t, displayName: t.displayTag),
-                          )
-                          .toList(),
-                    ),
-                  ),
-                  data: (state) => _CategoryChip(
-                    label: (_teamGroup != null && !_teamGroup!.isK1)
-                        ? _teamGroup!.displayTag
-                        : 'K2 구단',
-                    isSelected: _teamGroup != null && !_teamGroup!.isK1,
-                    onTap: () => _showK2Sheet(state.k2Teams),
+                _CategoryChip(
+                  label: (_selectedTeam != null && _selectedTeam!.isK1 == false)
+                      ? _selectedTeam!.displayName
+                      : 'K2 구단',
+                  isSelected: _selectedTeam != null && _selectedTeam!.isK1 == false,
+                  onTap: () => _showK2Sheet(
+                    teamAsync.valueOrNull?.k2Teams ?? [],
                   ),
                 ),
               ],
@@ -412,7 +403,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
 
             AppSpacing.h24,
             TwelfthElevatedButton(
-              onPressed: _canSubmit ? _submit : null,
+              onPressed: _isSubmitting ? null : _submit,
               backgroundColor: CustomColor.main,
               textColor: CustomColor.black,
               child: _isSubmitting
@@ -474,8 +465,9 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
 
   Widget _buildDatePicker() {
     final label = _expiryDate == null
-        ? '경기 날짜 선택'
-        : '만료: ${_expiryDate!.year}.${_expiryDate!.month.toString().padLeft(2, '0')}.${_expiryDate!.day.toString().padLeft(2, '0')}';
+        ? '만료일 선택'
+        : '만료: ${_expiryDate!.year}.${_expiryDate!.month.toString().padLeft(2, '0')}.${_expiryDate!.day.toString().padLeft(2, '0')} '
+            '${_expiryDate!.hour.toString().padLeft(2, '0')}:${_expiryDate!.minute.toString().padLeft(2, '0')}';
 
     return GestureDetector(
       onTap: _pickDate,

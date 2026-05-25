@@ -110,7 +110,7 @@ class _ChatViewState extends ConsumerState<ChatView> {
     if (_noticeId == null) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 48),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

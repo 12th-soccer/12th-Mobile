@@ -170,6 +170,7 @@ class _SignUpVerifyViewState extends ConsumerState<SignUpVerifyView> {
                         )
                       : const Text('다음'),
                 ),
+                AppSpacing.h48,
               ],
             ),
           ),

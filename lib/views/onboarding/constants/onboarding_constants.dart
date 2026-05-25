@@ -4,7 +4,7 @@ import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 
 class OnboardingUI {
-  static const SizedBox gapH32 = SizedBox(height: 32);
+  static const SizedBox gapH48 = SizedBox(height: 48);
   static const SizedBox gapH10 = SizedBox(height: 10);
   static const SizedBox gapH8 = AppSpacing.h8;
   static const SizedBox gapW10 = AppSpacing.w10;

@@ -228,6 +228,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
 
   Widget _buildClubResults(List<ClubSearchResult> clubs) {
     return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 48),
       itemCount: clubs.length,
       itemBuilder: (context, index) {
         final club = clubs[index];
@@ -257,6 +258,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
 
   Widget _buildPlayerResults(List<PlayerSearchResult> players) {
     return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 48),
       itemCount: players.length,
       itemBuilder: (context, index) {
         final player = players[index];

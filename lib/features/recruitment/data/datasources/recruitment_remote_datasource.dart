@@ -1,6 +1,7 @@
 import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/core/network/api_endpoints.dart';
 import 'package:twelfth_mobile/features/recruitment/data/models/recruitment_model.dart';
+import 'package:twelfth_mobile/features/recruitment/data/models/joined_recruitment_model.dart';
 
 abstract interface class IRecruitmentRemoteDataSource {
   Future<List<RecruitmentModel>> getRecruitments({int page = 0, int size = 10});
@@ -8,6 +9,7 @@ abstract interface class IRecruitmentRemoteDataSource {
   Future<void> createRecruitment(RecruitmentModel model);
   Future<void> joinRecruitment(String id);
   Future<void> createNoticeRoom(String recruitmentId, String description);
+  Future<List<JoinedRecruitmentModel>> getMyJoinedRecruitments();
 }
 
 class RecruitmentRemoteDataSourceImpl implements IRecruitmentRemoteDataSource {
@@ -60,6 +62,19 @@ class RecruitmentRemoteDataSourceImpl implements IRecruitmentRemoteDataSource {
     await _apiClient.postVoid(
       ApiEndpoints.noticeCreate(recruitmentId),
       data: {'description': description},
+    );
+  }
+
+  @override
+  Future<List<JoinedRecruitmentModel>> getMyJoinedRecruitments() async {
+    return await _apiClient.get(
+      ApiEndpoints.myJoinedRecruitments,
+      decoder: (data) {
+        final list = data as List<dynamic>;
+        return list
+            .map((e) => JoinedRecruitmentModel.fromJson(e as Map<String, dynamic>))
+            .toList();
+      },
     );
   }
 }

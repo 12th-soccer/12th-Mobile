@@ -43,6 +43,7 @@ class SignUpSuccessView extends StatelessWidget {
                 },
                 child: const Text('다음'),
               ),
+              AppSpacing.h48,
             ],
           ),
         ),

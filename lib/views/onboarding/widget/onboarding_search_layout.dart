@@ -4,6 +4,7 @@ import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.dart';
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 import '../constants/onboarding_constants.dart';
 
 class OnboardingSearchLayout<T> extends StatelessWidget {
@@ -49,7 +50,7 @@ class OnboardingSearchLayout<T> extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                OnboardingUI.gapH32,
+                OnboardingUI.gapH48,
                 Text(title, style: OnboardingUI.heading),
                 OnboardingUI.gapH8,
                 Text(
@@ -123,6 +124,7 @@ class OnboardingSearchLayout<T> extends StatelessWidget {
                     ),
                   ],
                 ),
+                AppSpacing.h48,
               ],
             ),
           ),

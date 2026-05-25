@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/constants/spacing.dart';
 
 class TwelfthAccentTitle extends StatelessWidget {
   final String text;
@@ -9,7 +10,7 @@ class TwelfthAccentTitle extends StatelessWidget {
   const TwelfthAccentTitle(
     this.text, {
     super.key,
-    this.spacing = const SizedBox(height: 32),
+    this.spacing = AppSpacing.h48,
   });
 
   @override

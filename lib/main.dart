@@ -5,6 +5,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/providers/club_mapping_provider.dart';
+import 'package:twelfth_mobile/core/providers/player_cache_provider.dart';
 import 'package:twelfth_mobile/core/router/router.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
 import 'package:twelfth_mobile/core/services/local_notification_service.dart';
@@ -31,6 +33,10 @@ void main() async {
 
   await LocalNotificationService.initialize();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  unawaited(ClubMappingService().initialize());
+
+  unawaited(PlayerCacheService().initializeCache());
 
   runApp(const ProviderScope(child: TwelfthApp()));
 }

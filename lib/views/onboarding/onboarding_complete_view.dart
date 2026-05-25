@@ -38,13 +38,13 @@ class OnboardingCompleteView extends ConsumerWidget {
                 gradient: TwelfthGradient.horizontal(CustomColor.silverGradient),
                 textColor: CustomColor.black,
                 onPressed: () {
-                  // 온보딩에서 등록한 관심 선수/구단이 목록에 반영되도록 갱신
                   ref.invalidate(favoritesNotifierProvider);
                   ref.invalidate(favoritePlayersNotifierProvider);
                   context.go(AppRoutes.schedule);
                 },
                 child: const Text('시작하기'),
               ),
+              AppSpacing.h48,
             ],
           ),
         ),

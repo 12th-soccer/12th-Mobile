@@ -45,7 +45,6 @@ class AlarmRemoteDataSourceImpl implements IAlarmRemoteDataSource {
         data: {'token': token},
       );
     } catch (_) {
-      // FCM 토큰 등록 실패는 무시 (앱 동작에 영향 없음)
     }
   }
 }

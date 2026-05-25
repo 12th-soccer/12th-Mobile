@@ -10,14 +10,12 @@ abstract final class AppRoutes {
   static const onboardingTeam = '/onboarding/team';
   static const onboardingComplete = '/onboarding/complete';
 
-  // Shell tabs (bottom nav visible)
   static const ranking = '/ranking';
   static const search = '/search';
   static const schedule = '/schedule';
   static const favorites = '/favorites';
   static const profile = '/profile';
 
-  // Detail views (no bottom nav)
   static const match = '/match';
   static const team = '/team';
   static const player = '/player';
@@ -25,8 +23,8 @@ abstract final class AppRoutes {
   static const noSpoiler = '/no-spoiler';
   static const editUsername = '/edit-username';
   static const myRecruitments = '/my-recruitments';
+  static const phoneVerification = '/phone-verification';
 
-  // Fan Finder
   static const fanFinder = '/fan-finder';
   static const fanFinderWrite = '/fan-finder/write';
   static const fanFinderDetail = '/fan-finder/detail';

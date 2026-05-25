@@ -38,6 +38,7 @@ class OnboardingWelcomeView extends StatelessWidget {
                 onPressed: () => context.push(AppRoutes.onboardingPlayer),
                 child: const Text('다음'),
               ),
+              AppSpacing.h48,
             ],
           ),
         ),

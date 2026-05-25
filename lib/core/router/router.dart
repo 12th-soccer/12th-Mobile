@@ -30,6 +30,7 @@ import 'package:twelfth_mobile/features/recruitment/domain/entities/recruitment.
 import 'package:twelfth_mobile/views/profile/edit_username_view.dart';
 import 'package:twelfth_mobile/views/profile/my_recruitments_view.dart';
 import 'package:twelfth_mobile/views/splash_view.dart';
+import 'package:twelfth_mobile/views/phone_verification/phone_verification_view.dart';
 
 final appRouter = GoRouter(
   initialLocation: AppRoutes.splash,
@@ -170,6 +171,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.myRecruitments,
       builder: (context, state) => const MyRecruitmentsView(),
+    ),
+    GoRoute(
+      path: AppRoutes.phoneVerification,
+      builder: (context, state) => const PhoneVerificationView(),
     ),
     GoRoute(
       path: AppRoutes.fanFinder,

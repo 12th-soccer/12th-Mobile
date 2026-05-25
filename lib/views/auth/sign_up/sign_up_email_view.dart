@@ -110,6 +110,7 @@ class _SignUpEmailViewState extends ConsumerState<SignUpEmailView> {
                       );
                     },
                   ),
+                  AppSpacing.h48,
                 ],
               ),
             ),

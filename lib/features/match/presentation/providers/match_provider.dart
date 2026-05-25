@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/core/network/api_endpoints.dart';
 import 'package:twelfth_mobile/core/network/dio.dart';
+import 'package:twelfth_mobile/core/providers/player_cache_provider.dart';
 import 'package:twelfth_mobile/features/match/data/datasources/match_remote_datasource.dart';
 import 'package:twelfth_mobile/features/match/data/repositories/match_repository_impl.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match.dart';
@@ -51,6 +52,60 @@ final matchDetailProvider = FutureProvider.family<Match, int>((ref, matchId) {
   return ref.read(_getMatchDetailUseCaseProvider).call(matchId);
 });
 
+final enhancedMatchDetailProvider = FutureProvider.family<Match, int>((
+  ref,
+  matchId,
+) async {
+  try {
+    final detailMatch = await ref
+        .read(_getMatchDetailUseCaseProvider)
+        .call(matchId);
+
+    final matchDate = detailMatch.matchDate;
+    final dateKey =
+        '${matchDate.year}-${matchDate.month.toString().padLeft(2, '0')}-${matchDate.day.toString().padLeft(2, '0')}';
+
+    try {
+      final k1Matches = await ref
+          .read(_getMatchesByDateUseCaseProvider)
+          .call(dateKey, 'K1');
+      final k2Matches = await ref
+          .read(_getMatchesByDateUseCaseProvider)
+          .call(dateKey, 'K2');
+
+      final allMatches = [...k1Matches, ...k2Matches];
+
+      final dateMatch = allMatches.firstWhere(
+        (m) =>
+            m.matchId == matchId ||
+            (m.homeTeamName == detailMatch.homeTeamName &&
+                m.awayTeamName == detailMatch.awayTeamName),
+        orElse: () => detailMatch,
+      );
+
+      final hasDetailScore =
+          detailMatch.homeTeamScore != null &&
+          detailMatch.awayTeamScore != null;
+      final hasDateScore =
+          dateMatch.homeTeamScore != null && dateMatch.awayTeamScore != null;
+
+      if (hasDateScore && !hasDetailScore) {
+        return dateMatch;
+      }
+
+      if (hasDateScore && hasDetailScore) {
+        return dateMatch;
+      }
+
+      return detailMatch;
+    } catch (e) {
+      return detailMatch;
+    }
+  } catch (e) {
+    rethrow;
+  }
+});
+
 final matchEventsProvider = FutureProvider.family<List<MatchEvent>, int>((
   ref,
   matchId,
@@ -65,29 +120,4 @@ final matchLineupsProvider = FutureProvider.family<List<MatchLineup>, int>((
   return ref.read(_getMatchLineupsUseCaseProvider).call(matchId);
 });
 
-final playerImageProvider = FutureProvider.family<String?, int>((
-  ref,
-  playerId,
-) async {
-  if (playerId == 0) return null;
-  final client = DioClient.instance.apiClient;
-  try {
-    return await client.get(
-      ApiEndpoints.player(
-        playerId.toString(),
-        season: DateTime.now().year.toString(),
-      ),
-      decoder: (data) {
-        if (data == null) return null;
-        final json = data as Map<String, dynamic>;
-        final photo = json['photo'] as String?;
-        final rawName = json['name'] as String? ?? '';
-        final rawImageUrl = photo ?? json['playerImageUrl'] as String?;
-        final isSwapped = photo == null && rawName.startsWith('http');
-        return isSwapped ? rawName : rawImageUrl;
-      },
-    );
-  } catch (_) {
-    return null;
-  }
-});
+final playerImageProvider = enhancedPlayerImageProvider;
