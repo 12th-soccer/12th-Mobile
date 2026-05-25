@@ -25,7 +25,11 @@ class ClubMatch {
     this.matchStatus,
   });
 
-  bool get isFinished => matchDate.isBefore(DateTime.now());
+  bool get isFinished {
+    final koreanMatchTime = matchDate.add(Duration(hours: 9));
+    final nowKorean = DateTime.now().add(Duration(hours: 9));
+    return koreanMatchTime.isBefore(nowKorean);
+  }
 }
 
 class ClubDetail {

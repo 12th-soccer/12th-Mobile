@@ -36,6 +36,6 @@ class RankingRepositoryImpl implements IRankingRepository {
       _dataSource.getPlayerDetail(playerId);
 
   @override
-  Future<PlayerGoal?> getPlayerGoals(int playerId) =>
+  Future<List<PlayerGoal>> getPlayerGoals(int playerId) =>
       _dataSource.getPlayerGoals(playerId);
 }

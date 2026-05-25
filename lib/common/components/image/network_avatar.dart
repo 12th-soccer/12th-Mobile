@@ -45,7 +45,26 @@ class NetworkAvatar extends StatelessWidget {
           width: size,
           height: size,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _placeholder(),
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              print('[NetworkAvatar] Successfully loaded: $imageUrl');
+              return child;
+            }
+            return Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(color: placeholderColor, shape: BoxShape.circle),
+              child: const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            print('[NetworkAvatar] Failed to load: $imageUrl, Error: $error');
+            return _placeholder();
+          },
         ),
       );
     }
@@ -56,6 +75,11 @@ class NetworkAvatar extends StatelessWidget {
     width: size,
     height: size,
     decoration: BoxDecoration(color: placeholderColor, shape: BoxShape.circle),
+    child: Icon(
+      Icons.person,
+      size: size * 0.6,
+      color: CustomColor.gray500,
+    ),
   );
 
   String? _getLocalImagePath(String imageUrl) {

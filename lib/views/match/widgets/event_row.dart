@@ -25,11 +25,15 @@ class EventRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print('[EventRow] Player: ${event.playerName}, ID: ${event.playerId}');
+
     final playerImageAsync = event.playerId != null
         ? ref.watch(playerImageProvider(event.playerId!))
         : null;
 
     final resolvedImageUrl = playerImageAsync?.valueOrNull;
+
+    print('[EventRow] ${event.playerName} - Image URL: $resolvedImageUrl');
 
     final photo = NetworkAvatar(imageUrl: resolvedImageUrl, size: 36);
     final name = Text(

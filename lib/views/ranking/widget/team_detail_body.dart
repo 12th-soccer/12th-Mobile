@@ -36,11 +36,15 @@ class TeamDetailBody extends StatelessWidget {
   }
 
   void _onMatchTap(BuildContext context, ClubMatch m) {
+    final koreanTime = m.matchDate.add(Duration(hours: 9));
+    final nowKorean = DateTime.now().add(Duration(hours: 9));
+
     final state = m.isFinished
         ? MatchState.finished
-        : m.matchDate.isBefore(DateTime.now())
+        : koreanTime.isBefore(nowKorean)
         ? MatchState.live
         : MatchState.upcoming;
+
     context.push(
       AppRoutes.match,
       extra: MatchExtra(
@@ -48,9 +52,8 @@ class TeamDetailBody extends StatelessWidget {
         homeTeam: m.homeTeamName,
         awayTeam: m.awayTeamName,
         matchState: state,
-        matchDate: '${m.matchDate.month}/${m.matchDate.day}',
-        matchTime:
-            '${m.matchDate.hour.toString().padLeft(2, '0')}:${m.matchDate.minute.toString().padLeft(2, '0')}',
+        matchDate: '${koreanTime.month}/${koreanTime.day}',
+        matchTime: '${koreanTime.hour.toString().padLeft(2, '0')}:${koreanTime.minute.toString().padLeft(2, '0')}',
         homeTeamId: m.homeTeamId,
         awayTeamId: m.awayTeamId,
       ),

@@ -147,9 +147,11 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
           );
         }
 
-        final now = DateTime.now();
-        bool isLive(m) =>
-            !m.matchDate.isAfter(now) && !m.isFinished;
+        final nowKorean = DateTime.now().add(Duration(hours: 9));
+        bool isLive(m) {
+          final koreanMatchTime = m.matchDate.add(Duration(hours: 9));
+          return !koreanMatchTime.isAfter(nowKorean) && !m.isFinished;
+        }
         bool isFavorite(m) =>
             favoriteClubNames.contains(m.homeTeamName) ||
             favoriteClubNames.contains(m.awayTeamName);

@@ -22,8 +22,8 @@ class HistoryMatchRow extends StatelessWidget {
   bool get _isHome => ClubIdMap.sameTeam(match.homeTeamName, clubName);
 
   String get _dateStr {
-    final d = match.matchDate;
-    return '${d.month} / ${d.day}';
+    final koreanTime = match.matchDate.add(Duration(hours: 9));
+    return '${koreanTime.month} / ${koreanTime.day}';
   }
 
   _MatchResult get _result {

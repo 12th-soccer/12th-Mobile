@@ -51,7 +51,10 @@ class MatchDetailView extends ConsumerWidget {
   const MatchDetailView({super.key, required this.extra});
 
   MatchState _resolveState(Match match) {
-    if (match.matchDate.isAfter(DateTime.now())) return MatchState.upcoming;
+    final koreanTime = match.matchDate.add(Duration(hours: 9));
+    final nowKorean = DateTime.now().add(Duration(hours: 9));
+
+    if (koreanTime.isAfter(nowKorean)) return MatchState.upcoming;
     if (match.isFinished) return MatchState.finished;
     return MatchState.live;
   }
@@ -163,10 +166,9 @@ class MatchDetailView extends ConsumerWidget {
                   match.awayTeamName,
                   match.awayTeamId,
                 );
-                final dateStr =
-                    '${match.matchDate.month}/${match.matchDate.day}';
-                final timeStr =
-                    '${match.matchDate.hour.toString().padLeft(2, '0')}:${match.matchDate.minute.toString().padLeft(2, '0')}';
+                final koreanTime = match.matchDate.add(Duration(hours: 9));
+                final dateStr = '${koreanTime.month}/${koreanTime.day}';
+                final timeStr = '${koreanTime.hour.toString().padLeft(2, '0')}:${koreanTime.minute.toString().padLeft(2, '0')}';
                 return _MatchHeader(
                   homeTeam: match.homeTeamName,
                   awayTeam: match.awayTeamName,

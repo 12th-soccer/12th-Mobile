@@ -70,7 +70,7 @@ class PlayerDetailView extends ConsumerWidget {
 
   Widget _buildBody(
     PlayerDetail detail,
-    AsyncValue<PlayerGoal?> goalsAsync,
+    AsyncValue<List<PlayerGoal>> goalsAsync,
   ) {
     return SingleChildScrollView(
       child: Padding(
@@ -101,30 +101,34 @@ class _InfoGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            children: [
-              _InfoCell(label: '소속', value: detail.clubName),
-              _vGap20,
-              _InfoCell(label: '포지션', value: detail.position),
-            ],
+    return SizedBox(
+      height: 100,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _InfoCell(label: '소속', value: detail.clubName),
+                _InfoCell(label: '포지션', value: detail.position),
+              ],
+            ),
           ),
-        ),
-        Expanded(
-          child: Column(
-            children: [
-              _InfoCell(
-                label: '나이',
-                value: detail.age != null ? '${detail.age}세' : null,
-              ),
-              _vGap20,
-              _InfoCell(label: '번호', value: detail.number?.toString()),
-            ],
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _InfoCell(
+                  label: '나이',
+                  value: detail.age != null ? '${detail.age}세' : null,
+                ),
+                _InfoCell(label: '번호', value: detail.number?.toString()),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -139,20 +143,28 @@ class _InfoCell extends StatelessWidget {
   Widget build(BuildContext context) {
     if (value == null) return const SizedBox.shrink();
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           label,
           style: CustomTextStyle.body3.copyWith(color: CustomColor.gray500),
+          textAlign: TextAlign.center,
         ),
         AppSpacing.h4,
-        Text(value!, style: CustomTextStyle.body1),
+        Text(
+          value!,
+          style: CustomTextStyle.body1,
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
       ],
     );
   }
 }
 
 class _GoalsSection extends StatelessWidget {
-  final AsyncValue<PlayerGoal?> goalsAsync;
+  final AsyncValue<List<PlayerGoal>> goalsAsync;
 
   const _GoalsSection({required this.goalsAsync});
 
@@ -171,25 +183,32 @@ class _GoalsSection extends StatelessWidget {
             '골 기록이 없습니다',
             style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
           ),
-          data: (goal) {
-            if (goal == null || goal.goalCount == 0) {
+          data: (goals) {
+            if (goals.isEmpty) {
               return Text(
                 '골 기록이 없습니다',
                 style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
               );
             }
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${goal.season}시즌',
-                  style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
-                ),
-                Text(
-                  '${goal.goalCount}골',
-                  style: CustomTextStyle.body1,
-                ),
-              ],
+            return Column(
+              children: goals.map((goal) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${goal.season}시즌',
+                        style: CustomTextStyle.body2.copyWith(color: CustomColor.gray500),
+                      ),
+                      Text(
+                        '${goal.goalCount}골',
+                        style: CustomTextStyle.body1,
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
             );
           },
         ),
