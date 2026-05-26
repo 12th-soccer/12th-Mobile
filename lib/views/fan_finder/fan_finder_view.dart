@@ -92,7 +92,7 @@ List<Recruitment> _applyFilters(List<Recruitment> posts) {
         backgroundColor: CustomColor.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Symbols.arrow_back_ios, color: CustomColor.white),
+          icon: const Icon(Icons.arrow_back_ios, color: CustomColor.white),
           onPressed: () => context.pop(),
         ),
       ),

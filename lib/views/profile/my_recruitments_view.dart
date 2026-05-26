@@ -6,7 +6,6 @@ import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
-import 'package:twelfth_mobile/features/recruitment/domain/entities/recruitment.dart';
 import 'package:twelfth_mobile/features/recruitment/domain/entities/joined_recruitment.dart';
 import 'package:twelfth_mobile/features/recruitment/presentation/providers/recruitment_provider.dart';
 

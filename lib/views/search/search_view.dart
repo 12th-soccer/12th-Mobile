@@ -172,7 +172,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
                   ),
                   AppSpacing.w4,
                   const Icon(
-                    Symbols.expand_more,
+                    Icons.expand_more,
                     color: CustomColor.black,
                     size: 16,
                   ),
@@ -387,7 +387,7 @@ class _FilterDropdown extends StatelessWidget {
                 Text(label, style: CustomTextStyle.body2),
                 AppSpacing.w4,
                 const Icon(
-                  Symbols.keyboard_arrow_down,
+                  Icons.keyboard_arrow_down,
                   color: CustomColor.white,
                   size: 16,
                 ),

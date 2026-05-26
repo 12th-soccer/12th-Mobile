@@ -163,7 +163,7 @@ class _RankingViewState extends ConsumerState<RankingView> {
                       ),
                       AppSpacing.w4,
                       const Icon(
-                        Symbols.expand_more,
+                        Icons.expand_more,
                         color: CustomColor.black,
                         size: 16,
                       ),

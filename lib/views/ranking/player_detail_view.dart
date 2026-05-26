@@ -1,7 +1,6 @@
 import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
@@ -37,9 +36,8 @@ class PlayerDetailView extends ConsumerWidget {
         actions: [
           IconButton(
             icon: Icon(
-              Symbols.star,
+              isFavorite ? Icons.star : Icons.star_border,
               color: isFavorite ? CustomColor.yellow : CustomColor.main,
-              fill: isFavorite ? 1 : 0,
             ),
             onPressed: () async {
               try {
@@ -94,8 +92,6 @@ class PlayerDetailView extends ConsumerWidget {
 
 class _InfoGrid extends StatelessWidget {
   final PlayerDetail detail;
-
-  static const _vGap20 = SizedBox(height: 20);
 
   const _InfoGrid({required this.detail});
 

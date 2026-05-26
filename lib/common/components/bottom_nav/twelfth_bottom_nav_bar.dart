@@ -1,6 +1,5 @@
 import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 
@@ -27,11 +26,11 @@ class TwelfthBottomNavBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(0, Symbols.leaderboard, '랭킹'),
-              _buildNavItem(1, Symbols.search, '검색'),
-              _buildNavItem(2, Symbols.home, '홈'),
-              _buildNavItem(3, Symbols.star, '관심'),
-              _buildNavItem(4, Symbols.person, '프로필'),
+              _buildNavItem(0, Icons.leaderboard, '랭킹'),
+              _buildNavItem(1, Icons.search, '검색'),
+              _buildNavItem(2, Icons.home, '홈'),
+              _buildNavItem(3, Icons.star, '관심'),
+              _buildNavItem(4, Icons.person, '프로필'),
             ],
           ),
         ),
