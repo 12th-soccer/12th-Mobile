@@ -142,7 +142,7 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
             child: Text(
               labelBuilder(index),
               style: CustomTextStyle.heading2.copyWith(
-                color: isSelected ? CustomColor.black : CustomColor.gray500,
+                color: isSelected ? CustomColor.gray900 : CustomColor.gray500,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
@@ -197,15 +197,15 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 12),
+                    padding: const EdgeInsets.only(left: 4),
                     child: Text(
                       '시',
                       style: CustomTextStyle.heading2.copyWith(
-                        color: CustomColor.gray950,
+                        color: CustomColor.gray900,
                       ),
                     ),
                   ),
-                  AppSpacing.w10,
+                  const SizedBox(width: 4),
                   Expanded(
                     child: _buildTimeWheel(
                       controller: _minuteController,
@@ -222,11 +222,11 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 12),
+                    padding: const EdgeInsets.only(left: 4, right: 20),
                     child: Text(
                       '분',
                       style: CustomTextStyle.heading2.copyWith(
-                        color: CustomColor.gray950,
+                        color: CustomColor.gray900,
                       ),
                     ),
                   ),
