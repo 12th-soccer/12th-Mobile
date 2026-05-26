@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/constants/spacing.dart';
@@ -138,7 +137,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
                       vertical: 2,
                     ),
                     child: Text(
-                      '${season}년',
+                      '$season년',
                       style: CustomTextStyle.body2.copyWith(
                         color: season == state.selectedSeason
                             ? CustomColor.main
@@ -193,7 +192,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
         children: [
           GestureDetector(
             onTap: _clearField,
-            child: const Icon(Symbols.arrow_back_ios, color: CustomColor.main),
+            child: const Icon(Icons.arrow_back_ios, color: CustomColor.main),
           ),
           Expanded(
             child: TextField(

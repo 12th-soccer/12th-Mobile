@@ -65,7 +65,6 @@ final _nameToCode = <String, String>{
 String _convertToCode(String name) {
   final mappedCode = _nameToCode[name];
   if (mappedCode != null) {
-    print('매핑 성공: $name -> $mappedCode');
     return mappedCode;
   }
 
@@ -76,7 +75,6 @@ String _convertToCode(String name) {
       .replaceAll('___', '_')
       .replaceAll('__', '_');
 
-  print('기본 변환: $name -> $converted');
   return converted;
 }
 
@@ -91,15 +89,11 @@ List<TeamItem> _parseTeams(dynamic data, {required bool isK1}) {
     return [];
   }
 
-  print('=== 서버에서 받아온 팀 데이터 (${isK1 ? 'K1' : 'K2'}) ===');
-  print('Data: $data');
-
   final seen = <String>{};
   final items = <TeamItem>[];
   for (final e in list) {
     final json = e as Map<String, dynamic>;
     final name = (json['teamName'] ?? json['name'] ?? '') as String;
-    print('팀 이름: $name');
     if (name.isEmpty || seen.contains(name)) continue;
     seen.add(name);
     final logo = (json['teamLogo'] ??
@@ -108,12 +102,9 @@ List<TeamItem> _parseTeams(dynamic data, {required bool isK1}) {
         json['image']) as String?;
     final serverCode = (json['teamCode'] ?? json['code']) as String?;
     final code = serverCode ?? _convertToCode(name);
-    print('팀 코드: $code');
     items.add(TeamItem(isK1: isK1, displayName: name, code: code, logoUrl: logo));
   }
-  print('=== 생성된 팀 아이템들 ===');
   for (final item in items) {
-    print('${item.displayName} -> ${item.code}');
   }
   return items;
 }

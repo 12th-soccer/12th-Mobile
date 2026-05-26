@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 
 class OnboardingCheckbox extends StatelessWidget {
@@ -27,10 +26,9 @@ class OnboardingCheckbox extends StatelessWidget {
       child: isSelected
           ? const Center(
         child: Icon(
-          Symbols.check,
+          Icons.check,
           size: 14,
           color: CustomColor.white,
-          weight: 700,
         ),
       )
           : null,

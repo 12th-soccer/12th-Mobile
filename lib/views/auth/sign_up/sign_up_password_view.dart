@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
 import 'package:twelfth_mobile/common/components/title/twelfth_accent_title.dart';
@@ -77,8 +76,8 @@ class _SignUpPasswordViewState extends ConsumerState<SignUpPasswordView> {
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword
-                              ? Symbols.visibility_off
-                              : Symbols.visibility,
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           color: CustomColor.gray600,
                           size: 20,
                         ),
@@ -110,8 +109,8 @@ class _SignUpPasswordViewState extends ConsumerState<SignUpPasswordView> {
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscureConfirm
-                              ? Symbols.visibility_off
-                              : Symbols.visibility,
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           color: CustomColor.gray600,
                           size: 20,
                         ),

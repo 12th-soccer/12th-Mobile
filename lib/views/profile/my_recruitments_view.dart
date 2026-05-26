@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/constants/spacing.dart';
@@ -32,7 +31,7 @@ class MyRecruitmentsView extends ConsumerWidget {
         backgroundColor: CustomColor.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Symbols.arrow_back_ios, color: CustomColor.white),
+          icon: const Icon(Icons.arrow_back_ios, color: CustomColor.white),
           onPressed: () => context.pop(),
         ),
         title: Text(
@@ -151,7 +150,7 @@ class _MyJoinedRecruitmentItem extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isExpired ? CustomColor.gray800.withOpacity(0.5) : CustomColor.gray800,
+          color: isExpired ? CustomColor.gray800.withValues(alpha: 0.5) : CustomColor.gray800,
           borderRadius: AppRadius.lg,
         ),
         child: Column(
@@ -223,7 +222,7 @@ class _MyJoinedRecruitmentItem extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  Symbols.group,
+                  Icons.group,
                   color: isExpired ? CustomColor.gray500 : CustomColor.gray500,
                   size: 16,
                 ),
@@ -236,7 +235,7 @@ class _MyJoinedRecruitmentItem extends StatelessWidget {
                 ),
                 const Spacer(),
                 Icon(
-                  Symbols.schedule,
+                  Icons.schedule,
                   color: isExpired ? CustomColor.gray500 : CustomColor.gray500,
                   size: 16,
                 ),

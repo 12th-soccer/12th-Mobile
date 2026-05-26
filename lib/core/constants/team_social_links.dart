@@ -127,15 +127,12 @@ abstract final class TeamSocials {
 
   static TeamSocialLinks? of(String teamName) {
     final canonical = canonicalName(teamName);
-    print('[TeamSocials] Looking up team: "$teamName" → canonical: "$canonical"');
 
     if (canonical != null && _data.containsKey(canonical)) {
       final links = _data[canonical]!;
-      print('[TeamSocials] Found social links for $canonical: Instagram: ${links.instagram}, YouTube: ${links.youtube}');
       return links;
     }
 
-    print('[TeamSocials] No social links found for "$teamName"');
     return null;
   }
 

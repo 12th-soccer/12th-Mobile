@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
@@ -45,19 +44,11 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
     if (!_validateSubmission()) return;
 
     final userInfo = ref.read(userInfoProvider).valueOrNull;
-    print('=== 사용자 정보 확인 ===');
-    print('UserInfo: $userInfo');
-    print('UserId: ${userInfo?.userId}');
-    print('Email: ${userInfo?.email}');
-    print('Username: ${userInfo?.username}');
-    print('HasUsername: ${userInfo?.hasUsername}');
 
     final token = await TokenStorage.instance.getAccessToken();
-    print('=== 토큰 상태 확인 ===');
-    print('Has Token: ${token != null}');
+
     if (token != null) {
-      print('Token Length: ${token.length}');
-      print('Token Prefix: ${token.length > 10 ? token.substring(0, 10) : token}...');
+
     }
 
     if (userInfo == null) {
@@ -83,17 +74,6 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
         expiryDate: _expiryDate,
       );
 
-      print('=== Recruitment 생성 요청 ===');
-      print('Title: ${recruitment.title}');
-      print('Content: ${recruitment.content}');
-      print('HeadCount: ${recruitment.headCount}');
-      print('AgeGroup: ${recruitment.ageGroup}');
-      print('GenderGroup: ${recruitment.genderGroup}');
-      print('TeamCode: ${recruitment.teamCode}');
-      print('IsK1: ${recruitment.isK1}');
-      print('TeamDisplayName: ${recruitment.teamDisplayName}');
-      print('ExpiryDate: ${recruitment.expiryDate}');
-
       await createRecruitment(ref, recruitment);
       if (!mounted) return;
       await ref.read(recruitmentListProvider.notifier).refresh();
@@ -101,11 +81,6 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
       context.pop();
     } on ApiException catch (e) {
       if (!mounted) return;
-
-      print('=== API 에러 정보 ===');
-      print('Status Code: ${e.statusCode}');
-      print('Response Data: ${e.responseData}');
-      print('URI: ${e.uri}');
 
       final msg = switch (e.statusCode) {
         401 => '로그인이 필요합니다.',
@@ -116,8 +91,6 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
       context.showErrorSnackBar(msg);
     } catch (e) {
       if (!mounted) return;
-      print('=== 일반 에러 ===');
-      print('Error: $e');
       context.showErrorSnackBar('모집글 등록에 실패했습니다. 다시 시도해 주세요. (에러: $e)');
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
@@ -146,10 +119,6 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
       return false;
     }
 
-    print('=== 선택된 팀 정보 ===');
-    print('Team DisplayName: ${_selectedTeam!.displayName}');
-    print('Team Code: ${_selectedTeam!.code}');
-    print('Team IsK1: ${_selectedTeam!.isK1}');
     if (_expiryDate == null) {
       context.showErrorSnackBar('만료일을 선택해 주세요.');
       return false;
@@ -218,7 +187,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
                     ),
                     trailing: isSel
                         ? const Icon(
-                            Symbols.check,
+                            Icons.check,
                             color: CustomColor.main,
                             size: 18,
                           )
@@ -280,7 +249,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
                       ),
                       trailing: isSel
                           ? const Icon(
-                              Symbols.check,
+                              Icons.check,
                               color: CustomColor.main,
                               size: 18,
                             )
@@ -322,7 +291,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
         backgroundColor: CustomColor.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Symbols.arrow_back_ios, color: CustomColor.white),
+          icon: const Icon(Icons.arrow_back_ios, color: CustomColor.white),
           onPressed: () => context.pop(),
         ),
       ),
@@ -438,7 +407,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
         Row(
           children: [
             _StepperButton(
-              icon: Symbols.remove,
+              icon: Icons.remove,
               onPressed: _headCount > FanFinderConstants.minParticipants
                   ? () => setState(() => _headCount--)
                   : null,
@@ -452,7 +421,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
               ),
             ),
             _StepperButton(
-              icon: Symbols.add,
+              icon: Icons.add,
               onPressed: _headCount < FanFinderConstants.maxParticipants
                   ? () => setState(() => _headCount++)
                   : null,
@@ -493,7 +462,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
               GestureDetector(
                 onTap: () => setState(() => _expiryDate = null),
                 child: const Icon(
-                  Symbols.close,
+                  Icons.close,
                   size: 16,
                   color: CustomColor.gray600,
                 ),
@@ -573,7 +542,7 @@ class _CategoryChip extends StatelessWidget {
             ),
             const SizedBox(width: 3),
             Icon(
-              Symbols.keyboard_arrow_down,
+              Icons.keyboard_arrow_down,
               size: 13,
               color: isSelected ? CustomColor.main : CustomColor.gray500,
             ),

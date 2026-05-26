@@ -72,6 +72,17 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
     _resetToToday();
   }
 
+  Set<String> _getMatchDatesForMonth() {
+    final matchesAsync = ref.watch(matchesByDateProvider((date: _dateKey, leagueType: _leagueType)));
+
+    // 현재 선택된 날짜에 경기가 있으면 해당 날짜만 표시
+    return matchesAsync.when(
+      data: (matches) => matches.isNotEmpty ? {_dateKey} : <String>{},
+      loading: () => <String>{},
+      error: (_, __) => <String>{},
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,6 +94,7 @@ class _ScheduleViewState extends ConsumerState<ScheduleView> {
             ScheduleCalendar(
               focusedMonth: _focusedMonth,
               selectedDate: _selectedDate,
+              matchDates: _getMatchDatesForMonth(),
               onPrevMonth: () => setState(
                 () => _focusedMonth = DateTime(
                   _focusedMonth.year,

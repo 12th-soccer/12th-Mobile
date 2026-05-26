@@ -1,6 +1,5 @@
 import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 
@@ -13,6 +12,7 @@ class ScheduleCalendar extends StatelessWidget {
     required this.onNextMonth,
     required this.onDateSelected,
     required this.onHeaderTap,
+    this.matchDates = const {},
   });
 
   final DateTime focusedMonth;
@@ -21,6 +21,7 @@ class ScheduleCalendar extends StatelessWidget {
   final VoidCallback onNextMonth;
   final ValueChanged<DateTime> onDateSelected;
   final VoidCallback? onHeaderTap;
+  final Set<String> matchDates; // "YYYY-MM-DD" 형식의 경기 날짜들
 
   static const _weekLabels = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -47,7 +48,7 @@ class ScheduleCalendar extends StatelessWidget {
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                     child: Icon(
-                      Symbols.arrow_back_ios,
+                      Icons.arrow_back_ios,
                       color: CustomColor.white,
                       size: 12,
                     ),
@@ -63,7 +64,7 @@ class ScheduleCalendar extends StatelessWidget {
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                     child: Icon(
-                      Symbols.arrow_forward_ios,
+                      Icons.arrow_forward_ios,
                       color: CustomColor.white,
                       size: 12,
                     ),
@@ -121,6 +122,9 @@ class ScheduleCalendar extends StatelessWidget {
                     selectedDate.month == date.month &&
                     selectedDate.day == date.day;
 
+                final dateKey = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+                final hasMatch = matchDates.contains(dateKey);
+
                 Color textColor;
                 if (!isCurrentMonth) {
                   textColor = CustomColor.gray900;
@@ -150,11 +154,27 @@ class ScheduleCalendar extends StatelessWidget {
                                 )
                               : null,
                           child: Center(
-                            child: Text(
-                              '$day',
-                              style: CustomTextStyle.body2.copyWith(
-                                color: textColor,
-                              ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  '$day',
+                                  style: CustomTextStyle.body2.copyWith(
+                                    color: textColor,
+                                  ),
+                                ),
+                                if (hasMatch && isCurrentMonth) ...[
+                                  const SizedBox(height: 2),
+                                  Container(
+                                    width: 4,
+                                    height: 4,
+                                    decoration: const BoxDecoration(
+                                      color: CustomColor.main,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                           ),
                         ),

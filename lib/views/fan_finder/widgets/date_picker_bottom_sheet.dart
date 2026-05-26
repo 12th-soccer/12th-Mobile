@@ -1,7 +1,6 @@
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 
 class DatePickerBottomSheet extends StatefulWidget {
@@ -278,7 +277,7 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
                         ),
                       ),
                       child: const Icon(
-                        Symbols.chevron_left,
+                        Icons.chevron_left,
                         color: CustomColor.white,
                       ),
                     ),
@@ -298,7 +297,7 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
                         ),
                       ),
                       child: const Icon(
-                        Symbols.chevron_right,
+                        Icons.chevron_right,
                         color: CustomColor.white,
                       ),
                     ),

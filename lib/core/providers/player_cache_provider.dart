@@ -53,11 +53,7 @@ class PlayerCacheService {
       }
 
       _isK1Loaded = true;
-      print('[PlayerCache] Loaded ${players.length} K1 players');
-      print('[PlayerCache] K1 players with images: $playersWithImages');
-      print('[PlayerCache] K1 players without images: $playersWithoutImages');
     } catch (e) {
-      print('[PlayerCache] Failed to load K1 players: $e');
     }
   }
 
@@ -95,11 +91,7 @@ class PlayerCacheService {
       }
 
       _isK2Loaded = true;
-      print('[PlayerCache] Loaded ${players.length} K2 players');
-      print('[PlayerCache] K2 players with images: $playersWithImages');
-      print('[PlayerCache] K2 players without images: $playersWithoutImages');
     } catch (e) {
-      print('[PlayerCache] Failed to load K2 players: $e');
     }
   }
 
@@ -110,9 +102,6 @@ class PlayerCacheService {
   String? getCachedPlayerImage(int playerId) {
     final player = _playerCache[playerId];
     if (player?.imageUrl != null) {
-      print(
-        '[PlayerCache] Found cached image for player $playerId: ${player!.imageUrl}',
-      );
     }
     return player?.imageUrl;
   }
@@ -131,30 +120,22 @@ final enhancedPlayerImageProvider = FutureProvider.family<String?, int>((
   playerId,
 ) async {
   if (playerId == 0) {
-    print('[PlayerImage] Skipping player ID 0');
     return null;
   }
 
-  print('[PlayerImage] === Starting enhanced provider for player $playerId ===');
 
   final cacheService = PlayerCacheService();
   if (!cacheService.isInitialized) {
-    print('[PlayerImage] Cache not initialized for $playerId, waiting...');
     await cacheService.initializeCache();
   }
 
-  print('[PlayerImage] Cache initialized. Cache size: ${cacheService.cacheSize}');
 
   final cachedImage = cacheService.getCachedPlayerImage(playerId);
-  print('[PlayerImage] Cached image for $playerId: $cachedImage');
 
   if (cachedImage != null && cachedImage.isNotEmpty) {
-    print('[PlayerImage] Using cached image for $playerId: $cachedImage');
-    print('[PlayerImage] === Final result for player $playerId: $cachedImage ===');
     return cachedImage;
   }
 
-  print('[PlayerImage] No cached image for $playerId, trying individual API...');
 
   final client = DioClient.instance.apiClient;
   final currentYear = DateTime.now().year;
@@ -162,7 +143,6 @@ final enhancedPlayerImageProvider = FutureProvider.family<String?, int>((
 
   for (final season in seasons) {
     try {
-      print('[PlayerImage] Calling individual player API for $playerId, season $season');
 
       final imageUrl = await client.get(
         ApiEndpoints.player(playerId.toString(), season: season),
@@ -170,52 +150,39 @@ final enhancedPlayerImageProvider = FutureProvider.family<String?, int>((
       );
 
       if (imageUrl != null && imageUrl.isNotEmpty) {
-        print('[PlayerImage] Found image URL in season $season: $imageUrl');
-        print('[PlayerImage] === Final result for player $playerId: $imageUrl ===');
         return imageUrl;
       } else {
-        print('[PlayerImage] No image found in season $season, trying next...');
       }
 
     } on ApiException catch (e) {
       final status = e.statusCode;
       if (status == 400 || status == 401 || status == 403 || status == 404) {
-        print('[PlayerImage] No data for player $playerId in season $season (${status}), trying next...');
         continue;
       }
-      print('[PlayerImage] API error for player $playerId in season $season: ${e.statusCode}');
       continue;
     } catch (e) {
-      print('[PlayerImage] Unexpected error for player $playerId in season $season: $e');
       continue;
     }
   }
 
-  print('[PlayerImage] No image found for player $playerId in any season');
-  print('[PlayerImage] === Final result for player $playerId: null ===');
   return null;
 });
 
 String? _parsePlayerImageData(dynamic data, String season) {
-  print('[PlayerImage] Individual player API response for season $season: $data (type: ${data.runtimeType})');
 
   if (data == null) {
-    print('[PlayerImage] Null response from player API for season $season');
     return null;
   }
 
   if (data is String && data.trim().isEmpty) {
-    print('[PlayerImage] Empty string response from player API for season $season');
     return null;
   }
 
   if (data is! Map<String, dynamic>) {
-    print('[PlayerImage] Unexpected response type from player API for season $season: ${data.runtimeType}');
     return null;
   }
 
   final json = data;
-  print('[PlayerImage] Player data keys for season $season: ${json.keys.toList()}');
 
   final photo = json['photo'] as String?;
   final playerImageUrl = json['playerImageUrl'] as String?;
@@ -240,8 +207,6 @@ String? _parsePlayerImageData(dynamic data, String season) {
 
   final finalUrl = isSwapped ? rawName : resolvedImageUrl;
 
-  print('[PlayerImage] API response fields for season $season - photo: $photo, playerImageUrl: $playerImageUrl, final: $finalUrl');
-
   if (finalUrl != null && finalUrl.isNotEmpty) {
     final lowerUrl = finalUrl.toLowerCase();
     if (lowerUrl.contains('default') ||
@@ -251,7 +216,6 @@ String? _parsePlayerImageData(dynamic data, String season) {
         finalUrl.endsWith('default.png') ||
         finalUrl.endsWith('default.jpg') ||
         finalUrl.endsWith('profile_default.png')) {
-      print('[PlayerImage] Server default image detected for season $season: $finalUrl');
       return finalUrl;
     }
   }

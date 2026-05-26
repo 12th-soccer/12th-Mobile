@@ -7,9 +7,7 @@ import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
 import 'package:twelfth_mobile/features/phone_verification/presentation/providers/phone_verification_provider.dart';
 import 'package:twelfth_mobile/core/components/text_form_field/text_form_field.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
-import 'package:twelfth_mobile/core/router/router_paths.dart';
 
 class PhoneVerificationView extends ConsumerStatefulWidget {
   const PhoneVerificationView({super.key});
@@ -106,7 +104,8 @@ class _PhoneVerificationViewState extends ConsumerState<PhoneVerificationView> {
 
       if (mounted) {
         _showSuccessSnackBar('전화번호 인증이 완료되었습니다.');
-        context.pushReplacement(AppRoutes.fanFinder);
+        // 인증 완료 후 이전 페이지로 돌아가기 (팬파인더 페이지)
+        context.pop(true);
       }
     } catch (e) {
       _showErrorSnackBar('서버 인증에 실패했습니다: $e');
@@ -137,7 +136,7 @@ class _PhoneVerificationViewState extends ConsumerState<PhoneVerificationView> {
         backgroundColor: CustomColor.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Symbols.arrow_back_ios, color: CustomColor.white),
+          icon: const Icon(Icons.arrow_back_ios, color: CustomColor.white),
           onPressed: () => context.pop(false),
         ),
         title: Text(

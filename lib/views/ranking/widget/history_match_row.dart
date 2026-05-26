@@ -1,6 +1,5 @@
 import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/constants/club_id_map.dart';
@@ -85,7 +84,7 @@ class HistoryMatchRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Icon(
-                  _isHome ? Symbols.stadium : Symbols.flight,
+                  _isHome ? Icons.home : Icons.flight,
                   size: 14,
                   color: CustomColor.gray500,
                 ),
