@@ -104,8 +104,6 @@ List<TeamItem> _parseTeams(dynamic data, {required bool isK1}) {
     final code = serverCode ?? _convertToCode(name);
     items.add(TeamItem(isK1: isK1, displayName: name, code: code, logoUrl: logo));
   }
-  for (final item in items) {
-  }
   return items;
 }
 

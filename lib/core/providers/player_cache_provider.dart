@@ -36,20 +36,11 @@ class PlayerCacheService {
         },
       );
 
-      int playersWithImages = 0;
-      int playersWithoutImages = 0;
-
       for (final playerJson in players) {
         final player = PlayerSearchResultModel.fromJson(
           playerJson as Map<String, dynamic>,
         );
         _playerCache[player.playerId] = player;
-
-        if (player.imageUrl != null && player.imageUrl!.isNotEmpty) {
-          playersWithImages++;
-        } else {
-          playersWithoutImages++;
-        }
       }
 
       _isK1Loaded = true;
@@ -74,20 +65,11 @@ class PlayerCacheService {
         },
       );
 
-      int playersWithImages = 0;
-      int playersWithoutImages = 0;
-
       for (final playerJson in players) {
         final player = PlayerSearchResultModel.fromJson(
           playerJson as Map<String, dynamic>,
         );
         _playerCache[player.playerId] = player;
-
-        if (player.imageUrl != null && player.imageUrl!.isNotEmpty) {
-          playersWithImages++;
-        } else {
-          playersWithoutImages++;
-        }
       }
 
       _isK2Loaded = true;

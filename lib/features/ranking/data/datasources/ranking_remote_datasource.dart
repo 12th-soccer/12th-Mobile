@@ -123,8 +123,6 @@ class RankingRemoteDataSourceImpl implements IRankingRemoteDataSource {
     throw Exception('Player not found in any season');
   }
 
-  static String get _currentSeason => DateTime.now().year.toString();
-
   @override
   Future<List<PlayerGoal>> getPlayerGoals(int playerId) async {
 
@@ -178,7 +176,6 @@ class RankingRemoteDataSourceImpl implements IRankingRemoteDataSource {
 
     if (goalsBySeasons.isNotEmpty) {
       goalsBySeasons.sort((a, b) => b.season.compareTo(a.season));
-    } else {
     }
 
     return goalsBySeasons;

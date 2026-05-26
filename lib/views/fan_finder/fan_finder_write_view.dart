@@ -50,6 +50,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
     if (token != null) {
 
     }
+    if (!mounted) return;
 
     if (userInfo == null) {
       context.showErrorSnackBar('로그인이 필요합니다.');
