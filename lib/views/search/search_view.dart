@@ -71,19 +71,12 @@ class _SearchViewState extends ConsumerState<SearchView> {
     }
   }
 
-  static List<String> get _seasons {
-    final current = DateTime.now().year;
-    return List.generate(current - kStartSeason + 1, (i) => (current - i).toString());
-  }
-
   @override
   Widget build(BuildContext context) {
     final searchState = ref.watch(searchNotifierProvider);
     final showResults =
         searchState.status != SearchStatus.initial ||
         _searchController.text.isNotEmpty;
-    final isPlayerFilter = searchState.filter == SearchFilter.player;
-
     return GestureDetector(
       onTap: () => _focusNode.unfocus(),
       child: Scaffold(
@@ -94,7 +87,6 @@ class _SearchViewState extends ConsumerState<SearchView> {
             children: [
               _buildTopBar(searchState),
               const Divider(color: CustomColor.main, height: 1),
-              if (isPlayerFilter) _buildSeasonDropdown(searchState),
               Expanded(
                 child: showResults
                     ? _buildResultsSection(searchState)
@@ -107,93 +99,13 @@ class _SearchViewState extends ConsumerState<SearchView> {
     );
   }
 
-  Widget _buildSeasonDropdown(SearchState state) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          AppSpacing.w8,
-          PopupMenuButton<String>(
-            onSelected: (season) {
-              ref.read(searchNotifierProvider.notifier).setSeason(season);
-              final q = _searchController.text.trim();
-              if (q.isNotEmpty) {
-                ref.read(searchNotifierProvider.notifier).search(q);
-              }
-            },
-            color: CustomColor.gray900,
-            shape: RoundedRectangleBorder(
-              borderRadius: AppRadius.md,
-              side: const BorderSide(color: CustomColor.gray600),
-            ),
-            offset: const Offset(0, 40),
-            itemBuilder: (_) => _seasons
-                .map(
-                  (season) => PopupMenuItem<String>(
-                    value: season,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 2,
-                    ),
-                    child: Text(
-                      '$season년',
-                      style: CustomTextStyle.body2.copyWith(
-                        color: season == state.selectedSeason
-                            ? CustomColor.main
-                            : CustomColor.white,
-                        fontWeight: season == state.selectedSeason
-                            ? FontWeight.w600
-                            : FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 7,
-              ),
-              decoration: BoxDecoration(
-                color: CustomColor.main,
-                borderRadius: AppRadius.lg,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '${state.selectedSeason}년',
-                    style: CustomTextStyle.body3.copyWith(
-                      color: CustomColor.black,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  AppSpacing.w4,
-                  const Icon(
-                    Icons.expand_more,
-                    color: CustomColor.black,
-                    size: 16,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildTopBar(SearchState state) {
     final filterLabel = state.filter == SearchFilter.player ? '선수' : '구단';
+    final hasText = _searchController.text.isNotEmpty;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: _clearField,
-            child: const Icon(Icons.arrow_back_ios, color: CustomColor.main),
-          ),
           Expanded(
             child: TextField(
               controller: _searchController,
@@ -210,6 +122,16 @@ class _SearchViewState extends ConsumerState<SearchView> {
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
+                suffixIcon: hasText
+                    ? GestureDetector(
+                        onTap: _clearField,
+                        child: const Icon(
+                          Icons.close,
+                          color: CustomColor.gray500,
+                          size: 20,
+                        ),
+                      )
+                    : null,
               ),
               onSubmitted: (v) => _onChanged(v),
               onChanged: (v) {
@@ -218,6 +140,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
               },
             ),
           ),
+          AppSpacing.w8,
           _FilterDropdown(label: filterLabel, onSelected: _onFilterChanged),
         ],
       ),

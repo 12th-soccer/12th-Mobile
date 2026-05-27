@@ -1,4 +1,3 @@
-import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
@@ -34,7 +33,7 @@ class ScheduleCalendar extends StatelessWidget {
     final prevMonthDays = DateTime(year, month, 0).day;
 
     return Padding(
-      padding: AppPadding.cardH,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
           Padding(
@@ -141,12 +140,13 @@ class ScheduleCalendar extends StatelessWidget {
                 return Expanded(
                   child: GestureDetector(
                     onTap: isCurrentMonth ? () => onDateSelected(date) : null,
+                    behavior: HitTestBehavior.opaque,
                     child: SizedBox(
-                      height: 34,
+                      height: 44,
                       child: Center(
                         child: Container(
-                          width: 25,
-                          height: 25,
+                          width: 32,
+                          height: 32,
                           decoration: isSelected
                               ? const BoxDecoration(
                                   color: CustomColor.main,

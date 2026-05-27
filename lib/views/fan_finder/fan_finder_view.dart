@@ -90,10 +90,7 @@ List<Recruitment> _applyFilters(List<Recruitment> posts) {
       appBar: AppBar(
         backgroundColor: CustomColor.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: CustomColor.white),
-          onPressed: () => context.pop(),
-        ),
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         children: [

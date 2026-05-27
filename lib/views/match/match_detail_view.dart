@@ -137,7 +137,7 @@ class MatchDetailView extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: CustomColor.background,
-      appBar: const TwelfthAppBar(title: '경기 상세'),
+      appBar: const TwelfthAppBar(title: '경기 상세', showBackButton: false),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

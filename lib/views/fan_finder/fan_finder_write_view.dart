@@ -85,14 +85,14 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
 
       final msg = switch (e.statusCode) {
         401 => '로그인이 필요합니다.',
-        403 => '모집글 작성 권한이 없습니다. 닉네임 설정을 확인해주세요.\n상세: ${e.responseData}',
-        400 => '입력된 정보를 확인해주세요.\n상세: ${e.responseData}',
-        _ => '모집글 등록에 실패했습니다. (${e.statusCode})\n상세: ${e.responseData}',
+        403 => '모집글 작성 권한이 없습니다. 닉네임 설정을 확인해주세요.',
+        400 => '입력된 정보를 확인해주세요.',
+        _ => '모집글 등록에 실패했습니다. 다시 시도해 주세요.',
       };
       context.showErrorSnackBar(msg);
     } catch (e) {
       if (!mounted) return;
-      context.showErrorSnackBar('모집글 등록에 실패했습니다. 다시 시도해 주세요. (에러: $e)');
+      context.showErrorSnackBar('모집글 등록에 실패했습니다. 다시 시도해 주세요.');
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -291,10 +291,7 @@ class _FanFinderWriteViewState extends ConsumerState<FanFinderWriteView> {
       appBar: AppBar(
         backgroundColor: CustomColor.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: CustomColor.white),
-          onPressed: () => context.pop(),
-        ),
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         padding: FanFinderConstants.screenPadding,

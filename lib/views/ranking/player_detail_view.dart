@@ -33,6 +33,7 @@ class PlayerDetailView extends ConsumerWidget {
       backgroundColor: CustomColor.background,
       appBar: TwelfthAppBar(
         title: '선수 상세',
+        showBackButton: false,
         actions: [
           IconButton(
             icon: Icon(

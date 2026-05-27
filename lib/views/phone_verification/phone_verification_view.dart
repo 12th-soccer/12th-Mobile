@@ -46,7 +46,7 @@ class _PhoneVerificationViewState extends ConsumerState<PhoneVerificationView> {
         },
         verificationFailed: (FirebaseAuthException e) {
           setState(() => _isLoading = false);
-          _showErrorSnackBar('인증번호 전송에 실패했습니다: ${e.message}');
+          _showErrorSnackBar('인증번호 전송에 실패했습니다. 전화번호를 확인해 주세요.');
         },
         codeSent: (String verificationId, int? resendToken) {
           setState(() {
@@ -62,7 +62,7 @@ class _PhoneVerificationViewState extends ConsumerState<PhoneVerificationView> {
       );
     } catch (e) {
       setState(() => _isLoading = false);
-      _showErrorSnackBar('오류가 발생했습니다: $e');
+      _showErrorSnackBar('오류가 발생했습니다. 다시 시도해 주세요.');
     }
   }
 
@@ -94,7 +94,7 @@ class _PhoneVerificationViewState extends ConsumerState<PhoneVerificationView> {
       }
     } catch (e) {
       setState(() => _isLoading = false);
-      _showErrorSnackBar('인증에 실패했습니다: $e');
+      _showErrorSnackBar('인증에 실패했습니다. 다시 시도해 주세요.');
     }
   }
 
@@ -108,7 +108,7 @@ class _PhoneVerificationViewState extends ConsumerState<PhoneVerificationView> {
         context.pop(true);
       }
     } catch (e) {
-      _showErrorSnackBar('서버 인증에 실패했습니다: $e');
+      _showErrorSnackBar('서버 인증에 실패했습니다. 다시 시도해 주세요.');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -135,14 +135,12 @@ class _PhoneVerificationViewState extends ConsumerState<PhoneVerificationView> {
       appBar: AppBar(
         backgroundColor: CustomColor.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: CustomColor.white),
-          onPressed: () => context.pop(false),
-        ),
+        automaticallyImplyLeading: false,
         title: Text(
           '전화번호 인증',
           style: CustomTextStyle.heading2.copyWith(color: CustomColor.white),
         ),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),

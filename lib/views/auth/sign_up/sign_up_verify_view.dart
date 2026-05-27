@@ -90,7 +90,16 @@ class _SignUpVerifyViewState extends ConsumerState<SignUpVerifyView> {
 
     return Scaffold(
       backgroundColor: CustomColor.background,
-      appBar: const TwelfthAppBar(),
+      appBar: TwelfthAppBar(
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: CustomColor.main,
+            size: 20,
+          ),
+          onPressed: () => context.pop(),
+        ),
+      ),
       body: SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),

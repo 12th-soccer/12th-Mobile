@@ -69,6 +69,7 @@ class _EditUsernameViewState extends ConsumerState<EditUsernameView> {
     return Scaffold(
       backgroundColor: CustomColor.background,
       appBar: TwelfthAppBar(
+        showBackButton: false,
         actions: [
           TextButton(
             onPressed: canSave ? _save : null,

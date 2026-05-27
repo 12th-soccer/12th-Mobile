@@ -125,7 +125,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
           },
         ),
         _buildMenuItem(
-          icon: Icons.group,
+          icon: Icons.groups,
           label: '모임 모아보기',
           onTap: () => context.push(AppRoutes.myRecruitments),
         ),

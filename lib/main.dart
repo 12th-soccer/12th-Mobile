@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/network/token_storage.dart';
 import 'package:twelfth_mobile/core/providers/club_mapping_provider.dart';
 import 'package:twelfth_mobile/core/providers/player_cache_provider.dart';
 import 'package:twelfth_mobile/core/router/router.dart';
@@ -48,12 +49,13 @@ class TwelfthApp extends StatefulWidget {
   State<TwelfthApp> createState() => _TwelfthAppState();
 }
 
-class _TwelfthAppState extends State<TwelfthApp> {
+class _TwelfthAppState extends State<TwelfthApp> with WidgetsBindingObserver {
   late final StreamSubscription<void> _sessionSub;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _sessionSub = SessionManager.onSessionExpired.listen((_) {
       appRouter.go(AppRoutes.login);
     });
@@ -61,8 +63,23 @@ class _TwelfthAppState extends State<TwelfthApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _sessionSub.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    final path =
+        appRouter.routerDelegate.currentConfiguration.uri.path;
+    final onLoginOrSplash =
+        path == AppRoutes.login || path == AppRoutes.splash;
+    if (!onLoginOrSplash) return;
+
+    TokenStorage.instance.hasToken().then((hasToken) {
+      if (hasToken) appRouter.go(AppRoutes.schedule);
+    });
   }
 
   @override

@@ -33,6 +33,7 @@ class TeamDetailView extends ConsumerWidget {
       backgroundColor: CustomColor.background,
       appBar: TwelfthAppBar(
         title: '구단 상세',
+        showBackButton: false,
         actions: [
           IconButton(
             icon: Icon(

@@ -76,6 +76,7 @@ class FavoritesNotifier extends AsyncNotifier<List<FavoriteClub>> {
       } else {
         await ref.read(_addFavoriteClubUseCaseProvider).call(clubId);
       }
+      state = await AsyncValue.guard(_fetch);
       return !alreadyFavorite;
     } catch (_) {
       state = AsyncData(current);
@@ -123,6 +124,7 @@ class FavoritePlayersNotifier extends AsyncNotifier<List<FavoritePlayer>> {
       } else {
         await ref.read(_addFavoritePlayerUseCaseProvider).call(playerId);
       }
+      state = await AsyncValue.guard(_fetch);
       return !alreadyFavorite;
     } catch (_) {
       state = AsyncData(current);
