@@ -20,9 +20,9 @@ dependencies:
   url_launcher: ^6.3.1
   flutter_web_auth_2: ^5.0.2
   firebase_core: ^3.13.0
-  firebase_auth: ^5.3.3
   firebase_messaging: ^15.2.5
   flutter_local_notifications: ^18.0.1
+  stomp_dart_client: ^2.0.0
 
 dev_dependencies:
   flutter_test:
