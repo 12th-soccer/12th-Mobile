@@ -44,7 +44,7 @@ class PlayerCacheService {
       }
 
       _isK1Loaded = true;
-    } catch (e) {
+    } catch (_) {
     }
   }
 
@@ -73,7 +73,7 @@ class PlayerCacheService {
       }
 
       _isK2Loaded = true;
-    } catch (e) {
+    } catch (_) {
     }
   }
 

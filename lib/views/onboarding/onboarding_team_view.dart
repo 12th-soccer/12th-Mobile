@@ -68,7 +68,7 @@ class _OnboardingTeamViewState extends ConsumerState<OnboardingTeamView> {
     if (_selected != null) {
       try {
         await _favoritesDs.addFavoriteClub(_selected!.clubId);
-      } catch (e) {
+      } catch (_) {
       }
     }
     if (mounted) context.push(AppRoutes.onboardingComplete);
