@@ -27,12 +27,22 @@ class PhoneVerificationNotifier extends AutoDisposeAsyncNotifier<void> {
   @override
   Future<void> build() async {}
 
-  Future<void> verifyPhone(String firebaseIdToken) async {
+  Future<void> sendCode(String phone) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      await ref.read(phoneVerificationRepositoryProvider).sendCode(phone);
+    });
+  }
+
+  Future<void> verifyCode({
+    required String phone,
+    required String code,
+  }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       await ref
           .read(phoneVerificationRepositoryProvider)
-          .verifyPhone(firebaseIdToken);
+          .verifyCode(phone: phone, code: code);
     });
   }
 }

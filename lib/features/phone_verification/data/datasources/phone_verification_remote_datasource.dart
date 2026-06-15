@@ -2,7 +2,9 @@ import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/core/network/api_endpoints.dart';
 
 abstract interface class IPhoneVerificationRemoteDataSource {
-  Future<void> verifyPhone(String firebaseIdToken);
+  Future<void> sendCode(String phone);
+
+  Future<void> verifyCode({required String phone, required String code});
 }
 
 class PhoneVerificationRemoteDataSourceImpl
@@ -12,10 +14,21 @@ class PhoneVerificationRemoteDataSourceImpl
   final ApiClient _apiClient;
 
   @override
-  Future<void> verifyPhone(String firebaseIdToken) async {
+  Future<void> sendCode(String phone) async {
+    await _apiClient.postVoid(
+      ApiEndpoints.phoneSend,
+      data: {'phone': phone},
+    );
+  }
+
+  @override
+  Future<void> verifyCode({
+    required String phone,
+    required String code,
+  }) async {
     await _apiClient.postVoid(
       ApiEndpoints.phoneVerify,
-      data: {'firebaseIdToken': firebaseIdToken},
+      data: {'phone': phone, 'code': code},
     );
   }
 }

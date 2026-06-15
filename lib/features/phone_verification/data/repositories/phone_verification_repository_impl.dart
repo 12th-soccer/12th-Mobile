@@ -7,6 +7,9 @@ class PhoneVerificationRepositoryImpl implements IPhoneVerificationRepository {
   final IPhoneVerificationRemoteDataSource _dataSource;
 
   @override
-  Future<void> verifyPhone(String firebaseIdToken) =>
-      _dataSource.verifyPhone(firebaseIdToken);
+  Future<void> sendCode(String phone) => _dataSource.sendCode(phone);
+
+  @override
+  Future<void> verifyCode({required String phone, required String code}) =>
+      _dataSource.verifyCode(phone: phone, code: code);
 }

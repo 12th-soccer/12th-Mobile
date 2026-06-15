@@ -1,3 +1,4 @@
 abstract interface class IPhoneVerificationRepository {
-  Future<void> verifyPhone(String firebaseIdToken);
+  Future<void> sendCode(String phone);
+  Future<void> verifyCode({required String phone, required String code});
 }
