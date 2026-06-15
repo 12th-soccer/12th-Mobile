@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
@@ -88,7 +87,7 @@ class _LiveChatViewState extends ConsumerState<LiveChatView> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(
-            Symbols.arrow_back_ios,
+            Icons.arrow_back_ios,
             color: CustomColor.white,
             size: 20,
           ),
@@ -243,7 +242,7 @@ class _LiveChatViewState extends ConsumerState<LiveChatView> {
             child: const SizedBox(
               width: 40,
               height: 40,
-              child: Icon(Symbols.send, size: 20, color: CustomColor.main),
+              child: Icon(Icons.send, size: 20, color: CustomColor.main),
             ),
           ),
         ],
