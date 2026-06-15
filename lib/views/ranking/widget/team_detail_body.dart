@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
+import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/constants/twelfth_assets.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
@@ -20,19 +21,27 @@ class TeamDetailBody extends StatelessWidget {
 
   const TeamDetailBody({super.key, required this.detail});
 
-  Future<void> _launchUrl(String url) async {
-    final uri = Uri.parse(url);
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  Future<void> _launchUrl(BuildContext context, String url) async {
+    try {
+      final uri = Uri.parse(url);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      if (context.mounted) context.showErrorSnackBar('링크를 열 수 없습니다.');
+    }
   }
 
-  Future<void> _openStadium(String stadiumName) async {
-    final appUri = StadiumMap.naverMapUri(stadiumName);
-    if (await canLaunchUrl(appUri)) {
-      await launchUrl(appUri);
-      return;
+  Future<void> _openStadium(BuildContext context, String stadiumName) async {
+    try {
+      final appUri = StadiumMap.naverMapUri(stadiumName);
+      if (await canLaunchUrl(appUri)) {
+        await launchUrl(appUri);
+        return;
+      }
+      final webUri = StadiumMap.naverMapWebUri(stadiumName);
+      await launchUrl(webUri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      if (context.mounted) context.showErrorSnackBar('지도를 열 수 없습니다.');
     }
-    final webUri = StadiumMap.naverMapWebUri(stadiumName);
-    await launchUrl(webUri, mode: LaunchMode.externalApplication);
   }
 
   void _onMatchTap(BuildContext context, ClubMatch m) {
@@ -78,7 +87,7 @@ class TeamDetailBody extends StatelessWidget {
                 Text(detail.clubName, style: CustomTextStyle.heading1),
                 AppSpacing.h8,
                 GestureDetector(
-                  onTap: () => _openStadium(detail.venueName),
+                  onTap: () => _openStadium(context, detail.venueName),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -104,7 +113,7 @@ class TeamDetailBody extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       GestureDetector(
-                        onTap: () => _launchUrl(socialLinks.youtube),
+                        onTap: () => _launchUrl(context, socialLinks.youtube),
                         child: SvgPicture.asset(
                           TwelfthAssets.youtube,
                           width: 30,
@@ -113,7 +122,7 @@ class TeamDetailBody extends StatelessWidget {
                       ),
                       const SizedBox(width: 50),
                       GestureDetector(
-                        onTap: () => _launchUrl(socialLinks.instagram),
+                        onTap: () => _launchUrl(context, socialLinks.instagram),
                         child: SvgPicture.asset(
                           TwelfthAssets.instagram,
                           width: 30,

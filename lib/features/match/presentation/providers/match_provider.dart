@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/core/network/api_client.dart';
-import 'package:twelfth_mobile/core/network/api_endpoints.dart';
 import 'package:twelfth_mobile/core/network/dio.dart';
 import 'package:twelfth_mobile/core/providers/player_cache_provider.dart';
 import 'package:twelfth_mobile/features/match/data/datasources/match_remote_datasource.dart';
@@ -50,6 +49,20 @@ final matchesByDateProvider =
 
 final matchDetailProvider = FutureProvider.family<Match, int>((ref, matchId) {
   return ref.read(_getMatchDetailUseCaseProvider).call(matchId);
+});
+
+final liveMatchScoreProvider = StreamProvider.family<Match, int>((
+  ref,
+  matchId,
+) async* {
+  final useCase = ref.read(_getMatchDetailUseCaseProvider);
+  while (true) {
+    try {
+      yield await useCase.call(matchId);
+    } catch (_) {
+    }
+    await Future<void>.delayed(const Duration(seconds: 15));
+  }
 });
 
 final enhancedMatchDetailProvider = FutureProvider.family<Match, int>((

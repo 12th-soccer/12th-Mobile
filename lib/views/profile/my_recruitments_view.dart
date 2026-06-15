@@ -6,7 +6,6 @@ import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
-import 'package:twelfth_mobile/features/recruitment/domain/entities/recruitment.dart';
 import 'package:twelfth_mobile/features/recruitment/domain/entities/joined_recruitment.dart';
 import 'package:twelfth_mobile/features/recruitment/presentation/providers/recruitment_provider.dart';
 
@@ -152,7 +151,7 @@ class _MyJoinedRecruitmentItem extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isExpired ? CustomColor.gray800.withOpacity(0.5) : CustomColor.gray800,
+          color: isExpired ? CustomColor.gray800.withValues(alpha: 0.5) : CustomColor.gray800,
           borderRadius: AppRadius.lg,
         ),
         child: Column(

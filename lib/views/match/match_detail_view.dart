@@ -16,6 +16,7 @@ import 'package:twelfth_mobile/features/match/domain/entities/match.dart';
 import 'package:twelfth_mobile/features/match/domain/entities/match_event.dart';
 import 'package:twelfth_mobile/features/match/presentation/providers/match_provider.dart';
 import 'package:twelfth_mobile/features/search/presentation/providers/search_provider.dart';
+import 'package:twelfth_mobile/views/match/live_chat_view.dart';
 import 'package:twelfth_mobile/views/match/widgets/center_section.dart';
 import 'package:twelfth_mobile/views/match/widgets/event_section.dart';
 import 'package:twelfth_mobile/views/match/widgets/lineup_section.dart';
@@ -189,6 +190,20 @@ class MatchDetailView extends ConsumerWidget {
                   ),
                   homeImageUrl: match.homeTeamImageUrl,
                   awayImageUrl: match.awayTeamImageUrl,
+                  onLiveChatTap: state != MatchState.upcoming
+                      ? () => context.push(
+                            AppRoutes.liveChat,
+                            extra: LiveChatExtra(
+                              matchId: match.matchId,
+                              homeTeam: match.homeTeamName,
+                              awayTeam: match.awayTeamName,
+                              homeImageUrl: match.homeTeamImageUrl,
+                              awayImageUrl: match.awayTeamImageUrl,
+                              homeScore: match.homeTeamScore,
+                              awayScore: match.awayTeamScore,
+                            ),
+                          )
+                      : null,
                 );
               },
             ),
@@ -236,6 +251,7 @@ class _MatchHeader extends StatelessWidget {
   final VoidCallback? onAwayTap;
   final String? homeImageUrl;
   final String? awayImageUrl;
+  final VoidCallback? onLiveChatTap;
 
   const _MatchHeader({
     required this.homeTeam,
@@ -249,16 +265,21 @@ class _MatchHeader extends StatelessWidget {
     this.onAwayTap,
     this.homeImageUrl,
     this.awayImageUrl,
+    this.onLiveChatTap,
   });
 
-  Future<void> _openStadium(String stadiumName) async {
-    final appUri = StadiumMap.naverMapUri(stadiumName);
-    if (await canLaunchUrl(appUri)) {
-      await launchUrl(appUri);
-      return;
+  Future<void> _openStadium(BuildContext context, String stadiumName) async {
+    try {
+      final appUri = StadiumMap.naverMapUri(stadiumName);
+      if (await canLaunchUrl(appUri)) {
+        await launchUrl(appUri);
+        return;
+      }
+      final webUri = StadiumMap.naverMapWebUri(stadiumName);
+      await launchUrl(webUri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      if (context.mounted) context.showErrorSnackBar('지도를 열 수 없습니다.');
     }
-    final webUri = StadiumMap.naverMapWebUri(stadiumName);
-    await launchUrl(webUri, mode: LaunchMode.externalApplication);
   }
 
   @override
@@ -267,36 +288,58 @@ class _MatchHeader extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            child: _TeamColumn(
-              name: homeTeam,
-              imageUrl: homeImageUrl,
-              onTap: onHomeTap,
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: _TeamColumn(
+                  name: homeTeam,
+                  imageUrl: homeImageUrl,
+                  onTap: onHomeTap,
+                ),
+              ),
+              Padding(
+                padding: AppPadding.cardH,
+                child: CenterSection(
+                  matchState: matchState,
+                  homeScore: homeScore,
+                  awayScore: awayScore,
+                  dateStr: dateStr,
+                  timeStr: timeStr,
+                  stadiumName: stadiumName,
+                  onStadiumTap: stadiumName != null
+                      ? () => _openStadium(context, stadiumName)
+                      : null,
+                ),
+              ),
+              Expanded(
+                child: _TeamColumn(
+                  name: awayTeam,
+                  imageUrl: awayImageUrl,
+                  onTap: onAwayTap,
+                ),
+              ),
+            ],
           ),
-          Padding(
-            padding: AppPadding.cardH,
-            child: CenterSection(
-              matchState: matchState,
-              homeScore: homeScore,
-              awayScore: awayScore,
-              dateStr: dateStr,
-              timeStr: timeStr,
-              stadiumName: stadiumName,
-              onStadiumTap: stadiumName != null
-                  ? () => _openStadium(stadiumName)
-                  : null,
+          if (onLiveChatTap != null) ...[
+            AppSpacing.h12,
+            Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                onTap: onLiveChatTap,
+                behavior: HitTestBehavior.opaque,
+                child: Text(
+                  '실시간 채팅 바로가기',
+                  style: CustomTextStyle.body3.copyWith(
+                    color: CustomColor.white,
+                    decoration: TextDecoration.underline,
+                    decorationColor: CustomColor.white,
+                  ),
+                ),
+              ),
             ),
-          ),
-          Expanded(
-            child: _TeamColumn(
-              name: awayTeam,
-              imageUrl: awayImageUrl,
-              onTap: onAwayTap,
-            ),
-          ),
+          ],
         ],
       ),
     );
