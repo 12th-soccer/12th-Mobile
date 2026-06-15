@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
@@ -91,10 +90,7 @@ List<Recruitment> _applyFilters(List<Recruitment> posts) {
       appBar: AppBar(
         backgroundColor: CustomColor.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Symbols.arrow_back_ios, color: CustomColor.white),
-          onPressed: () => context.pop(),
-        ),
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         children: [
@@ -160,7 +156,7 @@ List<Recruitment> _applyFilters(List<Recruitment> posts) {
         onPressed: () => context.push(AppRoutes.fanFinderWrite),
         backgroundColor: CustomColor.main,
         shape: const CircleBorder(),
-        child: const Icon(Symbols.add, color: CustomColor.black),
+        child: const Icon(Icons.add, color: CustomColor.black),
       ),
     );
   }
@@ -366,7 +362,7 @@ List<Recruitment> _applyFilters(List<Recruitment> posts) {
                     ),
                     trailing: isSel
                         ? const Icon(
-                            Symbols.check,
+                            Icons.check,
                             color: CustomColor.main,
                             size: 18,
                           )
@@ -431,7 +427,7 @@ List<Recruitment> _applyFilters(List<Recruitment> posts) {
                       ),
                     ),
                     trailing: isSel
-                        ? const Icon(Symbols.check, color: CustomColor.main, size: 18)
+                        ? const Icon(Icons.check, color: CustomColor.main, size: 18)
                         : null,
                     onTap: () {
                       onSelect(t);
@@ -490,7 +486,7 @@ class _RecruitmentListItem extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                const Icon(Symbols.group, color: CustomColor.gray500, size: 14),
+                const Icon(Icons.group, color: CustomColor.gray500, size: 14),
                 const SizedBox(width: 3),
                 Text(
                   '${recruitment.currentParticipants ?? 0}/${recruitment.headCount}명',

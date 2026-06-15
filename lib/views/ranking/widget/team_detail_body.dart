@@ -5,7 +5,6 @@ import 'package:twelfth_mobile/core/constants/stadium_map.dart';
 import 'package:twelfth_mobile/core/constants/team_social_links.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
@@ -92,7 +91,7 @@ class TeamDetailBody extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(
-                        Symbols.location_on,
+                        Icons.location_on,
                         size: 16,
                         color: CustomColor.main,
                         fill: 1,

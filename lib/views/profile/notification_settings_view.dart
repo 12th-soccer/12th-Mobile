@@ -18,14 +18,14 @@ class NotificationSettingsView extends ConsumerWidget {
     return settingsAsync.when(
       loading: () => Scaffold(
         backgroundColor: CustomColor.background,
-        appBar: const TwelfthAppBar(),
+        appBar: const TwelfthAppBar(showBackButton: false),
         body: const Center(
           child: CircularProgressIndicator(color: CustomColor.white),
         ),
       ),
       error: (e, _) => Scaffold(
         backgroundColor: CustomColor.background,
-        appBar: const TwelfthAppBar(),
+        appBar: const TwelfthAppBar(showBackButton: false),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -110,6 +110,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     return Scaffold(
       backgroundColor: CustomColor.background,
       appBar: TwelfthAppBar(
+        showBackButton: false,
         actions: [
           TextButton(
             onPressed: _hasChanges ? _save : null,

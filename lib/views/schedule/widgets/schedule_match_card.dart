@@ -2,7 +2,6 @@ import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
@@ -203,7 +202,7 @@ class _NormalRow extends StatelessWidget {
         centerWidget = Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Symbols.lock, size: 14, color: CustomColor.gray500),
+            const Icon(Icons.lock, size: 14, color: CustomColor.gray500),
             AppSpacing.w4,
             Text(
               '결과 보기',

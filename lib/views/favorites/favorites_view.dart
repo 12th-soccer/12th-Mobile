@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
@@ -142,9 +141,8 @@ class _FavoritesViewState extends ConsumerState<FavoritesView> {
                         .read(favoritesNotifierProvider.notifier)
                         .toggleFavorite(club.clubId, club.clubName),
                     child: const Icon(
-                      Symbols.star,
+                      Icons.star,
                       color: CustomColor.yellow,
-                      fill: 1.0,
                       size: 20,
                     ),
                   ),
@@ -210,9 +208,8 @@ class _FavoritesViewState extends ConsumerState<FavoritesView> {
                         .read(favoritePlayersNotifierProvider.notifier)
                         .toggleFavorite(player.playerId, player.playerName),
                     child: const Icon(
-                      Symbols.star,
+                      Icons.star,
                       color: CustomColor.yellow,
-                      fill: 1,
                       size: 20,
                     ),
                   ),

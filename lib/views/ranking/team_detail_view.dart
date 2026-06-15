@@ -1,7 +1,6 @@
 import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
@@ -34,12 +33,12 @@ class TeamDetailView extends ConsumerWidget {
       backgroundColor: CustomColor.background,
       appBar: TwelfthAppBar(
         title: '구단 상세',
+        showBackButton: false,
         actions: [
           IconButton(
             icon: Icon(
-              Symbols.star,
+              isFavorite ? Icons.star : Icons.star_border,
               color: isFavorite ? CustomColor.yellow : CustomColor.main,
-              fill: isFavorite ? 1 : 0,
             ),
             onPressed: () async {
               try {

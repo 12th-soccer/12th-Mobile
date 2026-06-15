@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:twelfth_mobile/core/network/api_endpoints.dart';
 import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/features/search/data/models/search_models.dart';
@@ -28,9 +27,6 @@ class SearchRemoteDataSourceImpl implements ISearchRemoteDataSource {
           if (data == null) return <ClubSearchResultModel>[];
           final list = _toList(data);
           if (list.isNotEmpty) {
-            debugPrint(
-              '[Search] club raw keys: ${(list.first as Map<String, dynamic>).keys.toList()}',
-            );
           }
           return list
               .map(
@@ -62,11 +58,6 @@ class SearchRemoteDataSourceImpl implements ISearchRemoteDataSource {
         decoder: (data) {
           if (data == null) return <PlayerSearchResultModel>[];
           final list = _toList(data);
-          if (list.isNotEmpty) {
-            final first = list.first as Map<String, dynamic>;
-            debugPrint('[Search] player raw keys: ${first.keys.toList()}');
-            debugPrint('[Search] player first item: $first');
-          }
           return list
               .map(
                 (e) =>
@@ -80,9 +71,6 @@ class SearchRemoteDataSourceImpl implements ISearchRemoteDataSource {
       if (e.statusCode != 400 && e.statusCode != 404) rethrow;
     }
 
-    debugPrint(
-      '[Search] falling back to full player list for keyword: $keyword',
-    );
     final allPlayers = <PlayerSearchResultModel>[];
 
     final fallbackSeason = season ?? DateTime.now().year.toString();

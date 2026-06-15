@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 
@@ -31,7 +30,7 @@ class TwelfthAppBar extends StatelessWidget implements PreferredSizeWidget {
           ? (leading ??
                 IconButton(
                   icon: const Icon(
-                    Symbols.arrow_back_ios_new,
+                    Icons.arrow_back_ios,
                     color: CustomColor.white,
                     size: 20,
                   ),

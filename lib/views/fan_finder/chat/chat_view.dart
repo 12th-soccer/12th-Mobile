@@ -1,8 +1,6 @@
 import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
@@ -84,10 +82,7 @@ class _ChatViewState extends ConsumerState<ChatView> {
       appBar: AppBar(
         backgroundColor: CustomColor.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Symbols.arrow_back_ios, color: CustomColor.white),
-          onPressed: () => context.pop(),
-        ),
+        automaticallyImplyLeading: false,
         title: Text(
           '그룹공지방',
           style: CustomTextStyle.body1.copyWith(
@@ -114,7 +109,7 @@ class _ChatViewState extends ConsumerState<ChatView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Symbols.hourglass_empty, color: CustomColor.gray500, size: 40),
+              const Icon(Icons.hourglass_empty, color: CustomColor.gray500, size: 40),
               AppSpacing.h16,
               Text(
                 '아직 공지방이 생성되지 않았습니다.',
@@ -176,7 +171,7 @@ class _ChatViewState extends ConsumerState<ChatView> {
         children: [
           Row(
             children: [
-              const Icon(Symbols.campaign, color: CustomColor.main, size: 18),
+              const Icon(Icons.campaign, color: CustomColor.main, size: 18),
               AppSpacing.w8,
               Text(
                 '모임',
@@ -371,7 +366,7 @@ class _ChatViewState extends ConsumerState<ChatView> {
                   ? const CircularProgressIndicator(
                       strokeWidth: 2, color: CustomColor.main)
                   : const Icon(
-                      Symbols.send, size: 18, color: CustomColor.main),
+                      Icons.send, size: 18, color: CustomColor.main),
             ),
           ),
         ],

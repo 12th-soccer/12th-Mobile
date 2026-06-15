@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
@@ -10,6 +11,7 @@ import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
+import 'package:twelfth_mobile/core/router/router.dart';
 import 'package:twelfth_mobile/features/auth/presentation/google_oauth_launcher.dart';
 import 'package:twelfth_mobile/features/auth/presentation/providers/auth_provider.dart';
 
@@ -20,21 +22,41 @@ class LoginView extends ConsumerStatefulWidget {
   ConsumerState<LoginView> createState() => _LoginViewState();
 }
 
-class _LoginViewState extends ConsumerState<LoginView> {
+class _LoginViewState extends ConsumerState<LoginView>
+    with WidgetsBindingObserver {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isGoogleLoading = false;
 
   static const _smallSpacing = AppSpacing.h8;
   static const _middleSpacing = AppSpacing.h10;
   static const _bigSpacing = AppSpacing.h20;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed || !_isGoogleLoading) return;
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted && _isGoogleLoading) {
+        GoogleOAuthLauncher.cancel();
+        setState(() => _isGoogleLoading = false);
+      }
+    });
   }
 
   Future<void> _onLogin() async {
@@ -56,20 +78,23 @@ class _LoginViewState extends ConsumerState<LoginView> {
   }
 
   Future<void> _onGoogleLogin() async {
+    if (_isGoogleLoading) return;
+    setState(() => _isGoogleLoading = true);
     try {
       final success = await GoogleOAuthLauncher.open();
-      if (!mounted || !success) return;
-      try {
-        ref.invalidate(userInfoProvider);
-        await ref.read(userInfoProvider.future);
-      } catch (_) {
-        ref.invalidate(userInfoProvider);
+      if (!success) return;
+      appRouter.go(AppRoutes.schedule);
+      ref.invalidate(userInfoProvider);
+    } catch (e) {
+      final isCancelled =
+          e.toString().contains('cancelled') ||
+          e is TimeoutException;
+      if (!mounted) return;
+      if (!isCancelled) {
+        context.showErrorSnackBar('구글 로그인에 실패했습니다. 다시 시도해 주세요.');
       }
-      if (!mounted) return;
-      context.go(AppRoutes.schedule);
-    } catch (_) {
-      if (!mounted) return;
-      context.showErrorSnackBar('구글 로그인을 시작하지 못했습니다.');
+    } finally {
+      if (mounted) setState(() => _isGoogleLoading = false);
     }
   }
 
@@ -130,8 +155,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword
-                              ? Symbols.visibility_off
-                              : Symbols.visibility,
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           color: CustomColor.gray600,
                         ),
                         onPressed: () => setState(
@@ -187,9 +212,18 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   TwelfthElevatedButton(
                     backgroundColor: CustomColor.white,
                     textColor: CustomColor.black,
-                    imgPath: TwelfthAssets.google,
-                    onPressed: _onGoogleLogin,
-                    child: const Text('구글 계정으로 로그인'),
+                    imgPath: _isGoogleLoading ? null : TwelfthAssets.google,
+                    onPressed: _isGoogleLoading ? null : _onGoogleLogin,
+                    child: _isGoogleLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: CustomColor.black,
+                            ),
+                          )
+                        : const Text('구글 계정으로 로그인'),
                   ),
                   AppSpacing.h48,
                 ],

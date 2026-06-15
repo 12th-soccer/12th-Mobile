@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/constants/spacing.dart';
@@ -78,7 +77,7 @@ class _FilterToggleSectionState extends State<FilterToggleSection>
                 RotationTransition(
                   turns: _arrowTurn,
                   child: const Icon(
-                    Symbols.chevron_right,
+                    Icons.chevron_right,
                     color: CustomColor.gray500,
                     size: 18,
                   ),

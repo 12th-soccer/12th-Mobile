@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/app_bar/twelfth_app_bar.dart';
 import 'package:twelfth_mobile/common/components/button/elevated_button.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
@@ -64,7 +63,7 @@ class OnboardingSearchLayout<T> extends StatelessWidget {
                   decoration: InputDecoration(
                     hintText: hintText,
                     prefixIcon: Icon(
-                      Symbols.search,
+                      Icons.search,
                       color: CustomColor.gray600,
                       size: 20,
                     ),

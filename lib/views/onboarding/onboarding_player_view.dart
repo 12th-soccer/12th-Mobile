@@ -68,7 +68,6 @@ class _OnboardingPlayerViewState extends ConsumerState<OnboardingPlayerView> {
       try {
         await _favoritesDs.addFavoritePlayer(_selected!.playerId);
       } catch (e) {
-        debugPrint('[Onboarding] addFavoritePlayer failed: $e');
       }
     }
     if (mounted) context.push(AppRoutes.onboardingTeam, extra: _selected?.name);

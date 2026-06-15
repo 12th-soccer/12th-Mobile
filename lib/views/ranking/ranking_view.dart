@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
@@ -163,7 +162,7 @@ class _RankingViewState extends ConsumerState<RankingView> {
                       ),
                       AppSpacing.w4,
                       const Icon(
-                        Symbols.expand_more,
+                        Icons.expand_more,
                         color: CustomColor.black,
                         size: 16,
                       ),
@@ -303,11 +302,10 @@ class _RankingViewState extends ConsumerState<RankingView> {
                         }
                       },
                       child: Icon(
-                        Symbols.star,
+                        isFavorite ? Icons.star : Icons.star_border,
                         color: isFavorite
                             ? CustomColor.yellow
                             : CustomColor.main,
-                        fill: isFavorite ? 1 : 0,
                         size: 20,
                       ),
                     ),

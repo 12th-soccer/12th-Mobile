@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/bottom_nav/twelfth_bottom_nav_bar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/router/router_paths.dart';
@@ -41,7 +40,7 @@ class _TwelfthMainAppState extends ConsumerState<TwelfthMainApp> {
         backgroundColor: CustomColor.main,
         shape: const CircleBorder(),
         tooltip: '팬 찾기',
-        child: const Icon(Symbols.group, color: CustomColor.black, size: 26),
+        child: const Icon(Icons.group, color: CustomColor.black, size: 26),
       ),
     );
   }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/constants/spacing.dart';
@@ -115,7 +114,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
     return Column(
       children: [
         _buildMenuItem(
-          icon: Symbols.badge,
+          icon: Icons.badge,
           label: '닉네임 수정',
           onTap: () async {
             final updated = await context.push<String>(AppRoutes.editUsername);
@@ -126,22 +125,22 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
           },
         ),
         _buildMenuItem(
-          icon: Symbols.group,
+          icon: Icons.groups,
           label: '모임 모아보기',
           onTap: () => context.push(AppRoutes.myRecruitments),
         ),
         _buildMenuItem(
-          icon: Symbols.schedule,
+          icon: Icons.schedule,
           label: '알림 설정',
           onTap: () => context.push(AppRoutes.notifications),
         ),
         _buildMenuItem(
-          icon: Symbols.visibility_off,
+          icon: Icons.visibility_off,
           label: '노 스포일러',
           onTap: () => context.push(AppRoutes.noSpoiler),
         ),
         _buildMenuItem(
-          icon: Symbols.exit_to_app,
+          icon: Icons.exit_to_app,
           label: '로그아웃',
           onTap: () async {
             await ref.read(authNotifierProvider.notifier).logout();
@@ -152,7 +151,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
           },
         ),
         _buildMenuItem(
-          icon: Symbols.person_remove,
+          icon: Icons.person_remove,
           label: '회원 탈퇴',
           color: CustomColor.red,
           onTap: () => _showDeleteAccountDialog(),

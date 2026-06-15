@@ -2,7 +2,6 @@ import 'package:twelfth_mobile/core/constants/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/constants/text_style.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/extensions/snackbar_extension.dart';
@@ -29,18 +28,12 @@ class _FanFinderDetailViewState extends ConsumerState<FanFinderDetailView> {
 
   bool _isAuthor(Recruitment recruitment) {
     final userInfo = ref.read(userInfoProvider).valueOrNull;
-    print('=== 작성자 판별 ===');
-    print('현재 사용자 ID: ${userInfo?.userId}');
-    print('작성자 ID: ${recruitment.authorId}');
-    print('작성자 이름: ${recruitment.authorName}');
 
     if (userInfo == null || recruitment.authorId == null) {
-      print('판별 실패: userInfo 또는 authorId가 null');
       return false;
     }
 
     final isAuthor = userInfo.userId == recruitment.authorId;
-    print('작성자 여부: $isAuthor');
     return isAuthor;
   }
 
@@ -157,15 +150,10 @@ class _FanFinderDetailViewState extends ConsumerState<FanFinderDetailView> {
 
       final updatedRecruitment = await ref.read(recruitmentDetailProvider(id).future);
 
-      print('=== 공지방 생성 후 데이터 확인 ===');
-      print('noticeId: ${updatedRecruitment.noticeId}');
-      print('recruitment ID: ${updatedRecruitment.id}');
-
       if (!mounted) return;
       context.showSuccessSnackBar('공지방이 생성됐습니다.');
 
       if (updatedRecruitment.noticeId == null) {
-        print('❌ 서버 문제: 공지방 생성 후에도 noticeId가 null입니다.');
         context.showErrorSnackBar('공지방이 생성되었지만 입장에 실패했습니다. 잠시 후 다시 시도해주세요.');
         return;
       }
@@ -274,10 +262,7 @@ class _FanFinderDetailViewState extends ConsumerState<FanFinderDetailView> {
       appBar: AppBar(
         backgroundColor: CustomColor.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Symbols.arrow_back_ios, color: CustomColor.white),
-          onPressed: () => context.pop(),
-        ),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: FanFinderConstants.horizontalScreenPadding,
@@ -331,7 +316,7 @@ class _FanFinderDetailViewState extends ConsumerState<FanFinderDetailView> {
             FanFinderConstants.spaceM,
             Row(
               children: [
-                const Icon(Symbols.group, color: CustomColor.main, size: 18),
+                const Icon(Icons.group, color: CustomColor.main, size: 18),
                 FanFinderConstants.spaceHXS,
                 Text(
                   current.currentParticipants != null

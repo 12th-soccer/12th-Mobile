@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twelfth_mobile/core/network/api_client.dart';
 import 'package:twelfth_mobile/core/network/dio.dart';
@@ -73,7 +72,6 @@ class SearchNotifier extends Notifier<SearchState> {
       if (state.filter == SearchFilter.club) {
         final clubs = await ref.read(_searchClubsUseCaseProvider).call(q);
         if (requestId != _requestId) return;
-        debugPrint('[Search] clubs count: ${clubs.length}');
         state = clubs.isEmpty
             ? state.copyWith(status: SearchStatus.empty, clubs: [])
             : state.copyWith(status: SearchStatus.success, clubs: clubs);
@@ -82,19 +80,16 @@ class SearchNotifier extends Notifier<SearchState> {
             .read(_searchPlayersUseCaseProvider)
             .call(q, season: state.selectedSeason);
         if (requestId != _requestId) return;
-        debugPrint('[Search] players count: ${players.length}');
         state = players.isEmpty
             ? state.copyWith(status: SearchStatus.empty, players: [])
             : state.copyWith(status: SearchStatus.success, players: players);
       }
     } on ApiException catch (e) {
-      debugPrint('[Search] ApiException: $e');
       state = state.copyWith(
         status: SearchStatus.error,
         errorMessage: _parseError(e),
       );
-    } catch (e, stack) {
-      debugPrint('[Search] unexpected error: $e\n$stack');
+    } catch (e) {
       state = state.copyWith(
         status: SearchStatus.error,
         errorMessage: '오류가 발생했습니다. 다시 시도해 주세요',

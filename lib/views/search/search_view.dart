@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:twelfth_mobile/common/components/image/network_avatar.dart';
 import 'package:twelfth_mobile/core/constants/color.dart';
 import 'package:twelfth_mobile/core/constants/spacing.dart';
@@ -83,8 +82,6 @@ class _SearchViewState extends ConsumerState<SearchView> {
     final showResults =
         searchState.status != SearchStatus.initial ||
         _searchController.text.isNotEmpty;
-    final isPlayerFilter = searchState.filter == SearchFilter.player;
-
     return GestureDetector(
       onTap: () => _focusNode.unfocus(),
       child: Scaffold(
@@ -95,7 +92,8 @@ class _SearchViewState extends ConsumerState<SearchView> {
             children: [
               _buildTopBar(searchState),
               const Divider(color: CustomColor.main, height: 1),
-              if (isPlayerFilter) _buildSeasonDropdown(searchState),
+              if (searchState.filter == SearchFilter.player)
+                _buildSeasonDropdown(searchState),
               Expanded(
                 child: showResults
                     ? _buildResultsSection(searchState)
@@ -172,7 +170,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
                   ),
                   AppSpacing.w4,
                   const Icon(
-                    Symbols.expand_more,
+                    Icons.expand_more,
                     color: CustomColor.black,
                     size: 16,
                   ),
@@ -187,14 +185,11 @@ class _SearchViewState extends ConsumerState<SearchView> {
 
   Widget _buildTopBar(SearchState state) {
     final filterLabel = state.filter == SearchFilter.player ? '선수' : '구단';
+    final hasText = _searchController.text.isNotEmpty;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: _clearField,
-            child: const Icon(Symbols.arrow_back_ios, color: CustomColor.main),
-          ),
           Expanded(
             child: TextField(
               controller: _searchController,
@@ -211,6 +206,16 @@ class _SearchViewState extends ConsumerState<SearchView> {
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
+                suffixIcon: hasText
+                    ? GestureDetector(
+                        onTap: _clearField,
+                        child: const Icon(
+                          Icons.close,
+                          color: CustomColor.gray500,
+                          size: 20,
+                        ),
+                      )
+                    : null,
               ),
               onSubmitted: (v) => _onChanged(v),
               onChanged: (v) {
@@ -219,6 +224,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
               },
             ),
           ),
+          AppSpacing.w8,
           _FilterDropdown(label: filterLabel, onSelected: _onFilterChanged),
         ],
       ),
@@ -387,7 +393,7 @@ class _FilterDropdown extends StatelessWidget {
                 Text(label, style: CustomTextStyle.body2),
                 AppSpacing.w4,
                 const Icon(
-                  Symbols.keyboard_arrow_down,
+                  Icons.keyboard_arrow_down,
                   color: CustomColor.white,
                   size: 16,
                 ),

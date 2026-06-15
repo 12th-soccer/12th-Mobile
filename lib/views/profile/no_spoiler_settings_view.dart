@@ -40,14 +40,14 @@ class _NoSpoilerSettingsViewState extends ConsumerState<NoSpoilerSettingsView> {
     return settingsAsync.when(
       loading: () => Scaffold(
         backgroundColor: CustomColor.background,
-        appBar: const TwelfthAppBar(title: '노 스포일러'),
+        appBar: const TwelfthAppBar(title: '노 스포일러', showBackButton: false),
         body: const Center(
           child: CircularProgressIndicator(color: CustomColor.white),
         ),
       ),
       error: (e, _) => Scaffold(
         backgroundColor: CustomColor.background,
-        appBar: const TwelfthAppBar(title: '노 스포일러'),
+        appBar: const TwelfthAppBar(title: '노 스포일러', showBackButton: false),
         body: Center(
           child: Text(
             '설정을 불러오지 못했습니다',
@@ -66,6 +66,7 @@ class _NoSpoilerSettingsViewState extends ConsumerState<NoSpoilerSettingsView> {
           backgroundColor: CustomColor.background,
           appBar: TwelfthAppBar(
             title: '노 스포일러',
+            showBackButton: false,
             actions: [
               TextButton(
                 onPressed: _hasChanges ? _save : null,

@@ -18,7 +18,6 @@ class NetworkAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       final localImagePath = _getLocalImagePath(imageUrl!);
-      print('[NetworkAvatar] imageUrl: $imageUrl, localPath: $localImagePath');
       if (localImagePath != null) {
         return ClipOval(
           child: localImagePath.endsWith('.svg')
@@ -47,7 +46,6 @@ class NetworkAvatar extends StatelessWidget {
           fit: BoxFit.cover,
           loadingBuilder: (context, child, loadingProgress) {
             if (loadingProgress == null) {
-              print('[NetworkAvatar] Successfully loaded: $imageUrl');
               return child;
             }
             return Container(
@@ -57,12 +55,11 @@ class NetworkAvatar extends StatelessWidget {
               child: const SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                child: CircularProgressIndicator(strokeWidth: 2, color: CustomColor.white),
               ),
             );
           },
           errorBuilder: (context, error, stackTrace) {
-            print('[NetworkAvatar] Failed to load: $imageUrl, Error: $error');
             return _placeholder();
           },
         ),
@@ -83,13 +80,10 @@ class NetworkAvatar extends StatelessWidget {
   );
 
   String? _getLocalImagePath(String imageUrl) {
-    print('[NetworkAvatar] Checking local image for URL: $imageUrl');
 
     if (imageUrl.startsWith('local://')) {
       final fileName = imageUrl.substring(8);
-      print('[NetworkAvatar] Found local:// scheme, fileName: $fileName');
       if (fileName == 'yonginfc.svg') {
-        print('[NetworkAvatar] Converting SVG to PNG for yonginfc');
         return 'assets/images/yonginfc.png';
       }
       return 'assets/images/$fileName';
@@ -98,7 +92,6 @@ class NetworkAvatar extends StatelessWidget {
     if (imageUrl.contains('9171') ||
         imageUrl.toLowerCase().contains('yongin') ||
         imageUrl.contains('teams/9171.png')) {
-      print('[NetworkAvatar] Found Yongin FC pattern (ID: 9171), using local PNG');
       return 'assets/images/yonginfc.png';
     }
 
