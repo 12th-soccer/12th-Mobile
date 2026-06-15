@@ -138,7 +138,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
                       vertical: 2,
                     ),
                     child: Text(
-                      '${season}년',
+                      '$season년',
                       style: CustomTextStyle.body2.copyWith(
                         color: season == state.selectedSeason
                             ? CustomColor.main

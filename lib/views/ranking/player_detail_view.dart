@@ -95,8 +95,6 @@ class PlayerDetailView extends ConsumerWidget {
 class _InfoGrid extends StatelessWidget {
   final PlayerDetail detail;
 
-  static const _vGap20 = SizedBox(height: 20);
-
   const _InfoGrid({required this.detail});
 
   @override
