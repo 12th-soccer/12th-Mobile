@@ -17,6 +17,7 @@ abstract final class AppRoutes {
   static const profile = '/profile';
 
   static const match = '/match';
+  static const liveChat = '/match/live-chat';
   static const team = '/team';
   static const player = '/player';
   static const notifications = '/notifications';

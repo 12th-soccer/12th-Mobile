@@ -71,10 +71,19 @@ class ApiEndpoints {
   static String commentList(String noticeId) => '/comment/$noticeId';
   static String commentCreate(String noticeId) => '/comment/$noticeId';
 
+  /// live chat
+  static final liveChatWebSocket =
+      '${baseUrl.replaceFirst('http', 'ws')}/ws';
+  static String liveChatSubscribe(int matchId) => '/pub/match/$matchId';
+  static String liveChatSend(int matchId) => '/sub/match/$matchId';
+  static String liveChatHistory(int matchId, {int page = 0, int size = 100}) =>
+      '/chat/$matchId?page=$page&size=$size';
+
   /// account
   static const deleteAccount = '/user/me';
 
   /// phone verification
+  static const phoneSend = '/user/phone/send';
   static const phoneVerify = '/user/phone/verify';
 
   /// notifications

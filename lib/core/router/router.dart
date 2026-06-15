@@ -9,6 +9,7 @@ import 'package:twelfth_mobile/views/favorites/favorites_view.dart';
 import 'package:twelfth_mobile/views/search/search_view.dart';
 import 'package:twelfth_mobile/views/main_app.dart';
 import 'package:twelfth_mobile/views/match/match_detail_view.dart';
+import 'package:twelfth_mobile/views/match/live_chat_view.dart';
 import 'package:twelfth_mobile/views/onboarding/onboarding_complete_view.dart';
 import 'package:twelfth_mobile/views/onboarding/onboarding_player_view.dart';
 import 'package:twelfth_mobile/views/onboarding/onboarding_team_view.dart';
@@ -140,6 +141,13 @@ final appRouter = GoRouter(
       builder: (context, state) {
         final extra = state.extra as MatchExtra;
         return MatchDetailView(extra: extra);
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.liveChat,
+      builder: (context, state) {
+        final extra = state.extra as LiveChatExtra;
+        return LiveChatView(extra: extra);
       },
     ),
     GoRoute(
